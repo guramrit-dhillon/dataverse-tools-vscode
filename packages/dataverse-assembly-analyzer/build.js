@@ -62,7 +62,7 @@ const buildAll = process.argv.includes("--all");
 const platformIdx = process.argv.indexOf("--platform");
 const platformArg = platformIdx !== -1 ? process.argv[platformIdx + 1] : undefined;
 
-const rids = buildAll ? RIDS : [platformArg || getCurrentRid()];
+const rids = buildAll ? RIDS : [platformArg || process.env.DOTNET_RID || getCurrentRid()];
 
 fs.mkdirSync(BIN_DIR, { recursive: true });
 for (const rid of rids) {
