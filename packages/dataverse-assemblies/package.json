@@ -4,7 +4,7 @@
   "license": "MIT",
   "displayName": "Dataverse Tools: Assemblies",
   "description": "Code-centric Dataverse assembly deployment and step management for VS Code",
-  "version": "0.1.0-preview",
+  "version": "0.1.1-preview",
   "publisher": "gdhillon",
   "engines": {
     "vscode": "^1.96.0"
