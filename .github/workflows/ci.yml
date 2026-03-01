@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm test
+
+  build-dotnet:
+    name: Build .NET (${{ matrix.rid }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - rid: win-x64
+            os: windows-latest
+          - rid: linux-x64
+            os: ubuntu-latest
+          - rid: osx-x64
+            os: macos-latest
+          - rid: osx-arm64
+            os: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Build analyzer (${{ matrix.rid }})
+        run: npm run build -w dataverse-assembly-analyzer
+        env:
+          DOTNET_RID: ${{ matrix.rid }}
+      - name: Build decompiler (${{ matrix.rid }})
+        run: npm run build -w assembly-decompiler
+        env:
+          DOTNET_RID: ${{ matrix.rid }}
+      - name: Upload analyzer binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: analyzer-${{ matrix.rid }}
+          path: packages/dataverse-assembly-analyzer/bin/${{ matrix.rid }}/
+          if-no-files-found: error
+      - name: Upload decompiler binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: decompiler-${{ matrix.rid }}
+          path: packages/assembly-decompiler/bin/${{ matrix.rid }}/
+          if-no-files-found: error

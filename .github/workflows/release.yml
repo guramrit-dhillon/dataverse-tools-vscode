@@ -1,0 +1,163 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-dotnet:
+    name: Build .NET (${{ matrix.rid }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - rid: win-x64
+            os: windows-latest
+          - rid: linux-x64
+            os: ubuntu-latest
+          - rid: osx-x64
+            os: macos-latest
+          - rid: osx-arm64
+            os: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Build analyzer
+        run: npm run build -w dataverse-assembly-analyzer
+        env:
+          DOTNET_RID: ${{ matrix.rid }}
+      - name: Build decompiler
+        run: npm run build -w assembly-decompiler
+        env:
+          DOTNET_RID: ${{ matrix.rid }}
+      - name: Upload analyzer binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: analyzer-${{ matrix.rid }}
+          path: packages/dataverse-assembly-analyzer/bin/${{ matrix.rid }}/
+          if-no-files-found: error
+      - name: Upload decompiler binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: decompiler-${{ matrix.rid }}
+          path: packages/assembly-decompiler/bin/${{ matrix.rid }}/
+          if-no-files-found: error
+
+  package:
+    name: Package VSIX (${{ matrix.extension }})
+    needs: build-dotnet
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        extension:
+          - dataverse-environments
+          # - dataverse-assemblies
+          # - dataverse-metadata
+          # - dataverse-assembly-decompiler
+          - plugin-trace-viewer
+          - fetchxml-builder
+          - dataverse-query-analyzer
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm install -g @vscode/vsce
+
+      # - name: Download all .NET binaries
+      #   if: matrix.extension == 'dataverse-assemblies' || matrix.extension == 'dataverse-assembly-decompiler'
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     pattern: "{analyzer,decompiler}-*"
+      #     merge-multiple: false
+
+      # - name: Copy analyzer binaries into package
+      #   if: matrix.extension == 'dataverse-assemblies'
+      #   run: |
+      #     for rid in win-x64 linux-x64 osx-x64 osx-arm64; do
+      #       mkdir -p packages/dataverse-assembly-analyzer/bin/$rid
+      #       cp -r analyzer-$rid/* packages/dataverse-assembly-analyzer/bin/$rid/
+      #     done
+
+      # - name: Copy decompiler binaries into package
+      #   if: matrix.extension == 'dataverse-assembly-decompiler'
+      #   run: |
+      #     for rid in win-x64 linux-x64 osx-x64 osx-arm64; do
+      #       mkdir -p packages/assembly-decompiler/bin/$rid
+      #       cp -r decompiler-$rid/* packages/assembly-decompiler/bin/$rid/
+      #     done
+
+      - name: Build extension
+        run: npm run build -w ${{ matrix.extension }}
+
+      - name: Package VSIX
+        run: vsce package -o ${{ matrix.extension }}.vsix
+        working-directory: packages/${{ matrix.extension }}
+
+      - name: Upload VSIX
+        uses: actions/upload-artifact@v4
+        with:
+          name: vsix-${{ matrix.extension }}
+          path: packages/${{ matrix.extension }}/${{ matrix.extension }}.vsix
+
+  release:
+    name: Create Release
+    needs: package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download all VSIX artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: vsix-*
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: "*.vsix"
+
+  publish:
+    name: Publish (${{ matrix.extension }})
+    needs: package
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    strategy:
+      max-parallel: 1
+      matrix:
+        extension:
+          - dataverse-environments
+          - fetchxml-builder
+          # - dataverse-assemblies
+          # - dataverse-metadata
+          - plugin-trace-viewer
+          # - dataverse-assembly-decompiler
+          - dataverse-query-analyzer
+    steps:
+      - name: Download VSIX
+        uses: actions/download-artifact@v4
+        with:
+          name: vsix-${{ matrix.extension }}
+
+      - name: Install vsce
+        run: npm install -g @vscode/vsce
+
+      - name: Publish to VS Code Marketplace
+        run: vsce publish --packagePath ${{ matrix.extension }}.vsix
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
