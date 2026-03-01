@@ -15,13 +15,15 @@ type FetchNodeKind =
   | "link-entity"
   | "filter"
   | "condition"
-  | "order";
+  | "order"
+  | "value";
 
 interface FetchNode {
   id: string;
   kind: FetchNodeKind;
   attrs: Record<string, string>;
   children: FetchNode[];
+  text?: string;
 }
 
 interface AttributeMeta {
@@ -300,6 +302,7 @@ type Action =
   | { type: "loadRelationships:response"; payload: RelationshipMeta[] }
   | { type: "loadRelationships:error"; payload: string }
   | { type: "updateNode"; payload: { id: string; attrs: Record<string, string> }; meta: { toExtension: true } }
+  | { type: "setConditionValues"; payload: { id: string; values: string[] }; meta: { toExtension: true } }
   | { type: "ready"; meta: { toExtension: true } }
   | { type: "executing"; payload: boolean }
   | { type: "setError"; payload: string | null };
@@ -781,7 +784,8 @@ function FilterForm({ draft, dispatch, commit }: {
   ], draft, dispatch, commit);
 }
 
-function ConditionForm({ draft, dispatch, commit, attributes, attributesLoading, attrTypeMap, linkedEntities, nodeId }: {
+function ConditionForm({ node, draft, dispatch, commit, attributes, attributesLoading, attrTypeMap, linkedEntities }: {
+  node: FetchNode;
   draft: Record<string, string>;
   dispatch: (a: Action) => void;
   commit: CommitFn;
@@ -789,7 +793,6 @@ function ConditionForm({ draft, dispatch, commit, attributes, attributesLoading,
   attributesLoading: boolean;
   attrTypeMap: Record<string, string>;
   linkedEntities: AutocompleteOption[];
-  nodeId: string;
 }): React.ReactElement {
   const selectedAttrType = attrTypeMap[draft.attribute ?? ""] ?? "";
   const operators = OPERATORS_BY_TYPE[selectedAttrType] ?? OPS_ALL;
@@ -810,7 +813,32 @@ function ConditionForm({ draft, dispatch, commit, attributes, attributesLoading,
     "next-fiscal-year", "next-fiscal-period",
     "last-fiscal-year", "last-fiscal-period",
   ]);
-  const multiValueOps = ["in", "not-in", "between", "not-between"];
+  const multiValueOps = new Set(["in", "not-in", "between", "not-between"]);
+  const isMultiValue = multiValueOps.has(operator);
+
+  // Local value list state for multi-value operators, derived from node children.
+  const initialValues = useMemo(
+    () => node.children.filter((c) => c.kind === "value").map((c) => c.text ?? ""),
+    [node.id] // eslint-disable-line react-hooks/exhaustive-deps
+  );
+  const [values, setValues] = useState<string[]>(initialValues);
+
+  // Sync values when switching nodes.
+  useEffect(() => {
+    setValues(node.children.filter((c) => c.kind === "value").map((c) => c.text ?? ""));
+  }, [node.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const commitValues = useCallback(
+    (next: string[]) => {
+      setValues(next);
+      dispatch({
+        type: "setConditionValues",
+        payload: { id: node.id, values: next },
+        meta: { toExtension: true },
+      });
+    },
+    [node.id, dispatch]
+  );
 
   const [attrQuery, setAttrQuery] = useState("");
   const filteredAttrs = useMemo(() => {
@@ -845,21 +873,56 @@ function ConditionForm({ draft, dispatch, commit, attributes, attributesLoading,
         />
       </div>
       {selectField("operator", "Operator *", operators, draft, dispatch, commit)}
-      {!noValueOps.has(operator) && (
+      {!noValueOps.has(operator) && !isMultiValue && (
         <div className="field">
-          <label htmlFor="condValue">
-            {multiValueOps.includes(operator) ? "Values (comma-separated)" : "Value"}
-          </label>
+          <label htmlFor="condValue">Value</label>
           <input
             id="condValue"
             type="text"
             value={draft.value ?? ""}
-            placeholder={multiValueOps.includes(operator) ? "e.g. value1, value2" : "Enter value"}
+            placeholder="Enter value"
             onChange={(e) =>
               dispatch({ type: "setField", payload: { key: "value", value: e.target.value } })
             }
             onBlur={(e) => commit({ value: e.target.value })}
           />
+        </div>
+      )}
+      {isMultiValue && (
+        <div className="field">
+          <label>Values</label>
+          <div className="value-list">
+            {values.map((v, i) => (
+              <div key={i} className="value-list-item">
+                <input
+                  type="text"
+                  value={v}
+                  placeholder="Enter value"
+                  onChange={(e) => {
+                    const next = [...values];
+                    next[i] = e.target.value;
+                    setValues(next);
+                  }}
+                  onBlur={() => commitValues(values)}
+                />
+                <button
+                  type="button"
+                  className="value-list-remove"
+                  title="Remove value"
+                  onClick={() => commitValues(values.filter((_, j) => j !== i))}
+                >
+                  <Codicon name="close" />
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              className="value-list-add"
+              onClick={() => commitValues([...values, ""])}
+            >
+              <Codicon name="add" /> Add value
+            </button>
+          </div>
         </div>
       )}
       {draft._underLinkEntity !== "true" && (
@@ -876,11 +939,9 @@ function ConditionForm({ draft, dispatch, commit, attributes, attributesLoading,
               const value = opt?.key ?? "";
               dispatch({ type: "setField", payload: { key: "entityname", value } });
               commit({ entityname: value });
-              // Reload attributes from the newly selected cross-link entity.
-              // Empty string falls back to the parent entity from the tree.
               dispatch({
                 type: "loadAttributes",
-                payload: { entityName: value, nodeId },
+                payload: { entityName: value, nodeId: node.id },
                 meta: { toExtension: true },
               });
             }}
@@ -1096,11 +1157,10 @@ function NodePropertiesApp(): React.ReactElement {
       )}
       {node.kind === "condition" && (
         <ConditionForm
-          draft={draft} dispatch={dispatch} commit={commit}
+          node={node} draft={draft} dispatch={dispatch} commit={commit}
           attributes={attributes} attributesLoading={attributesLoading}
           attrTypeMap={attrTypeMap}
           linkedEntities={linkedEntities}
-          nodeId={node.id}
         />
       )}
       {node.kind === "order" && (

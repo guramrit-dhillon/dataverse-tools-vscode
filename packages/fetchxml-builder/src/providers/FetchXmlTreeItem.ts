@@ -10,6 +10,7 @@ const KIND_ICONS: Record<FetchNodeKind, string> = {
   filter: "filter",
   condition: "symbol-boolean",
   order: "list-ordered",
+  value: "symbol-string",
 };
 
 function getLabel(node: FetchNode): string {
@@ -40,6 +41,8 @@ function getLabel(node: FetchNode): string {
       return node.attrs.attribute
         ? `order: ${node.attrs.attribute}${node.attrs.descending === "true" ? " ↓" : " ↑"}`
         : "order";
+    case "value":
+      return node.text ? `value: ${node.text}` : "value (empty)";
     default:
       return node.kind;
   }

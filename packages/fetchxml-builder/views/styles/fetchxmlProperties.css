@@ -96,6 +96,59 @@
   cursor: pointer;
 }
 
+/* ── Value list (in/not-in operators) ────────────────────────────── */
+.value-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.value-list-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.value-list-item input {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.value-list-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--vscode-descriptionForeground);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 3px;
+}
+
+.value-list-remove:hover {
+  color: var(--vscode-errorForeground);
+  background: var(--vscode-toolbar-hoverBackground);
+}
+
+.value-list-add {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: 1px dashed var(--vscode-input-border, #3c3c3c);
+  color: var(--vscode-textLink-foreground);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: var(--vscode-font-size);
+  margin-top: 4px;
+}
+
+.value-list-add:hover {
+  background: var(--vscode-toolbar-hoverBackground);
+}
+
 /* ── Animations ──────────────────────────────────────────────────── */
 @keyframes props-fade-in {
   from { opacity: 0; }

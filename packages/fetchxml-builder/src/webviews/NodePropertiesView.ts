@@ -1,6 +1,6 @@
 import type * as vscode from "vscode";
 import { View, Views, DataverseWebApiClient, type ODataCollection } from "core-dataverse";
-import { type FetchNode, DEFAULT_ATTRS } from "../model/FetchXmlNode";
+import { type FetchNode, DEFAULT_ATTRS, createFetchNode, findNode } from "../model/FetchXmlNode";
 import { type FetchXmlTreeProvider } from "../providers/FetchXmlTreeProvider";
 
 export class NodePropertiesView extends View {
@@ -29,6 +29,7 @@ export class NodePropertiesView extends View {
       loadFromAttributes: this.handleLoadFromAttributes.bind(this),
       loadLinkedEntities: this.handleLoadLinkedEntities.bind(this),
       loadRelationships: this.handleLoadRelationships.bind(this),
+      setConditionValues: this.handleSetConditionValues.bind(this),
     });
   }
 
@@ -102,6 +103,36 @@ export class NodePropertiesView extends View {
       Object.entries(attrs).filter(([k]) => !k.startsWith("_"))
     );
     this.treeProvider.updateNodeAttrs(id, cleaned);
+  }
+
+  /**
+   * Replace all `<value>` children on a condition node.
+   * Called by the webview when the user edits the value list for in/not-in operators.
+   */
+  private handleSetConditionValues({
+    id,
+    values,
+  }: {
+    id: string;
+    values: string[];
+  }): void {
+    if (this.#executing) { return; }
+    const root = this.treeProvider.getRoot();
+    if (!root) { return; }
+    const [node] = findNode(root, id);
+    if (!node || node.kind !== "condition") { return; }
+
+    // Remove existing value children
+    node.children = node.children.filter((c) => c.kind !== "value");
+
+    // Add new value children
+    for (const v of values) {
+      const valueNode = createFetchNode("value");
+      valueNode.text = v;
+      node.children.push(valueNode);
+    }
+
+    this.treeProvider.refresh();
   }
 
   private async handleLoadEntities(): Promise<string[]> {

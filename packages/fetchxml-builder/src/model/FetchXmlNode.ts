@@ -6,7 +6,8 @@ export type FetchNodeKind =
   | "link-entity"
   | "filter"
   | "condition"
-  | "order";
+  | "order"
+  | "value";
 
 /** An in-memory representation of a single FetchXML element. */
 export interface FetchNode {
@@ -110,8 +111,9 @@ export const ALLOWED_CHILDREN: Record<FetchNodeKind, FetchNodeKind[]> = {
   attribute: [],
   "link-entity": ["attribute", "link-entity", "filter", "order"],
   filter: ["condition", "filter"],
-  condition: [],
+  condition: ["value"],
   order: [],
+  value: [],
 };
 
 /** Default attributes to use when adding a new node of each kind. */
@@ -123,4 +125,5 @@ export const DEFAULT_ATTRS: Record<FetchNodeKind, Record<string, string>> = {
   filter: { type: "and" },
   condition: { attribute: "", operator: "eq", value: "" },
   order: { attribute: "" },
+  value: {},
 };
