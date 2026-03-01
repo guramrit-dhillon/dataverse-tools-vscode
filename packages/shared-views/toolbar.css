@@ -1,0 +1,62 @@
+/* ── Toolbar ────────────────────────────────────────────────────────── */
+.toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px;
+    border-bottom: 1px solid var(--vscode-panel-border);
+    flex-shrink: 0;
+    gap: 8px;
+}
+
+.toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.toolbar-separator {
+    width: 1px;
+    height: 18px;
+    background: var(--vscode-panel-border);
+    margin: 0 2px;
+    flex-shrink: 0;
+}
+
+/* ── Toolbar button ─────────────────────────────────────────────────── */
+.toolbar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    height: 26px;
+    border: 1px solid var(--vscode-button-border, transparent);
+    background: var(--vscode-button-secondaryBackground);
+    color: var(--vscode-button-secondaryForeground);
+    cursor: pointer;
+    font-size: 12px;
+    white-space: nowrap;
+    border-radius: 2px;
+}
+
+.toolbar-btn:hover {
+    background: var(--vscode-button-secondaryHoverBackground);
+}
+
+.toolbar-btn:active {
+    background: var(--vscode-button-secondaryBackground);
+}
+
+.toolbar-btn.primary {
+    background: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
+}
+
+.toolbar-btn.primary:hover {
+    background: var(--vscode-button-hoverBackground);
+}
+
+.toolbar-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+}

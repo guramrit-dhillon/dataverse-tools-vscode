@@ -1,0 +1,21 @@
+node_modules/
+out/
+*.vsix
+.DS_Store
+CLAUDE.md
+.vscode/
+.claude/
+tsconfig.tsbuildinfo
+package-lock.json
+
+# .NET build artifacts in workspace packages
+packages/assembly-backend/dotnet/bin/
+packages/assembly-backend/dotnet/obj/
+packages/assembly-backend/tests/fixtures/bin/
+packages/assembly-backend/tests/fixtures/obj/
+packages/dataverse-assembly-analyzer/bin/
+packages/dataverse-assembly-analyzer/dotnet/bin/
+packages/dataverse-assembly-analyzer/dotnet/obj/
+packages/assembly-decompiler/bin/
+packages/assembly-decompiler/dotnet/bin/
+packages/assembly-decompiler/dotnet/obj/

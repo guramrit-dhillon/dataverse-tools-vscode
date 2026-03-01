@@ -1,0 +1,93 @@
+/* ── Data table ──────────────────────────────────────────────────── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  color: var(--vscode-foreground);
+}
+
+/* ── Header ──────────────────────────────────────────────────────── */
+.data-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.data-table thead th {
+  background: var(--vscode-editor-background);
+  text-align: left;
+  padding: 6px 8px;
+  font-size: 10px;
+  font-weight: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--vscode-descriptionForeground);
+  border-bottom: 1px solid var(--vscode-panel-border);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+  position: relative;
+}
+
+/* ── Column resize handle ─────────────────────────────────────────── */
+.col-resize-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  cursor: col-resize;
+}
+
+.col-resize-handle:hover {
+  background: var(--vscode-focusBorder);
+}
+
+/* ── Body ────────────────────────────────────────────────────────── */
+.data-table tbody tr {
+  cursor: text;
+}
+
+.data-table tbody tr:hover {
+  background: var(--vscode-list-hoverBackground);
+}
+
+.data-table tbody tr.selected {
+  background: var(--vscode-list-activeSelectionBackground);
+  color: var(--vscode-list-activeSelectionForeground);
+}
+
+.data-table tbody tr:focus-visible {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: -1px;
+}
+
+.data-table tbody td {
+  padding: 5px 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-bottom: 1px solid var(--vscode-panel-border);
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* ── Column types ────────────────────────────────────────────────── */
+.col-number {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.col-date {
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 11px;
+}
+
+/* ── Empty state ─────────────────────────────────────────────────── */
+.data-table td.empty {
+  text-align: center;
+  padding: 24px;
+  color: var(--vscode-descriptionForeground);
+  font-style: italic;
+}

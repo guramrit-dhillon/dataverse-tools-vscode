@@ -1,0 +1,65 @@
+{
+  "name": "dataverse-assembly-decompiler",
+  "displayName": "Dataverse Tools: Decompiler",
+  "description": "Browse and decompile C# source from Dataverse plugin assemblies",
+  "version": "0.1.0",
+  "publisher": "gdhillon",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "dataverse",
+    "power platform",
+    "dynamics 365",
+    "plugin",
+    "decompile",
+    "ilspy"
+  ],
+  "extensionDependencies": [
+    "gdhillon.dataverse-environments"
+  ],
+  "activationEvents": [
+    "onView:dataverse-tools.explorer",
+    "onFileSystem:dataverse-decompiled"
+  ],
+  "main": "./out/extension.js",
+  "icon": "resources/icon.png",
+  "contributes": {
+    "configuration": {
+      "title": "Dataverse Tools: Decompiler",
+      "properties": {
+        "dataverse-tools.decompiler.idleTimeoutMs": {
+          "type": "number",
+          "description": "Milliseconds of inactivity before the decompiler backend process is terminated. Set to 0 to keep alive indefinitely.",
+          "default": 300000
+        },
+        "dataverse-tools.decompiler.backendPath": {
+          "type": "string",
+          "description": "Path to the decompiler backend binary. Leave empty to use bundled binary.",
+          "default": ""
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node ../../scripts/build-extension.js --production",
+    "watch": "node ../../scripts/build-extension.js --watch"
+  },
+  "dependencies": {
+    "assembly-decompiler": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.3",
+    "@types/vscode": "^1.109.0",
+    "@typescript-eslint/eslint-plugin": "^8.55.0",
+    "@typescript-eslint/parser": "^8.55.0",
+    "@vscode/test-electron": "^2.5.2",
+    "esbuild": "^0.21.0",
+    "eslint": "^9.39.2",
+    "typescript": "^5.3.0",
+    "typescript-eslint": "^8.55.0"
+  }
+}

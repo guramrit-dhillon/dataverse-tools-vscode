@@ -1,0 +1,33 @@
+.date-input {
+    width: 100%;
+    background: var(--vscode-input-background);
+    color: var(--vscode-input-foreground);
+    border: 1px solid var(--vscode-input-border, var(--vscode-panel-border));
+    padding: 5px 8px;
+    font-family: var(--vscode-font-family);
+    font-size: var(--vscode-font-size);
+    border-radius: 2px;
+    transition: border-color 0.1s;
+    color-scheme: light dark;
+}
+
+.date-input:focus {
+    outline: 1px solid var(--vscode-focusBorder);
+    outline-offset: -1px;
+    border-color: var(--vscode-focusBorder);
+}
+
+.date-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Calendar/clock icon: use theme-aware opacity instead of hardcoded invert */
+.date-input::-webkit-calendar-picker-indicator {
+    opacity: 0.7;
+    cursor: pointer;
+}
+
+.date-input::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}

@@ -1,0 +1,198 @@
+/* ── Step config page-specific styles ──────────────────────────────────── */
+#root {
+    overflow: auto;
+}
+
+textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+input.readonly-input {
+    background: var(--vscode-sideBar-background);
+    cursor: default;
+    color: var(--vscode-disabledForeground);
+}
+
+/* ── Row layout ───────────────────────────────────────────────────────── */
+.row {
+    display: flex;
+    gap: 12px;
+}
+
+.row .field {
+    flex: 1;
+}
+
+.execution-row {
+    display: flex;
+    gap: 24px;
+}
+
+.execution-column {
+    flex: 1;
+}
+
+/* ── Radio groups ─────────────────────────────────────────────────────── */
+.group-label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--vscode-descriptionForeground);
+    margin-bottom: 8px;
+}
+
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    font-size: var(--vscode-font-size);
+}
+
+.radio-label input[type="radio"] {
+    width: auto;
+    border: none;
+    padding: 0;
+    background: none;
+    accent-color: var(--vscode-focusBorder);
+}
+
+/* ── Fieldset ─────────────────────────────────────────────────────────── */
+fieldset {
+    border: 1px solid var(--vscode-panel-border);
+    padding: 14px;
+    margin-bottom: 14px;
+    border-radius: 3px;
+}
+
+legend {
+    padding: 0 6px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--vscode-descriptionForeground);
+}
+
+/* ── Input group (text + button) ──────────────────────────────────────── */
+.input-group {
+    display: flex;
+    gap: 5px;
+    align-items: stretch;
+}
+
+.input-group input {
+    flex: 1;
+}
+
+.input-group button {
+    padding: 5px 10px;
+    flex-shrink: 0;
+    background: var(--vscode-button-secondaryBackground);
+    color: var(--vscode-button-secondaryForeground);
+    border: 1px solid var(--vscode-input-border, var(--vscode-panel-border));
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.input-group button:hover {
+    background: var(--vscode-button-secondaryHoverBackground);
+}
+
+/* ── Action buttons ───────────────────────────────────────────────────── */
+.actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 22px;
+    justify-content: flex-end;
+}
+
+/* ── Attribute picker ─────────────────────────────────────────────────── */
+.picker-list {
+    overflow-y: auto;
+    flex: 1;
+    margin-bottom: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.picker-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 2px 0;
+}
+
+.picker-item input[type="checkbox"] {
+    width: auto;
+    border: none;
+    padding: 0;
+    background: none;
+    accent-color: var(--vscode-focusBorder);
+    cursor: pointer;
+}
+
+/* ── Step images section ──────────────────────────────────────────────── */
+.images-section {
+    margin-top: 20px;
+}
+
+.image-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--vscode-panel-border);
+}
+
+.image-row:last-of-type {
+    border-bottom: none;
+}
+
+.image-name {
+    font-weight: 500;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.image-alias {
+    font-size: 11px;
+    color: var(--vscode-descriptionForeground);
+    flex-shrink: 0;
+}
+
+.image-type {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    background: var(--vscode-badge-background);
+    color: var(--vscode-badge-foreground);
+    flex-shrink: 0;
+}
+
+.image-actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.image-dialog {
+    min-width: 360px;
+    max-width: 480px;
+}

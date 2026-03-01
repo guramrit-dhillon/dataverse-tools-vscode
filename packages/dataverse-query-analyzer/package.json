@@ -1,0 +1,118 @@
+{
+  "name": "dataverse-query-analyzer",
+  "displayName": "Dataverse Tools: Query Analyzer",
+  "description": "SQL query editor for Dataverse with intellisense, results display, and query analysis via the TDS endpoint",
+  "version": "0.1.0",
+  "publisher": "gdhillon",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "dataverse",
+    "sql",
+    "query",
+    "power platform",
+    "dynamics 365",
+    "tds",
+    "crm"
+  ],
+  "extensionDependencies": [
+    "gdhillon.dataverse-environments"
+  ],
+  "activationEvents": [
+    "workspaceContains:**/*.csproj"
+  ],
+  "main": "./out/extension.js",
+  "icon": "resources/icon.png",
+  "contributes": {
+    "commands": [
+      {
+        "command": "dataverse-tools.queryAnalyzer.open",
+        "title": "Open Query Analyzer",
+        "category": "Dataverse Tools: Query Analyzer",
+        "icon": "$(search)"
+      },
+      {
+        "command": "dataverse-tools.queryAnalyzer.selectEnvironment",
+        "title": "Select Environment",
+        "category": "Dataverse Tools: Query Analyzer",
+        "icon": "$(plug)"
+      },
+      {
+        "command": "dataverse-tools.queryAnalyzer.queryEntity",
+        "title": "Query This Entity",
+        "category": "Dataverse Tools: Query Analyzer",
+        "icon": "$(search)"
+      },
+      {
+        "command": "dataverse-tools.queryAnalyzer.changeEnvironment",
+        "title": "Change Environment",
+        "category": "Dataverse Tools: Query Analyzer",
+        "icon": "$(plug)"
+      }
+    ],
+    "menus": {
+      "view/item/context": [
+        {
+          "command": "dataverse-tools.queryAnalyzer.queryEntity",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /^entity/",
+          "group": "dataverse@3"
+        },
+        {
+          "command": "dataverse-tools.queryAnalyzer.open",
+          "when": "view == dataverse-tools.environments && viewItem == environment",
+          "group": "2_tools@2"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "dataverse-tools.queryAnalyzer.changeEnvironment",
+          "when": "activeWebviewPanelId == dataverse-tools.queryPanel"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Dataverse Tools: Query Analyzer",
+      "properties": {
+        "dataverse-tools.queryAnalyzer.queryTimeout": {
+          "type": "number",
+          "default": 30,
+          "description": "Query timeout in seconds"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node ../../scripts/build-extension.js --production",
+    "watch": "node ../../scripts/build-extension.js --watch"
+  },
+  "dependencies": {
+    "tedious": "^19.0.0"
+  },
+  "devDependencies": {
+    "@codemirror/autocomplete": "^6.18.0",
+    "@codemirror/commands": "^6.7.0",
+    "@codemirror/lang-sql": "^6.8.0",
+    "@codemirror/language": "^6.12.0",
+    "@codemirror/search": "^6.5.0",
+    "@codemirror/state": "^6.5.0",
+    "@codemirror/view": "^6.36.0",
+    "@lezer/highlight": "^1.2.0",
+    "@types/node": "^25.2.3",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@types/vscode": "^1.109.0",
+    "@typescript-eslint/eslint-plugin": "^8.55.0",
+    "@typescript-eslint/parser": "^8.55.0",
+    "@vscode/test-electron": "^2.5.2",
+    "esbuild": "^0.21.0",
+    "eslint": "^9.39.2",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "typescript": "^5.3.0",
+    "typescript-eslint": "^8.55.0"
+  }
+}

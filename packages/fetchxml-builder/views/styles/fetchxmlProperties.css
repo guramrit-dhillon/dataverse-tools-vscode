@@ -1,0 +1,103 @@
+/* ── Node Properties panel styles ─────────────────────────────────── */
+
+/* ── Empty state (no node selected) ──────────────────────────────── */
+.props-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 40px 20px;
+  text-align: center;
+  animation: props-fade-in 0.2s ease-out;
+}
+
+.props-empty-icon {
+  font-size: 28px;
+  color: var(--vscode-descriptionForeground);
+  opacity: 0.4;
+}
+
+.props-empty-text {
+  color: var(--vscode-descriptionForeground);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ── Form container ──────────────────────────────────────────────── */
+.props-form {
+  padding: 16px 20px 32px;
+  max-width: 640px;
+  transition: opacity 0.15s;
+}
+
+.props-form.disabled {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* ── Node header ─────────────────────────────────────────────────── */
+.props-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.props-header-icon {
+  font-size: 16px;
+  color: var(--vscode-descriptionForeground);
+}
+
+.props-header h2 {
+  font-weight: 600;
+  font-size: 14px;
+  margin: 0;
+}
+
+.props-subtitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--vscode-descriptionForeground);
+  font-family: var(--vscode-editor-font-family);
+  margin-bottom: 20px;
+}
+
+/* ── Loading / executing indicator ───────────────────────────────── */
+.props-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--vscode-progressBar-background, #0078d4);
+  margin-left: auto;
+}
+
+/* ── Checkbox field ──────────────────────────────────────────────── */
+.field-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.field-check input[type="checkbox"] {
+  width: auto;
+}
+
+.field-check label {
+  text-transform: none;
+  letter-spacing: 0;
+  opacity: 1;
+  font-size: var(--vscode-font-size);
+  color: var(--vscode-foreground);
+  cursor: pointer;
+}
+
+/* ── Animations ──────────────────────────────────────────────────── */
+@keyframes props-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

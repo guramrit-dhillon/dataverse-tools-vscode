@@ -1,3 +1,29 @@
 {
-  "files": []
+  "files": [],
+  "references": [
+    {
+      "path": "./packages/core-dataverse"
+    },
+    {
+      "path": "./packages/dataverse-environments"
+    },
+    {
+      "path": "./packages/dataverse-metadata"
+    },
+    {
+      "path": "./packages/dataverse-assemblies"
+    },
+    {
+      "path": "./packages/plugin-trace-viewer"
+    },
+    {
+      "path": "./packages/fetchxml-builder"
+    },
+    {
+      "path": "./packages/dataverse-query-analyzer"
+    },
+    {
+      "path": "./packages/dataverse-assembly-decompiler"
+    }
+  ]
 }

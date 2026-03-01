@@ -1,0 +1,294 @@
+{
+  "name": "fetchxml-builder",
+  "displayName": "Dataverse Tools: FetchXML Builder",
+  "description": "Visual FetchXML query builder for Dataverse — inspect entities, build queries, execute and view results",
+  "version": "0.1.0",
+  "publisher": "gdhillon",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "dataverse",
+    "fetchxml",
+    "power platform",
+    "dynamics 365",
+    "query builder",
+    "crm"
+  ],
+  "extensionDependencies": [
+    "gdhillon.dataverse-environments"
+  ],
+  "activationEvents": [
+    "workspaceContains:**/*.csproj"
+  ],
+  "main": "./out/extension.js",
+  "icon": "resources/icon.png",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "fetchxml-builder",
+          "title": "FetchXML Builder",
+          "icon": "resources/fetchxml.svg"
+        }
+      ]
+    },
+    "languages": [
+      {
+        "id": "fetchxml",
+        "aliases": ["FetchXML", "fetchxml"],
+        "extensions": [".fetchxml"]
+      }
+    ],
+    "grammars": [
+      {
+        "language": "fetchxml",
+        "scopeName": "text.xml.fetchxml",
+        "path": "./syntaxes/fetchxml.tmLanguage.json"
+      }
+    ],
+    "views": {
+      "fetchxml-builder": [
+        {
+          "id": "dataverse-tools.fetchxmlTree",
+          "name": "FetchXML Builder",
+          "icon": "resources/fetchxml.svg"
+        },
+        {
+          "id": "dataverse-tools.fetchxmlProperties",
+          "name": "Node Properties",
+          "type": "webview"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "dataverse-tools.fetchxml.newQuery",
+        "title": "New Query",
+        "category": "Dataverse Tools: FetchXML Builder",
+        "icon": "$(new-file)"
+      },
+      {
+        "command": "dataverse-tools.fetchxml.execute",
+        "title": "Execute Query",
+        "category": "Dataverse Tools: FetchXML Builder",
+        "icon": "$(run)"
+      },
+      {
+        "command": "dataverse-tools.fetchxml.copyXml",
+        "title": "Copy FetchXML",
+        "category": "Dataverse Tools: FetchXML Builder",
+        "icon": "$(clippy)"
+      },
+      {
+        "command": "dataverse-tools.fetchxml.openFile",
+        "title": "Open from File…",
+        "category": "Dataverse Tools: FetchXML Builder",
+        "icon": "$(folder-opened)"
+      },
+      {
+        "command": "dataverse-tools.fetchxml.saveFile",
+        "title": "Save to File…",
+        "category": "Dataverse Tools: FetchXML Builder",
+        "icon": "$(save)"
+      },
+      {
+        "command": "dataverse-tools.fetchxml.selectEnvironment",
+        "title": "Select Environment",
+        "category": "Dataverse Tools: FetchXML Builder",
+        "icon": "$(plug)"
+      },
+      {
+        "command": "dataverse-tools.fetchxml.addChild",
+        "title": "Add Child Node",
+        "category": "Dataverse Tools: FetchXML Builder",
+        "icon": "$(add)"
+      },
+      {
+        "command": "dataverse-tools.fetchxml.deleteNode",
+        "title": "Delete Node",
+        "category": "Dataverse Tools: FetchXML Builder",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "dataverse-tools.fetchxml.previewXml",
+        "title": "Edit XML",
+        "category": "Dataverse Tools: FetchXML Builder",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "dataverse-tools.fetchxml.duplicateNode",
+        "title": "Duplicate Node",
+        "category": "Dataverse Tools: FetchXML Builder",
+        "icon": "$(copy)"
+      },
+      {
+        "command": "dataverse-tools.fetchxml.moveNodeUp",
+        "title": "Move Up",
+        "category": "Dataverse Tools: FetchXML Builder",
+        "icon": "$(arrow-up)"
+      },
+      {
+        "command": "dataverse-tools.fetchxml.moveNodeDown",
+        "title": "Move Down",
+        "category": "Dataverse Tools: FetchXML Builder",
+        "icon": "$(arrow-down)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "dataverse-tools.fetchxml.newQuery",
+          "when": "view == dataverse-tools.fetchxmlTree && !dataverse-tools.fetchxml.executing",
+          "group": "navigation@0"
+        },
+        {
+          "command": "dataverse-tools.fetchxml.execute",
+          "when": "view == dataverse-tools.fetchxmlTree && !dataverse-tools.fetchxml.executing",
+          "group": "navigation@1"
+        },
+        {
+          "command": "dataverse-tools.fetchxml.previewXml",
+          "when": "view == dataverse-tools.fetchxmlTree",
+          "group": "navigation@2"
+        },
+        {
+          "command": "dataverse-tools.fetchxml.selectEnvironment",
+          "when": "view == dataverse-tools.fetchxmlTree",
+          "group": "1_env@0"
+        },
+        {
+          "command": "dataverse-tools.fetchxml.copyXml",
+          "when": "view == dataverse-tools.fetchxmlTree",
+          "group": "2_file@0"
+        },
+        {
+          "command": "dataverse-tools.fetchxml.openFile",
+          "when": "view == dataverse-tools.fetchxmlTree && !dataverse-tools.fetchxml.executing",
+          "group": "2_file@1"
+        },
+        {
+          "command": "dataverse-tools.fetchxml.saveFile",
+          "when": "view == dataverse-tools.fetchxmlTree",
+          "group": "2_file@2"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "dataverse-tools.fetchxml.addChild",
+          "when": "view == dataverse-tools.fetchxmlTree && viewItem =~ /canAddChild/ && !dataverse-tools.fetchxml.executing",
+          "group": "fetchxml@1"
+        },
+        {
+          "command": "dataverse-tools.fetchxml.duplicateNode",
+          "when": "view == dataverse-tools.fetchxmlTree && viewItem =~ /canDuplicate/ && !dataverse-tools.fetchxml.executing",
+          "group": "fetchxml@2"
+        },
+        {
+          "command": "dataverse-tools.fetchxml.moveNodeUp",
+          "when": "view == dataverse-tools.fetchxmlTree && viewItem =~ /canMoveUp/ && !dataverse-tools.fetchxml.executing",
+          "group": "fetchxml@3"
+        },
+        {
+          "command": "dataverse-tools.fetchxml.moveNodeDown",
+          "when": "view == dataverse-tools.fetchxmlTree && viewItem =~ /canMoveDown/ && !dataverse-tools.fetchxml.executing",
+          "group": "fetchxml@4"
+        },
+        {
+          "command": "dataverse-tools.fetchxml.deleteNode",
+          "when": "view == dataverse-tools.fetchxmlTree && viewItem =~ /canDelete/ && !dataverse-tools.fetchxml.executing",
+          "group": "fetchxml@9"
+        },
+        {
+          "command": "dataverse-tools.fetchxml.addChild",
+          "when": "view == dataverse-tools.fetchxmlTree && viewItem =~ /canAddChild/ && !dataverse-tools.fetchxml.executing",
+          "group": "inline@1"
+        },
+        {
+          "command": "dataverse-tools.fetchxml.moveNodeUp",
+          "when": "view == dataverse-tools.fetchxmlTree && viewItem =~ /canMoveUp/ && !dataverse-tools.fetchxml.executing",
+          "group": "inline@2"
+        },
+        {
+          "command": "dataverse-tools.fetchxml.moveNodeDown",
+          "when": "view == dataverse-tools.fetchxmlTree && viewItem =~ /canMoveDown/ && !dataverse-tools.fetchxml.executing",
+          "group": "inline@3"
+        },
+        {
+          "command": "dataverse-tools.fetchxml.duplicateNode",
+          "when": "view == dataverse-tools.fetchxmlTree && viewItem =~ /canDuplicate/ && !dataverse-tools.fetchxml.executing",
+          "group": "inline@4"
+        },
+        {
+          "command": "dataverse-tools.fetchxml.deleteNode",
+          "when": "view == dataverse-tools.fetchxmlTree && viewItem =~ /canDelete/ && !dataverse-tools.fetchxml.executing",
+          "group": "inline@5"
+        }
+      ]
+    },
+    "languageModelTools": [
+      {
+        "name": "dataverse-tools_executeFetchXml",
+        "displayName": "Execute FetchXML Query",
+        "modelDescription": "Executes a FetchXML query against a Dataverse environment and returns the results as JSON. Requires a valid FetchXML string and an environment ID. Use the dataverse-tools_listEnvironments tool first to get available environment IDs. Returns rows with column names and values. Example FetchXML: <fetch top=\"10\"><entity name=\"account\"><attribute name=\"name\"/><attribute name=\"accountid\"/></entity></fetch>",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "environmentId": {
+              "type": "string",
+              "description": "The ID of the Dataverse environment to query against"
+            },
+            "fetchXml": {
+              "type": "string",
+              "description": "The FetchXML query string to execute"
+            }
+          },
+          "required": ["environmentId", "fetchXml"]
+        }
+      }
+    ],
+    "customEditors": [
+      {
+        "viewType": "dataverse-tools.csvViewer",
+        "displayName": "CSV Viewer",
+        "selector": [
+          {
+            "filenamePattern": "*.csv"
+          }
+        ],
+        "priority": "option"
+      }
+    ],
+    "resourceLabelFormatters": [
+      {
+        "scheme": "fetchxml-edit",
+        "formatting": {
+          "label": "${path}",
+          "separator": "/",
+          "stripPathStartingSeparator": true
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "build": "node ../../scripts/build-extension.js --production",
+    "watch": "node ../../scripts/build-extension.js --watch"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.3",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@types/vscode": "^1.109.0",
+    "@typescript-eslint/eslint-plugin": "^8.55.0",
+    "@typescript-eslint/parser": "^8.55.0",
+    "esbuild": "^0.21.0",
+    "eslint": "^9.39.2",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "typescript": "^5.3.0",
+    "typescript-eslint": "^8.55.0"
+  }
+}

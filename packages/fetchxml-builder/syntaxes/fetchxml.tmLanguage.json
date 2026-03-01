@@ -1,0 +1,7 @@
+{
+  "name": "FetchXML",
+  "scopeName": "text.xml.fetchxml",
+  "patterns": [
+    { "include": "text.xml" }
+  ]
+}

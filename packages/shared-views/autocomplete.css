@@ -1,0 +1,70 @@
+/* ── Autocomplete ─────────────────────────────────────────────────────── */
+.autocomplete {
+    position: relative;
+}
+
+.autocomplete-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.autocomplete-input-wrap input {
+    flex: 1;
+}
+
+.autocomplete-spinner {
+    position: absolute;
+    right: 8px;
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--vscode-foreground);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: ac-spin 0.6s linear infinite;
+    opacity: 0.5;
+}
+
+@keyframes ac-spin {
+    to { transform: rotate(360deg); }
+}
+
+.autocomplete-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: var(--vscode-dropdown-background, var(--vscode-input-background));
+    border: 1px solid var(--vscode-dropdown-border, var(--vscode-input-border, var(--vscode-panel-border)));
+    border-top: none;
+    border-radius: 0 0 2px 2px;
+    max-height: 200px;
+    overflow-y: auto;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+}
+
+.autocomplete-option {
+    padding: 5px 8px;
+    cursor: pointer;
+    font-size: var(--vscode-font-size);
+}
+
+.autocomplete-option.highlighted {
+    background: var(--vscode-list-hoverBackground);
+    color: var(--vscode-list-hoverForeground, inherit);
+}
+
+.autocomplete-option.selected {
+    font-weight: 600;
+}
+
+.autocomplete-empty {
+    padding: 8px;
+    color: var(--vscode-descriptionForeground);
+    font-size: var(--vscode-font-size);
+    text-align: center;
+}

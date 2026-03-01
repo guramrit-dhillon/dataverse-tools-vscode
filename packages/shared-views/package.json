@@ -1,0 +1,9 @@
+{
+  "name": "shared-views",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.ts",
+  "scripts": {
+    "build": "echo 'Shared views — bundled by extension esbuild'"
+  }
+}

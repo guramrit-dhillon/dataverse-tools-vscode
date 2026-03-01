@@ -1,0 +1,294 @@
+/* ── Reset ──────────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--vscode-font-family);
+    font-size: var(--vscode-font-size);
+    color: var(--vscode-foreground);
+    background: var(--vscode-editor-background);
+}
+
+/* ── Layout ────────────────────────────────────────────────────────────── */
+.container {
+    padding: 20px;
+    max-width: 640px;
+}
+
+h2 {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.subtitle {
+    font-size: 11px;
+    color: var(--vscode-descriptionForeground);
+    margin-bottom: 20px;
+    font-family: var(--vscode-editor-font-family);
+}
+
+.loading {
+    padding: 20px;
+    color: var(--vscode-descriptionForeground);
+}
+
+/* ── Form elements ─────────────────────────────────────────────────────── */
+.field {
+    margin-bottom: 14px;
+}
+
+.field > label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--vscode-descriptionForeground);
+    margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="number"],
+select,
+textarea {
+    width: 100%;
+    background: var(--vscode-input-background);
+    color: var(--vscode-input-foreground);
+    border: 1px solid var(--vscode-input-border, var(--vscode-panel-border));
+    padding: 5px 8px;
+    font-family: var(--vscode-font-family);
+    font-size: var(--vscode-font-size);
+    border-radius: 2px;
+    transition: border-color 0.1s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 1px solid var(--vscode-focusBorder);
+    outline-offset: -1px;
+    border-color: var(--vscode-focusBorder);
+}
+
+select {
+    cursor: pointer;
+}
+
+.hint {
+    font-size: 10px;
+    color: var(--vscode-descriptionForeground);
+    margin-top: 4px;
+}
+
+/* ── Error banner ──────────────────────────────────────────────────────── */
+.error-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: var(--vscode-inputValidation-errorBackground);
+    border: 1px solid var(--vscode-inputValidation-errorBorder);
+    color: var(--vscode-inputValidation-errorForeground, inherit);
+    padding: 8px 10px;
+    margin-bottom: 14px;
+    border-radius: 2px;
+    font-size: var(--vscode-font-size);
+}
+
+.error-banner-message {
+    flex: 1;
+    min-width: 0;
+}
+
+.error-banner-dismiss {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    font-size: 14px;
+    line-height: 1;
+    opacity: 0.7;
+}
+
+.error-banner-dismiss:hover {
+    opacity: 1;
+    background: none;
+}
+
+/* ── Buttons ───────────────────────────────────────────────────────────── */
+button {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 16px;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    font-family: var(--vscode-font-family);
+    font-size: var(--vscode-font-size);
+}
+
+button.primary {
+    background: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
+}
+
+button.primary:hover:not(:disabled) {
+    background: var(--vscode-button-hoverBackground);
+}
+
+button:focus-visible {
+    outline: 1px solid var(--vscode-focusBorder);
+    outline-offset: 1px;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+button.secondary {
+    background: var(--vscode-button-secondaryBackground);
+    border: 1px solid var(--vscode-button-border, var(--vscode-panel-border));
+    color: var(--vscode-button-secondaryForeground);
+}
+
+button.secondary:hover:not(:disabled) {
+    background: var(--vscode-button-secondaryHoverBackground);
+}
+
+button.secondary:active:not(:disabled) {
+    background: var(--vscode-button-secondaryBackground);
+}
+
+.icon-btn {
+    padding: 3px 7px;
+    font-size: 13px;
+    line-height: 1;
+    border-radius: 3px;
+}
+
+.icon-btn.danger:hover:not(:disabled) {
+    background: var(--vscode-inputValidation-errorBackground);
+    border-color: var(--vscode-inputValidation-errorBorder);
+    color: var(--vscode-inputValidation-errorForeground, inherit);
+}
+
+/* ── Utility: link button ──────────────────────────────────────────────── */
+.link-btn {
+    background: none;
+    border: none;
+    color: var(--vscode-textLink-foreground);
+    cursor: pointer;
+    padding: 0;
+    font-size: 11px;
+    height: auto;
+}
+
+.link-btn:hover {
+    color: var(--vscode-textLink-activeForeground);
+    text-decoration: underline;
+    background: none;
+}
+
+/* ── Utility: progress bar ────────────────────────────────────────────── */
+.progress-bar {
+    height: 2px;
+    background: var(--vscode-progressBar-background, #0078d4);
+    animation: progress-slide 1.2s ease-in-out infinite;
+}
+
+@keyframes progress-slide {
+    0% { width: 0; margin-left: 0; }
+    50% { width: 60%; margin-left: 20%; }
+    100% { width: 0; margin-left: 100%; }
+}
+
+/* ── Utility: empty hint ──────────────────────────────────────────────── */
+.empty-hint {
+    padding: 20px 16px;
+    color: var(--vscode-descriptionForeground);
+    font-size: 12px;
+}
+
+/* ── Utility: monospace text ──────────────────────────────────────────── */
+.mono {
+    font-family: var(--vscode-editor-font-family, monospace);
+    font-size: 11px;
+}
+
+/* ── Utility: tab bar ─────────────────────────────────────────────────── */
+.tab-bar {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--vscode-panel-border);
+    flex-shrink: 0;
+}
+
+.tab-btn {
+    padding: 6px 16px;
+    background: transparent;
+    color: var(--vscode-descriptionForeground);
+    border: none;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    cursor: pointer;
+    font-size: var(--vscode-font-size);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.tab-btn:hover:not(:disabled) {
+    background: var(--vscode-toolbar-hoverBackground);
+    color: var(--vscode-foreground);
+}
+
+.tab-btn.active {
+    border-bottom-color: var(--vscode-focusBorder);
+    color: var(--vscode-foreground);
+    font-weight: 600;
+}
+
+/* ── Modal / dialog ────────────────────────────────────────────────────── */
+.backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 100;
+}
+
+.picker-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 101;
+    background: var(--vscode-editor-background);
+    border: 1px solid var(--vscode-panel-border);
+    border-radius: 4px;
+    padding: 18px;
+    min-width: 300px;
+    max-width: 420px;
+    max-height: 65vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.picker-dialog h3 {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.picker-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}

@@ -1,0 +1,20 @@
+/* ── EnvironmentBar ─────────────────────────────────────────────────── */
+.env-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    /* padding: 4px 10px; */
+    font-size: 11px;
+    /* background: var(--vscode-sideBar-background, var(--vscode-editor-background)); */
+    /* border: 1px solid var(--vscode-panel-border); */
+    border-radius: 3px;
+}
+
+.env-name {
+    color: var(--vscode-foreground);
+    font-weight: 500;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

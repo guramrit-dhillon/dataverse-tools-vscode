@@ -1,0 +1,29 @@
+/* ── Full-page webview layout ──────────────────────────────────────────── */
+/* Used by webviews that fill the entire panel (trace viewer, query analyzer) */
+
+html,
+body {
+    height: 100%;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    overflow: hidden;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#root,
+.app {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}

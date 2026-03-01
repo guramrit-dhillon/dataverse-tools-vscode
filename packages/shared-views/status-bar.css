@@ -1,0 +1,38 @@
+
+/* ── Status bar ──────────────────────────────────────────────────────── */
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 4px 12px;
+  font-size: 11px;
+  border-top: 1px solid var(--vscode-panel-border);
+  flex-shrink: 0;
+  min-height: 24px;
+}
+
+.status-bar-error {
+  background: var(--vscode-inputValidation-errorBackground, rgba(255, 0, 0, 0.1));
+}
+
+.status-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--vscode-descriptionForeground);
+}
+
+.status-executing {
+  color: var(--vscode-progressBar-background, #0078d4);
+}
+
+.status-schema-loading {
+  margin-left: auto;
+}
+
+.status-error {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--vscode-errorForeground);
+}

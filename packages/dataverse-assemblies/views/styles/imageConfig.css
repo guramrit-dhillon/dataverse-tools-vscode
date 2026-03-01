@@ -1,0 +1,91 @@
+/* ── Image config page-specific styles ─────────────────────────────────── */
+#root {
+    overflow: auto;
+}
+
+h2 {
+    font-size: 14px;
+}
+
+.subtitle {
+    word-break: break-all;
+}
+
+.loading {
+    font-style: italic;
+    font-size: 12px;
+}
+
+/* ── Images list ──────────────────────────────────────────────────────── */
+.empty-hint {
+    padding: 8px 0;
+}
+
+.image-card {
+    border: 1px solid var(--vscode-panel-border);
+    border-radius: 3px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.image-card-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.image-card-name {
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 3px;
+}
+
+.image-card-meta {
+    font-size: 11px;
+    color: var(--vscode-descriptionForeground);
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.image-type-badge {
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 8px;
+    background: var(--vscode-badge-background);
+    color: var(--vscode-badge-foreground);
+}
+
+.image-card-actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+/* ── Form ─────────────────────────────────────────────────────────────── */
+.field {
+    margin-bottom: 12px;
+}
+
+.form-row {
+    display: flex;
+    gap: 12px;
+}
+
+.form-row .field {
+    flex: 1;
+}
+
+.form-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+/* ── Dialog overrides ─────────────────────────────────────────────────── */
+.picker-dialog {
+    min-width: 360px;
+    max-width: 480px;
+}

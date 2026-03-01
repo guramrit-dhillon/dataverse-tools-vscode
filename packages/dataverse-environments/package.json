@@ -1,0 +1,319 @@
+{
+  "name": "dataverse-environments",
+  "displayName": "Dataverse Tools: Environments",
+  "description": "Manages Dataverse authentication and connections",
+  "version": "0.1.0",
+  "publisher": "gdhillon",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "dataverse",
+    "power platform",
+    "dynamics 365",
+    "plugin",
+    "crm"
+  ],
+  "activationEvents": [
+    "workspaceContains:**/*.csproj"
+  ],
+  "main": "./out/extension.js",
+  "icon": "resources/icon.png",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "dataverse-tools",
+          "title": "Dataverse Tools",
+          "icon": "resources/dataverse.svg"
+        }
+      ]
+    },
+    "views": {
+      "dataverse-tools": [
+        {
+          "id": "dataverse-tools.environments",
+          "name": "Environments",
+          "icon": "resources/dataverse.svg",
+          "order": 1
+        },
+        {
+          "id": "dataverse-tools.explorer",
+          "name": "Explorer",
+          "icon": "resources/dataverse.svg",
+          "order": 2
+        },
+        {
+          "id": "dataverse-tools.details",
+          "name": "Details",
+          "type": "webview",
+          "order": 999
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "dataverse-tools.addEnvironment",
+        "title": "Add Environment",
+        "category": "Dataverse Tools: Environments",
+        "icon": "$(add)"
+      },
+      {
+        "command": "dataverse-tools.editEnvironment",
+        "title": "Edit Environment",
+        "category": "Dataverse Tools: Environments",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "dataverse-tools.removeEnvironment",
+        "title": "Remove Environment",
+        "category": "Dataverse Tools: Environments",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "dataverse-tools.testConnection",
+        "title": "Test Connection",
+        "category": "Dataverse Tools: Environments",
+        "icon": "$(debug-alt)"
+      },
+      {
+        "command": "dataverse-tools.explorer.selectEnvironment",
+        "title": "Select Environment",
+        "category": "Dataverse Tools: Explorer",
+        "icon": "$(plug)"
+      },
+      {
+        "command": "dataverse-tools.explorer.refresh",
+        "title": "Refresh",
+        "category": "Dataverse Tools: Explorer",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "dataverse-tools.explorer.showAll",
+        "title": "Show All Components",
+        "category": "Dataverse Tools: Explorer",
+        "icon": "$(filter-filled)"
+      },
+      {
+        "command": "dataverse-tools.explorer.filterUnmanaged",
+        "title": "Show Unmanaged Only",
+        "category": "Dataverse Tools: Explorer",
+        "icon": "$(filter)"
+      },
+      {
+        "command": "dataverse-tools.explorer.showGlobal",
+        "title": "Show All Components",
+        "category": "Dataverse Tools: Explorer",
+        "icon": "$(filter-filled)"
+      },
+      {
+        "command": "dataverse-tools.explorer.showSolutionOnly",
+        "title": "Show Solution Components Only",
+        "category": "Dataverse Tools: Explorer",
+        "icon": "$(filter)"
+      },
+      {
+        "command": "dataverse-tools.explorer.addToSolution",
+        "title": "Add to Solution",
+        "category": "Dataverse Tools: Explorer",
+        "icon": "$(add)"
+      },
+      {
+        "command": "dataverse-tools.explorer.removeFromSolution",
+        "title": "Remove from Solution",
+        "category": "Dataverse Tools: Explorer",
+        "icon": "$(remove)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "dataverse-tools.addEnvironment",
+          "when": "view == dataverse-tools.environments",
+          "group": "navigation"
+        },
+        {
+          "command": "dataverse-tools.explorer.selectEnvironment",
+          "when": "view == dataverse-tools.explorer",
+          "group": "navigation@1"
+        },
+        {
+          "command": "dataverse-tools.explorer.refresh",
+          "when": "view == dataverse-tools.explorer",
+          "group": "navigation@2"
+        },
+        {
+          "command": "dataverse-tools.explorer.showGlobal",
+          "when": "view == dataverse-tools.explorer && dataverse-tools.explorer.solutionActive && !dataverse-tools.explorer.showOutOfSolutionActive",
+          "group": "navigation@3"
+        },
+        {
+          "command": "dataverse-tools.explorer.showSolutionOnly",
+          "when": "view == dataverse-tools.explorer && dataverse-tools.explorer.solutionActive && dataverse-tools.explorer.showOutOfSolutionActive",
+          "group": "navigation@3"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "dataverse-tools.testConnection",
+          "when": "view == dataverse-tools.environments && viewItem == environment",
+          "group": "inline@1"
+        },
+        {
+          "command": "dataverse-tools.editEnvironment",
+          "when": "view == dataverse-tools.environments && viewItem == environment",
+          "group": "inline@2"
+        },
+        {
+          "command": "dataverse-tools.removeEnvironment",
+          "when": "view == dataverse-tools.environments && viewItem == environment",
+          "group": "inline@3"
+        },
+        {
+          "command": "dataverse-tools.testConnection",
+          "when": "view == dataverse-tools.environments && viewItem == environment",
+          "group": "1_actions@1"
+        },
+        {
+          "command": "dataverse-tools.editEnvironment",
+          "when": "view == dataverse-tools.environments && viewItem == environment",
+          "group": "1_actions@2"
+        },
+        {
+          "command": "dataverse-tools.removeEnvironment",
+          "when": "view == dataverse-tools.environments && viewItem == environment",
+          "group": "1_actions@3"
+        },
+        {
+          "command": "dataverse-tools.explorer.addToSolution",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /\\.outOfSolution$/",
+          "group": "inline@1"
+        },
+        {
+          "command": "dataverse-tools.explorer.addToSolution",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /\\.outOfSolution$/",
+          "group": "solution@1"
+        },
+        {
+          "command": "dataverse-tools.explorer.addToSolution",
+          "when": "view == dataverse-tools.explorer && viewItem == entity.inSolution",
+          "group": "inline@2"
+        },
+        {
+          "command": "dataverse-tools.explorer.addToSolution",
+          "when": "view == dataverse-tools.explorer && viewItem == entity.inSolution",
+          "group": "solution@1"
+        },
+        {
+          "command": "dataverse-tools.explorer.removeFromSolution",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /\\.inSolution$/",
+          "group": "inline@1"
+        },
+        {
+          "command": "dataverse-tools.explorer.removeFromSolution",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /\\.inSolution$/",
+          "group": "solution@2"
+        }
+      ]
+    },
+    "languageModelTools": [
+      {
+        "name": "dataverse-tools_listEnvironments",
+        "displayName": "List Dataverse Environments",
+        "modelDescription": "Lists all configured Dataverse/Dynamics 365 environments. Returns an array of environments with their id, name, URL, and authentication method. Use this to discover which environments are available before performing other operations.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {}
+        }
+      },
+      {
+        "name": "dataverse-tools_getEnvironmentDetails",
+        "displayName": "Get Dataverse Environment Details",
+        "modelDescription": "Gets full details for a specific Dataverse environment by its ID. Returns id, name, URL, auth method, tenant ID, client ID, user ID, and organization ID. Use listEnvironments first to get the environment ID.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "environmentId": {
+              "type": "string",
+              "description": "The ID of the environment to get details for"
+            }
+          },
+          "required": ["environmentId"]
+        }
+      },
+      {
+        "name": "dataverse-tools_testConnection",
+        "displayName": "Test Dataverse Connection",
+        "modelDescription": "Tests connectivity to a Dataverse environment by calling the WhoAmI endpoint. Returns the user ID and organization ID on success, or an error message on failure. This makes an API call to the Dataverse server.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "environmentId": {
+              "type": "string",
+              "description": "The ID of the environment to test"
+            }
+          },
+          "required": ["environmentId"]
+        }
+      }
+    ],
+    "configuration": {
+      "title": "Dataverse Tools: Environments",
+      "properties": {
+        "dataverse-tools.authMethod": {
+          "type": "string",
+          "enum": ["vscode", "azcli", "devicecode", "clientcredentials"],
+          "enumDescriptions": [
+            "VS Code built-in Microsoft authentication — uses accounts signed in to VS Code",
+            "Azure CLI (az account get-access-token) — requires az CLI installed and signed in",
+            "MSAL device code flow — works headless/SSH; user enters a code in a browser",
+            "Service Principal (client credentials) — client ID + secret for app-based access"
+          ],
+          "default": "vscode",
+          "description": "Default auth method hint shown in the Add Environment wizard. The actual method is chosen per-environment."
+        },
+        "dataverse-tools.logLevel": {
+          "type": "string",
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ],
+          "default": "info",
+          "description": "Log verbosity level"
+        },
+        "dataverse-tools.requestTimeoutMs": {
+          "type": "number",
+          "default": 30000,
+          "description": "HTTP request timeout in milliseconds"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node ../../scripts/build-extension.js --production",
+    "watch": "node ../../scripts/build-extension.js --watch"
+  },
+  "dependencies": {
+    "@azure/identity": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.3",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@types/vscode": "^1.109.0",
+    "@typescript-eslint/eslint-plugin": "^8.55.0",
+    "@typescript-eslint/parser": "^8.55.0",
+    "@vscode/test-electron": "^2.5.2",
+    "esbuild": "^0.21.0",
+    "eslint": "^9.39.2",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "typescript": "^5.3.0",
+    "typescript-eslint": "^8.55.0"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "assembly-decompiler",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Node.js wrapper for the AssemblyDecompiler .NET backend",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "build": "node build.js",
+    "build:all": "node build.js --all",
+    "watch": "echo \"No watch mode for .NET packages\"",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "assembly-backend": "*"
+  }
+}

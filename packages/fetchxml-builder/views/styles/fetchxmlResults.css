@@ -1,0 +1,38 @@
+/* ── Name-mode toggle (Logical / Friendly / Both) ───────────────── */
+.name-mode-toggle {
+  display: flex;
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-left: auto;
+}
+
+.name-mode-btn {
+  padding: 2px 9px;
+  background: transparent;
+  color: var(--vscode-descriptionForeground);
+  border: none;
+  border-radius: 0;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.name-mode-btn + .name-mode-btn {
+  border-left: 1px solid var(--vscode-panel-border);
+}
+
+.name-mode-btn:hover:not(.active) {
+  background: var(--vscode-toolbar-hoverBackground);
+  color: var(--vscode-foreground);
+}
+
+.name-mode-btn.active {
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+}
+
+/* ── Error banner override ───────────────────────────────────────── */
+.error-banner {
+  padding: 6px 10px;
+  margin: 0;
+}

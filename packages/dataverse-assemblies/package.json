@@ -1,0 +1,220 @@
+{
+  "name": "dataverse-assemblies",
+  "displayName": "Dataverse Tools: Assemblies",
+  "description": "Code-centric Dataverse assembly deployment and step management for VS Code",
+  "version": "0.1.0",
+  "publisher": "gdhillon",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "dataverse",
+    "power platform",
+    "dynamics 365",
+    "plugin",
+    "crm"
+  ],
+  "extensionDependencies": [
+    "gdhillon.dataverse-environments"
+  ],
+  "activationEvents": [
+    "workspaceContains:**/*.csproj",
+    "onView:dataverse-tools.explorer"
+  ],
+  "main": "./out/extension.js",
+  "icon": "resources/icon.png",
+  "contributes": {
+    "commands": [
+      {
+        "command": "dataverse-tools.deployAssembly",
+        "title": "Deploy Assembly",
+        "category": "Dataverse Tools: Assemblies",
+        "icon": "$(cloud-upload)"
+      },
+      {
+        "command": "dataverse-tools.addStep",
+        "title": "Add Step",
+        "category": "Dataverse Tools: Assemblies",
+        "icon": "$(add)"
+      },
+      {
+        "command": "dataverse-tools.editStep",
+        "title": "Edit Step",
+        "category": "Dataverse Tools: Assemblies",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "dataverse-tools.enableStep",
+        "title": "Enable Step",
+        "category": "Dataverse Tools: Assemblies"
+      },
+      {
+        "command": "dataverse-tools.disableStep",
+        "title": "Disable Step",
+        "category": "Dataverse Tools: Assemblies"
+      },
+      {
+        "command": "dataverse-tools.downloadAssembly",
+        "title": "Download Assembly",
+        "category": "Dataverse Tools: Assemblies",
+        "icon": "$(cloud-download)"
+      },
+      {
+        "command": "dataverse-tools.manageImages",
+        "title": "Manage Images",
+        "category": "Dataverse Tools: Assemblies",
+        "icon": "$(layers)"
+      },
+      {
+        "command": "dataverse-tools.changeActivityGroup",
+        "title": "Change Activity Group…",
+        "category": "Dataverse Tools: Assemblies",
+        "icon": "$(folder)"
+      },
+      {
+        "command": "dataverse-tools.renameNode",
+        "title": "Rename…",
+        "category": "Dataverse Tools: Assemblies",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "dataverse-tools.deleteNode",
+        "title": "Delete",
+        "category": "Dataverse Tools: Assemblies",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "dataverse-tools.openTraceViewer",
+        "title": "View Trace Logs…",
+        "category": "Dataverse Tools: Assemblies",
+        "icon": "$(output)"
+      },
+      {
+        "command": "dataverse-tools.assemblies.showManaged",
+        "title": "Show Managed",
+        "category": "Dataverse Tools: Assemblies",
+        "icon": "$(eye)"
+      },
+      {
+        "command": "dataverse-tools.assemblies.hideManaged",
+        "title": "Hide Managed",
+        "category": "Dataverse Tools: Assemblies",
+        "icon": "$(eye-closed)"
+      }
+    ],
+    "menus": {
+      "view/item/context": [
+        {
+          "command": "dataverse-tools.deployAssembly",
+          "when": "view == dataverse-tools.explorer && viewItem == providerGroup.assemblies",
+          "group": "inline@1"
+        },
+        {
+          "command": "dataverse-tools.assemblies.showManaged",
+          "when": "view == dataverse-tools.explorer && viewItem == providerGroup.assemblies && dataverse-tools.explorer.unmanagedFilterActive",
+          "group": "inline@2"
+        },
+        {
+          "command": "dataverse-tools.assemblies.hideManaged",
+          "when": "view == dataverse-tools.explorer && viewItem == providerGroup.assemblies && !dataverse-tools.explorer.unmanagedFilterActive",
+          "group": "inline@2"
+        },
+        {
+          "command": "dataverse-tools.deployAssembly",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /^assembly/",
+          "group": "dataverse@1"
+        },
+        {
+          "command": "dataverse-tools.addStep",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /^pluginType/",
+          "group": "dataverse@1"
+        },
+        {
+          "command": "dataverse-tools.editStep",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /^step\\.(enabled|disabled)/",
+          "group": "dataverse@1"
+        },
+        {
+          "command": "dataverse-tools.manageImages",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /^step\\.(enabled|disabled)/",
+          "group": "dataverse@1"
+        },
+        {
+          "command": "dataverse-tools.enableStep",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /^step\\.disabled/",
+          "group": "dataverse@2"
+        },
+        {
+          "command": "dataverse-tools.disableStep",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /^step\\.enabled/",
+          "group": "dataverse@2"
+        },
+        {
+          "command": "dataverse-tools.downloadAssembly",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /^assembly/",
+          "group": "dataverse@2"
+        },
+        {
+          "command": "dataverse-tools.openTraceViewer",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /^(assembly|pluginType|activityType)/",
+          "group": "dataverse@5"
+        },
+        {
+          "command": "dataverse-tools.changeActivityGroup",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /^activityType/",
+          "group": "dataverse@7"
+        },
+        {
+          "command": "dataverse-tools.renameNode",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /^(assembly|pluginType|activityType|step\\.enabled|step\\.disabled)/",
+          "group": "dataverse@8"
+        },
+        {
+          "command": "dataverse-tools.deleteNode",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /^(assembly|pluginType|activityType|step\\.enabled|step\\.disabled)/",
+          "group": "dataverse@9"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Dataverse Tools: Assemblies",
+      "properties": {
+        "dataverse-tools.analyzerPath": {
+          "type": "string",
+          "description": "Path to the plugin analyzer .NET tool. Leave empty to use bundled analyzer.",
+          "default": ""
+        },
+        "dataverse-tools.deployOnBuild": {
+          "type": "boolean",
+          "description": "Prompt to deploy after a successful build task",
+          "default": true
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node ../../scripts/build-extension.js --production",
+    "watch": "node ../../scripts/build-extension.js --watch"
+  },
+  "dependencies": {
+    "dataverse-assembly-analyzer": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.3",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@types/vscode": "^1.109.0",
+    "@typescript-eslint/eslint-plugin": "^8.55.0",
+    "@typescript-eslint/parser": "^8.55.0",
+    "@vscode/test-electron": "^2.5.2",
+    "esbuild": "^0.21.0",
+    "eslint": "^9.39.2",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "typescript": "^5.3.0",
+    "typescript-eslint": "^8.55.0"
+  }
+}
