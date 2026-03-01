@@ -12,10 +12,14 @@ export function serialize(node: FetchNode, indent = 0): string {
 
   const openTag = attrsStr ? `${pad}<${tag} ${attrsStr}>` : `${pad}<${tag}>`;
 
-  if (node.children.length === 0) {
+  if (node.children.length === 0 && !node.text) {
     return attrsStr
       ? `${pad}<${tag} ${attrsStr} />`
       : `${pad}<${tag} />`;
+  }
+
+  if (node.text && node.children.length === 0) {
+    return `${openTag}${escapeXml(node.text)}</${tag}>`;
   }
 
   const inner = node.children.map((c) => serialize(c, indent + 1)).join("\n");
@@ -78,7 +82,15 @@ function parseElement(
     while (pos < inner.length && /\s/.test(inner[pos])) { pos++; }
     if (pos >= inner.length) { break; }
 
-    if (inner[pos] !== "<") { break; }
+    if (inner[pos] !== "<") {
+      // Text content (e.g. inside <value>123</value>)
+      const textEnd = inner.indexOf("<", pos);
+      const text = textEnd === -1 ? inner.slice(pos) : inner.slice(pos, textEnd);
+      node.text = text.replace(/&apos;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+      if (textEnd === -1) { break; }
+      pos = textEnd;
+      continue;
+    }
 
     // Find the end of this child element
     const childXml = extractElement(inner, pos);

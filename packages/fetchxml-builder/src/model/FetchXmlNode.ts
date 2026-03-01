@@ -14,6 +14,8 @@ export interface FetchNode {
   kind: FetchNodeKind;
   attrs: Record<string, string>;
   children: FetchNode[];
+  /** Text content inside the element (e.g. `<value>123</value>` → text = "123"). */
+  text?: string;
 }
 
 let _counter = 0;
@@ -61,10 +63,10 @@ export function deleteNode(root: FetchNode, id: string): boolean {
 
 /** Deep-clone a subtree, assigning fresh IDs to every node. */
 export function cloneNode(node: FetchNode): FetchNode {
-  return {
-    ...createFetchNode(node.kind, { ...node.attrs }),
-    children: node.children.map(cloneNode),
-  };
+  const clone = createFetchNode(node.kind, { ...node.attrs });
+  clone.children = node.children.map(cloneNode);
+  if (node.text) { clone.text = node.text; }
+  return clone;
 }
 
 /**

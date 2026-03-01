@@ -2,7 +2,7 @@
   "name": "dataverse-metadata",
   "displayName": "Dataverse Tools: Metadata",
   "description": "Contributes metadata providers (entities, etc.) to the Dataverse Explorer",
-  "version": "0.1.0",
+  "version": "0.1.0-preview",
   "publisher": "gdhillon",
   "engines": {
     "vscode": "^1.96.0"

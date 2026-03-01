@@ -82,7 +82,7 @@ export class FetchXmlTreeProvider
     if (!this.root) { return false; }
     const [node] = findNode(this.root, id);
     if (!node) { return false; }
-    node.attrs = attrs;
+    node.attrs = { ...node.attrs, ...attrs };
     this.refresh();
     return true;
   }

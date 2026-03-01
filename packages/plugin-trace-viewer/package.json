@@ -2,7 +2,7 @@
   "name": "dataverse-plugin-trace-viewer",
   "displayName": "Dataverse Tools: Trace Viewer",
   "description": "View and analyze trace logs for Dataverse plugins in VS Code",
-  "version": "0.1.0",
+  "version": "0.1.0-preview",
   "publisher": "gdhillon",
   "engines": {
     "vscode": "^1.96.0"

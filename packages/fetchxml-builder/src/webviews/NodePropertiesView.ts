@@ -96,7 +96,12 @@ export class NodePropertiesView extends View {
     attrs: Record<string, string>;
   }): void {
     if (this.#executing) { return; } // silently block writes during execution
-    this.treeProvider.updateNodeAttrs(id, attrs);
+    // Strip internal context flags (prefixed with _) as defense-in-depth;
+    // the webview already strips them in buildAttrs, but guard here too.
+    const cleaned = Object.fromEntries(
+      Object.entries(attrs).filter(([k]) => !k.startsWith("_"))
+    );
+    this.treeProvider.updateNodeAttrs(id, cleaned);
   }
 
   private async handleLoadEntities(): Promise<string[]> {

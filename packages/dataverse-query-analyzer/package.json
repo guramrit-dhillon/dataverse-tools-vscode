@@ -2,7 +2,7 @@
   "name": "dataverse-query-analyzer",
   "displayName": "Dataverse Tools: Query Analyzer",
   "description": "SQL query editor for Dataverse with intellisense, results display, and query analysis via the TDS endpoint",
-  "version": "0.1.0",
+  "version": "0.1.0-preview",
   "publisher": "gdhillon",
   "engines": {
     "vscode": "^1.96.0"

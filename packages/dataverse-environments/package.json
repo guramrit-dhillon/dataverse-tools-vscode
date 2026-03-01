@@ -2,7 +2,7 @@
   "name": "dataverse-environments",
   "displayName": "Dataverse Tools: Environments",
   "description": "Manages Dataverse authentication and connections",
-  "version": "0.1.0",
+  "version": "0.1.0-preview",
   "publisher": "gdhillon",
   "engines": {
     "vscode": "^1.96.0"
