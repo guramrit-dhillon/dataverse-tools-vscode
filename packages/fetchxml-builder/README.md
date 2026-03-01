@@ -90,4 +90,4 @@ Inspired by [FetchXML Builder](https://fetchxmlbuilder.com/) by Jonas Rapp — t
 
 ## Part of Dataverse Tools
 
-This extension is part of the [Dataverse Tools](../../README.md) suite for Dynamics 365 / Power Platform developers.
+This extension is part of the [Dataverse Tools](https://github.com/guramrit-dhillon/dataverse-tools-vscode) suite for Dynamics 365 / Power Platform developers.

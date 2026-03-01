@@ -1,0 +1,15 @@
+.vscode/**
+src/**
+views/**
+tsconfig.json
+tsconfig.tsbuildinfo
+../../**
+../**
+**/*.ts
+!**/*.d.ts
+**/*.map
+node_modules/**
+!out/node_modules/**
+.eslintrc*
+**/*.eslintrc*
+*.vsix

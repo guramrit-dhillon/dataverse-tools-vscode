@@ -1,5 +1,7 @@
 {
   "name": "fetchxml-builder",
+  "repository": {"type": "git", "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"},
+  "license": "MIT",
   "displayName": "Dataverse Tools: FetchXML Builder",
   "description": "Visual FetchXML query builder for Dataverse — inspect entities, build queries, execute and view results",
   "version": "0.1.0-preview",
@@ -55,11 +57,15 @@
         {
           "id": "dataverse-tools.fetchxmlTree",
           "name": "FetchXML Builder",
+  "repository": {"type": "git", "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"},
+  "license": "MIT",
           "icon": "resources/fetchxml.svg"
         },
         {
           "id": "dataverse-tools.fetchxmlProperties",
           "name": "Node Properties",
+  "repository": {"type": "git", "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"},
+  "license": "MIT",
           "type": "webview"
         }
       ]
@@ -232,6 +238,8 @@
     "languageModelTools": [
       {
         "name": "dataverse-tools_executeFetchXml",
+  "repository": {"type": "git", "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"},
+  "license": "MIT",
         "displayName": "Execute FetchXML Query",
         "modelDescription": "Executes a FetchXML query against a Dataverse environment and returns the results as JSON. Requires a valid FetchXML string and an environment ID. Use the dataverse-tools_listEnvironments tool first to get available environment IDs. Returns rows with column names and values. Example FetchXML: <fetch top=\"10\"><entity name=\"account\"><attribute name=\"name\"/><attribute name=\"accountid\"/></entity></fetch>",
         "inputSchema": {
@@ -281,7 +289,7 @@
     "@types/node": "^25.2.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@types/vscode": "^1.109.0",
+    "@types/vscode": "^1.96.0",
     "@typescript-eslint/eslint-plugin": "^8.55.0",
     "@typescript-eslint/parser": "^8.55.0",
     "esbuild": "^0.21.0",

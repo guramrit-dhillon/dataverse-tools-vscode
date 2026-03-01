@@ -50,4 +50,4 @@ Inspired by the [Plugin Registration Tool](https://learn.microsoft.com/en-us/pow
 
 ## Part of Dataverse Tools
 
-This extension is part of the [Dataverse Tools](../../README.md) suite for Dynamics 365 / Power Platform plugin developers.
+This extension is part of the [Dataverse Tools](https://github.com/guramrit-dhillon/dataverse-tools-vscode) suite for Dynamics 365 / Power Platform plugin developers.

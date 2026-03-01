@@ -25,4 +25,4 @@ This package has no standalone build step. It is bundled into each extension by 
 
 ## Part of Dataverse Tools
 
-This library is part of the [Dataverse Tools](../../README.md) suite for Dynamics 365 / Power Platform plugin developers.
+This library is part of the [Dataverse Tools](https://github.com/guramrit-dhillon/dataverse-tools-vscode) suite for Dynamics 365 / Power Platform plugin developers.

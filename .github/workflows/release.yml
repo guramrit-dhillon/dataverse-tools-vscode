@@ -9,55 +9,55 @@ permissions:
   contents: write
 
 jobs:
-  build-dotnet:
-    name: Build .NET (${{ matrix.rid }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - rid: win-x64
-            os: windows-latest
-          - rid: linux-x64
-            os: ubuntu-latest
-          - rid: osx-x64
-            os: macos-latest
-          - rid: osx-arm64
-            os: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 8.0.x
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-      - run: npm ci
-      - name: Build analyzer
-        run: npm run build -w dataverse-assembly-analyzer
-        env:
-          DOTNET_RID: ${{ matrix.rid }}
-      - name: Build decompiler
-        run: npm run build -w assembly-decompiler
-        env:
-          DOTNET_RID: ${{ matrix.rid }}
-      - name: Upload analyzer binary
-        uses: actions/upload-artifact@v4
-        with:
-          name: analyzer-${{ matrix.rid }}
-          path: packages/dataverse-assembly-analyzer/bin/${{ matrix.rid }}/
-          if-no-files-found: error
-      - name: Upload decompiler binary
-        uses: actions/upload-artifact@v4
-        with:
-          name: decompiler-${{ matrix.rid }}
-          path: packages/assembly-decompiler/bin/${{ matrix.rid }}/
-          if-no-files-found: error
+  # build-dotnet:
+  #   name: Build .NET (${{ matrix.rid }})
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       include:
+  #         - rid: win-x64
+  #           os: windows-latest
+  #         - rid: linux-x64
+  #           os: ubuntu-latest
+  #         - rid: osx-x64
+  #           os: macos-latest
+  #         - rid: osx-arm64
+  #           os: macos-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-dotnet@v4
+  #       with:
+  #         dotnet-version: 8.0.x
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 20
+  #         cache: npm
+  #     - run: npm ci
+  #     - name: Build analyzer
+  #       run: npm run build -w dataverse-assembly-analyzer
+  #       env:
+  #         DOTNET_RID: ${{ matrix.rid }}
+  #     - name: Build decompiler
+  #       run: npm run build -w assembly-decompiler
+  #       env:
+  #         DOTNET_RID: ${{ matrix.rid }}
+  #     - name: Upload analyzer binary
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: analyzer-${{ matrix.rid }}
+  #         path: packages/dataverse-assembly-analyzer/bin/${{ matrix.rid }}/
+  #         if-no-files-found: error
+  #     - name: Upload decompiler binary
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: decompiler-${{ matrix.rid }}
+  #         path: packages/assembly-decompiler/bin/${{ matrix.rid }}/
+  #         if-no-files-found: error
 
   package:
     name: Package VSIX (${{ matrix.extension }})
-    needs: build-dotnet
+    # needs: build-dotnet
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -66,7 +66,7 @@ jobs:
           # - dataverse-assemblies
           # - dataverse-metadata
           # - dataverse-assembly-decompiler
-          - plugin-trace-viewer
+          - dataverse-plugin-trace-viewer
           - fetchxml-builder
           - dataverse-query-analyzer
     steps:
@@ -101,11 +101,24 @@ jobs:
       #       cp -r decompiler-$rid/* packages/assembly-decompiler/bin/$rid/
       #     done
 
+      - name: Detect pre-release version
+        id: prerelease
+        run: |
+          VERSION=$(node -p "require('./packages/${{ matrix.extension }}/package.json').version")
+          if [[ "$VERSION" == *-* ]]; then
+            CLEAN=${VERSION%%-*}
+            echo "flag=--pre-release" >> "$GITHUB_OUTPUT"
+            cd packages/${{ matrix.extension }}
+            npm version "$CLEAN" --no-git-tag-version
+          else
+            echo "flag=" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Build extension
         run: npm run build -w ${{ matrix.extension }}
 
       - name: Package VSIX
-        run: vsce package -o ${{ matrix.extension }}.vsix
+        run: vsce package -o ${{ matrix.extension }}.vsix ${{ steps.prerelease.outputs.flag }}
         working-directory: packages/${{ matrix.extension }}
 
       - name: Upload VSIX
@@ -145,7 +158,7 @@ jobs:
           - fetchxml-builder
           # - dataverse-assemblies
           # - dataverse-metadata
-          - plugin-trace-viewer
+          - dataverse-plugin-trace-viewer
           # - dataverse-assembly-decompiler
           - dataverse-query-analyzer
     steps:
@@ -157,7 +170,19 @@ jobs:
       - name: Install vsce
         run: npm install -g @vscode/vsce
 
+      - name: Detect pre-release flag
+        id: prerelease
+        run: |
+          # Check if the VSIX was built as pre-release by inspecting the package.json in the artifact
+          # We use the tag name as the source of truth: v1.0.0-preview, v1.0.0-beta, etc.
+          TAG=${GITHUB_REF#refs/tags/}
+          if [[ "$TAG" == *-* ]]; then
+            echo "flag=--pre-release" >> "$GITHUB_OUTPUT"
+          else
+            echo "flag=" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Publish to VS Code Marketplace
-        run: vsce publish --packagePath ${{ matrix.extension }}.vsix
+        run: vsce publish --packagePath ${{ matrix.extension }}.vsix ${{ steps.prerelease.outputs.flag }}
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}

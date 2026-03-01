@@ -1,6 +1,6 @@
 {
   "name": "assembly-backend",
-  "version": "0.1.0",
+  "version": "0.1.0-preview",
   "private": true,
   "description": "Shared Node.js process manager and JSON-RPC client for .NET assembly backend tools",
   "main": "index.js",

@@ -1,6 +1,6 @@
 {
   "name": "assembly-decompiler",
-  "version": "0.1.0",
+  "version": "0.1.0-preview",
   "private": true,
   "description": "Node.js wrapper for the AssemblyDecompiler .NET backend",
   "main": "index.js",

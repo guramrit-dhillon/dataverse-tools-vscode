@@ -1,5 +1,7 @@
 {
   "name": "dataverse-metadata",
+  "repository": {"type": "git", "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"},
+  "license": "MIT",
   "displayName": "Dataverse Tools: Metadata",
   "description": "Contributes metadata providers (entities, etc.) to the Dataverse Explorer",
   "version": "0.1.0-preview",
@@ -34,7 +36,7 @@
     "@types/node": "^25.2.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@types/vscode": "^1.109.0",
+    "@types/vscode": "^1.96.0",
     "@typescript-eslint/eslint-plugin": "^8.55.0",
     "@typescript-eslint/parser": "^8.55.0",
     "@vscode/test-electron": "^2.5.2",
