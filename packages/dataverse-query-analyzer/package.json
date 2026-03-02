@@ -1,10 +1,13 @@
 {
   "name": "dataverse-query-analyzer",
-  "repository": {"type": "git", "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"
+  },
   "license": "MIT",
   "displayName": "Dataverse Tools: Query Analyzer",
   "description": "SQL query editor for Dataverse with intellisense, results display, and query analysis via the TDS endpoint",
-  "version": "0.1.1-preview",
+  "version": "0.2.0-preview",
   "publisher": "gdhillon",
   "engines": {
     "vscode": "^1.96.0"

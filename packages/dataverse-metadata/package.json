@@ -1,10 +1,13 @@
 {
   "name": "dataverse-metadata",
-  "repository": {"type": "git", "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"
+  },
   "license": "MIT",
   "displayName": "Dataverse Tools: Metadata",
   "description": "Contributes metadata providers (entities, etc.) to the Dataverse Explorer",
-  "version": "0.1.1-preview",
+  "version": "0.2.0-preview",
   "publisher": "gdhillon",
   "engines": {
     "vscode": "^1.96.0"

@@ -1,10 +1,13 @@
 {
   "name": "dataverse-environments",
-  "repository": {"type": "git", "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"
+  },
   "license": "MIT",
   "displayName": "Dataverse Tools: Environments",
   "description": "Manages Dataverse authentication and connections",
-  "version": "0.1.1-preview",
+  "version": "0.2.0-preview",
   "publisher": "gdhillon",
   "engines": {
     "vscode": "^1.96.0"
@@ -39,24 +42,33 @@
         {
           "id": "dataverse-tools.environments",
           "name": "Environments",
-  "repository": {"type": "git", "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"},
-  "license": "MIT",
+          "repository": {
+            "type": "git",
+            "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"
+          },
+          "license": "MIT",
           "icon": "resources/dataverse.svg",
           "order": 1
         },
         {
           "id": "dataverse-tools.explorer",
           "name": "Explorer",
-  "repository": {"type": "git", "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"},
-  "license": "MIT",
+          "repository": {
+            "type": "git",
+            "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"
+          },
+          "license": "MIT",
           "icon": "resources/dataverse.svg",
           "order": 2
         },
         {
           "id": "dataverse-tools.details",
           "name": "Details",
-  "repository": {"type": "git", "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"},
-  "license": "MIT",
+          "repository": {
+            "type": "git",
+            "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"
+          },
+          "license": "MIT",
           "type": "webview",
           "order": 999
         }
@@ -230,8 +242,11 @@
     "languageModelTools": [
       {
         "name": "dataverse-tools_listEnvironments",
-  "repository": {"type": "git", "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"},
-  "license": "MIT",
+        "repository": {
+          "type": "git",
+          "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"
+        },
+        "license": "MIT",
         "displayName": "List Dataverse Environments",
         "modelDescription": "Lists all configured Dataverse/Dynamics 365 environments. Returns an array of environments with their id, name, URL, and authentication method. Use this to discover which environments are available before performing other operations.",
         "inputSchema": {
@@ -241,8 +256,11 @@
       },
       {
         "name": "dataverse-tools_getEnvironmentDetails",
-  "repository": {"type": "git", "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"},
-  "license": "MIT",
+        "repository": {
+          "type": "git",
+          "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"
+        },
+        "license": "MIT",
         "displayName": "Get Dataverse Environment Details",
         "modelDescription": "Gets full details for a specific Dataverse environment by its ID. Returns id, name, URL, auth method, tenant ID, client ID, user ID, and organization ID. Use listEnvironments first to get the environment ID.",
         "inputSchema": {
@@ -253,13 +271,18 @@
               "description": "The ID of the environment to get details for"
             }
           },
-          "required": ["environmentId"]
+          "required": [
+            "environmentId"
+          ]
         }
       },
       {
         "name": "dataverse-tools_testConnection",
-  "repository": {"type": "git", "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"},
-  "license": "MIT",
+        "repository": {
+          "type": "git",
+          "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"
+        },
+        "license": "MIT",
         "displayName": "Test Dataverse Connection",
         "modelDescription": "Tests connectivity to a Dataverse environment by calling the WhoAmI endpoint. Returns the user ID and organization ID on success, or an error message on failure. This makes an API call to the Dataverse server.",
         "inputSchema": {
@@ -270,7 +293,9 @@
               "description": "The ID of the environment to test"
             }
           },
-          "required": ["environmentId"]
+          "required": [
+            "environmentId"
+          ]
         }
       }
     ],
@@ -279,7 +304,12 @@
       "properties": {
         "dataverse-tools.authMethod": {
           "type": "string",
-          "enum": ["vscode", "azcli", "devicecode", "clientcredentials"],
+          "enum": [
+            "vscode",
+            "azcli",
+            "devicecode",
+            "clientcredentials"
+          ],
           "enumDescriptions": [
             "VS Code built-in Microsoft authentication — uses accounts signed in to VS Code",
             "Azure CLI (az account get-access-token) — requires az CLI installed and signed in",

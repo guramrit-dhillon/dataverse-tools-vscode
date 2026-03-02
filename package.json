@@ -10,7 +10,8 @@
     "clean": "rimraf packages/**/out",
     "lint": "eslint .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "bump": "node scripts/bump-version.js"
   },
   "devDependencies": {
     "@types/vscode": "^1.109.0",
