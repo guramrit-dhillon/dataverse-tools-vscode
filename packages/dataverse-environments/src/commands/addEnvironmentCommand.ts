@@ -566,8 +566,11 @@ export async function addEnvironmentCommand(
           tenantId: item._tenantId ?? customTenantId ?? spTenantId,
           clientId: customClientId ?? spClientId,
         };
-        processing = false;
-        saveEnvironment(envManager, env, authSvc, secretStorage, spSecret).then(() => {
+        qp.busy = true;
+        qp.enabled = false;
+        qp.title = `Adding "${env.name}"…`;
+        saveEnvironment(envManager, env, authSvc, secretStorage, spSecret).finally(() => {
+          processing = false;
           qp.hide();
         });
         return;
@@ -704,27 +707,32 @@ async function saveEnvironment(
   secretStorage: SecretStorageService,
   spSecret?: string
 ): Promise<void> {
-  if (env.authMethod === "clientcredentials" && spSecret) {
-    await secretStorage.storeClientSecret(env.id, spSecret);
-  }
+  await vscode.window.withProgress(
+    { location: vscode.ProgressLocation.Notification, title: `Adding "${env.name}"…` },
+    async () => {
+      if (env.authMethod === "clientcredentials" && spSecret) {
+        await secretStorage.storeClientSecret(env.id, spSecret);
+      }
 
-  const whoAmI = await fetchWhoAmI(env, authSvc);
-  await authSvc.clearTokens(env); // clear test token so first real use re-acquires cleanly
+      const whoAmI = await fetchWhoAmI(env, authSvc);
+      await authSvc.clearTokens(env); // clear test token so first real use re-acquires cleanly
 
-  const envToSave = whoAmI
-    ? { ...env, userId: whoAmI.userId, organizationId: whoAmI.organizationId }
-    : env;
-  await envManager.save(envToSave);
-  Logger.info("Environment added", { name: env.name, method: env.authMethod });
+      const envToSave = whoAmI
+        ? { ...env, userId: whoAmI.userId, organizationId: whoAmI.organizationId }
+        : env;
+      await envManager.save(envToSave);
+      Logger.info("Environment added", { name: env.name, method: env.authMethod });
 
-  if (whoAmI) {
-    vscode.window.showInformationMessage(`\u2714 Environment "${env.name}" added and connection verified.`);
-  } else {
-    vscode.window.showWarningMessage(
-      `Environment "${env.name}" added, but the connection test failed. ` +
-      "Check your credentials — the environment will still appear in the list."
-    );
-  }
+      if (whoAmI) {
+        vscode.window.showInformationMessage(`✔ Environment "${env.name}" added and connection verified.`);
+      } else {
+        vscode.window.showWarningMessage(
+          `Environment "${env.name}" added, but the connection test failed. ` +
+          "Check your credentials — the environment will still appear in the list."
+        );
+      }
+    }
+  );
 }
 
 // ── Custom URL input (runs after QP is hidden) ────────────────────────────────
