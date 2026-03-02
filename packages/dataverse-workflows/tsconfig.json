@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "./out",
+    "types": ["node", "vscode"],
+    "composite": true,
+    "noEmit": false
+  },
+  "references": [
+    { "path": "../core-dataverse" }
+  ],
+  "include": ["src"]
+}

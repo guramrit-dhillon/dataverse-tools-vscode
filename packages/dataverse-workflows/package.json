@@ -1,0 +1,100 @@
+{
+  "name": "dataverse-workflows",
+  "displayName": "Dataverse Tools: Workflows",
+  "description": "Browse and manage Dataverse workflow processes in VS Code",
+  "version": "0.1.1-preview",
+  "publisher": "gdhillon",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"
+  },
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "dataverse",
+    "power platform",
+    "dynamics 365",
+    "workflow",
+    "crm"
+  ],
+  "extensionDependencies": [
+    "gdhillon.dataverse-environments"
+  ],
+  "activationEvents": [
+    "workspaceContains:**/*.csproj",
+    "onView:dataverse-tools.explorer"
+  ],
+  "main": "./out/extension.js",
+  "icon": "resources/icon.png",
+  "contributes": {
+    "commands": [
+      {
+        "command": "dataverse-tools.workflows.activate",
+        "title": "Activate",
+        "category": "Dataverse Tools: Workflows",
+        "icon": "$(play)"
+      },
+      {
+        "command": "dataverse-tools.workflows.deactivate",
+        "title": "Deactivate",
+        "category": "Dataverse Tools: Workflows",
+        "icon": "$(debug-pause)"
+      },
+      {
+        "command": "dataverse-tools.workflows.delete",
+        "title": "Delete",
+        "category": "Dataverse Tools: Workflows",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "dataverse-tools.workflows.triggerOnDemand",
+        "title": "Trigger On-Demand…",
+        "category": "Dataverse Tools: Workflows",
+        "icon": "$(run)"
+      }
+    ],
+    "menus": {
+      "view/item/context": [
+        {
+          "command": "dataverse-tools.workflows.activate",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /^dv\\.(wf|action|bpf|businessrule|dialog|modernflow)\\.draft/",
+          "group": "dataverse@1"
+        },
+        {
+          "command": "dataverse-tools.workflows.deactivate",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /^dv\\.(wf|action|bpf|businessrule|dialog|modernflow)\\.(activated|ondemand)/",
+          "group": "dataverse@1"
+        },
+        {
+          "command": "dataverse-tools.workflows.triggerOnDemand",
+          "when": "view == dataverse-tools.explorer && viewItem == dv.wf.ondemand",
+          "group": "dataverse@2"
+        },
+        {
+          "command": "dataverse-tools.workflows.delete",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /^dv\\.(wf|action|bpf|businessrule|dialog|modernflow)\\./",
+          "group": "dataverse@9"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "build": "node ../../scripts/build-extension.js --production",
+    "watch": "node ../../scripts/build-extension.js --watch"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.3",
+    "@types/vscode": "^1.96.0",
+    "@typescript-eslint/eslint-plugin": "^8.55.0",
+    "@typescript-eslint/parser": "^8.55.0",
+    "esbuild": "^0.21.0",
+    "eslint": "^9.39.2",
+    "typescript": "^5.3.0",
+    "typescript-eslint": "^8.55.0"
+  }
+}
