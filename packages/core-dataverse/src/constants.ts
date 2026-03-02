@@ -49,6 +49,11 @@ export const Commands = {
   QueryAnalyzerQueryEntity: "dataverse-tools.queryAnalyzer.queryEntity",
   // ── Assembly Decompiler ─────────────────────────────────────────────────
   BrowseAssemblyCode: "dataverse-tools.browseAssemblyCode",
+  // ── Workflows ─────────────────────────────────────────────────────────
+  WorkflowActivate: "dataverse-tools.workflows.activate",
+  WorkflowDeactivate: "dataverse-tools.workflows.deactivate",
+  WorkflowDelete: "dataverse-tools.workflows.delete",
+  WorkflowTriggerOnDemand: "dataverse-tools.workflows.triggerOnDemand",
 } as const;
 
 export const Views = {
@@ -69,4 +74,5 @@ export const ExtensionIds = {
   FetchXmlBuilder: "gdhillon.fetchxml-builder",
   QueryAnalyzer: "gdhillon.dataverse-query-analyzer",
   AssemblyDecompiler: "gdhillon.dataverse-assembly-decompiler",
+  Workflows: "gdhillon.dataverse-workflows",
 } as const;

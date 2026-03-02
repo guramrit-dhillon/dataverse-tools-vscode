@@ -69,6 +69,7 @@ jobs:
           - dataverse-plugin-trace-viewer
           - fetchxml-builder
           - dataverse-query-analyzer
+          - dataverse-workflows
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -161,14 +162,15 @@ jobs:
           - dataverse-plugin-trace-viewer
           # - dataverse-assembly-decompiler
           - dataverse-query-analyzer
+          - dataverse-workflows
     steps:
       - name: Download VSIX
         uses: actions/download-artifact@v4
         with:
           name: vsix-${{ matrix.extension }}
 
-      - name: Install vsce
-        run: npm install -g @vscode/vsce
+      - name: Install vsce and ovsx
+        run: npm install -g @vscode/vsce ovsx
 
       - name: Detect pre-release flag
         id: prerelease
@@ -186,3 +188,8 @@ jobs:
         run: vsce publish --packagePath ${{ matrix.extension }}.vsix ${{ steps.prerelease.outputs.flag }}
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
+
+      - name: Publish to Open VSX
+        run: ovsx publish ${{ matrix.extension }}.vsix ${{ steps.prerelease.outputs.flag }}
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}

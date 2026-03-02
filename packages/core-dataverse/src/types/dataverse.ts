@@ -203,6 +203,48 @@ export type TraceLogTarget =
   | { readonly kind: "assembly"; readonly assemblyName: string }
   | { readonly kind: "pluginType"; readonly pluginTypeName: string };
 
+// ─── Workflow / Process ─────────────────────────────────────────────────────
+
+/** A Dataverse process from the `workflows` entity set. */
+export interface WorkflowProcess {
+  workflowid: string;
+  name: string;
+  uniquename?: string;
+  /** 0=Workflow, 1=Dialog, 2=BusinessRule, 3=Action, 4=BPF, 5=ModernFlow */
+  category: WorkflowCategory;
+  /** 1=Definition, 2=Activation, 3=Template */
+  type: WorkflowType;
+  /** 0=Draft, 1=Activated */
+  statecode: WorkflowStateCode;
+  statuscode: number;
+  primaryentity: string;
+  ismanaged?: boolean;
+  description?: string;
+  modifiedon?: string;
+  createdon?: string;
+  _ownerid_value?: string;
+}
+
+export const enum WorkflowCategory {
+  Workflow = 0,
+  Dialog = 1,
+  BusinessRule = 2,
+  Action = 3,
+  BPF = 4,
+  ModernFlow = 5,
+}
+
+export const enum WorkflowType {
+  Definition = 1,
+  Activation = 2,
+  Template = 3,
+}
+
+export const enum WorkflowStateCode {
+  Draft = 0,
+  Activated = 1,
+}
+
 // ─── Details panel ──────────────────────────────────────────────────────────
 
 /** A single row in the Details panel property table. */
