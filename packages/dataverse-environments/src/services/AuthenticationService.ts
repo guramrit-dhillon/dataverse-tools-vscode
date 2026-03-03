@@ -183,12 +183,9 @@ export class AuthenticationService implements IAuthenticationService {
           Logger.info(info.message);
           vscode.window.showInformationMessage(
             `Dataverse sign-in: enter code **${info.userCode}** at ${info.verificationUri}`,
-            "Copy Code",
             "Open Browser"
           ).then((choice) => {
-            if (choice === "Copy Code") {
-              vscode.env.clipboard.writeText(info.userCode);
-            } else if (choice === "Open Browser") {
+            if (choice === "Open Browser") {
               vscode.env.openExternal(vscode.Uri.parse(info.verificationUri));
             }
           });

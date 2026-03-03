@@ -1,7 +1,7 @@
 import type { DataverseEnvironment, WorkflowProcess } from "core-dataverse";
 
 export interface IWorkflowService {
-  listWorkflows(env: DataverseEnvironment): Promise<WorkflowProcess[]>;
+  listWorkflows(env: DataverseEnvironment, solutionId?: string): Promise<WorkflowProcess[]>;
   activateWorkflow(env: DataverseEnvironment, workflowId: string): Promise<void>;
   deactivateWorkflow(env: DataverseEnvironment, workflowId: string): Promise<void>;
   deleteWorkflow(env: DataverseEnvironment, workflowId: string): Promise<void>;

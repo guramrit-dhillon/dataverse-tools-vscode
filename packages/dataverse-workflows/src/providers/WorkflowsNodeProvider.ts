@@ -61,7 +61,11 @@ export class WorkflowsNodeProvider implements NodeProvider {
 
   async getRoots(context: ExplorerContext): Promise<ExplorerNode[]> {
     return this.fetchCached("__roots__", async () => {
-      let all = await this.workflowSvc.listWorkflows(context.environment);
+      const solutionId = context.filter.showOutOfSolution
+        ? undefined
+        : context.solution?.solutionid;
+
+      let all = await this.workflowSvc.listWorkflows(context.environment, solutionId);
 
       if (context.filter.componentScope === "unmanaged") {
         all = all.filter((w) => !w.ismanaged);

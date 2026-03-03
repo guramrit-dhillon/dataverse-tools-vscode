@@ -4,6 +4,8 @@
   "private": true,
   "main": "index.ts",
   "scripts": {
-    "build": "echo 'Shared views — bundled by extension esbuild'"
+    "build": "echo 'Shared views — bundled by extension esbuild'",
+    "package": "echo 'Shared views — bundled by extension esbuild'",
+    "package:prerelease": "echo 'Shared views — bundled by extension esbuild'"
   }
 }

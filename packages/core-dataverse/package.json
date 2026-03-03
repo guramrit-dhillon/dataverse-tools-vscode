@@ -4,7 +4,9 @@
   "private": true,
   "main": "src/index.ts",
   "scripts": {
-    "build": "echo 'Core library - built by extension esbuild'"
+    "build": "echo 'Core library - built by extension esbuild'",
+    "package": "echo 'Core library - packaged by extension esbuild'",
+    "package:prerelease": "echo 'Core library - packaged by extension esbuild'"
   },
   "dependencies": {
     "axios": "^1.6.0"

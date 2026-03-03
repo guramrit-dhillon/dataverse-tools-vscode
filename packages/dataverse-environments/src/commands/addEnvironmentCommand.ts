@@ -10,7 +10,7 @@ import {
   Logger,
   runWizard,
 } from "core-dataverse";
-import { fetchWhoAmI } from "./testConnectionCommand";
+import { fetchWhoAmI, type WhoAmIResult } from "./testConnectionCommand";
 
 const DISCOVERY_URL = "https://globaldisco.crm.dynamics.com/api/discovery/v2.0/Instances";
 const DISCOVERY_SCOPE = "https://globaldisco.crm.dynamics.com/.default";
@@ -718,8 +718,14 @@ async function saveEnvironment(
         await secretStorage.storeClientSecret(env.id, spSecret);
       }
 
-      const whoAmI = await fetchWhoAmI(env, authSvc);
-      await authSvc.clearTokens(env);
+      // Skip WhoAmI for device code — discovery already proved auth works,
+      // and acquiring a token for a different resource would trigger a second
+      // device code prompt (MSAL treats each resource as a separate flow).
+      let whoAmI: WhoAmIResult | null = null;
+      if (env.authMethod !== "devicecode") {
+        whoAmI = await fetchWhoAmI(env, authSvc);
+        await authSvc.clearTokens(env);
+      }
 
       const envToSave = whoAmI
         ? { ...env, userId: whoAmI.userId, organizationId: whoAmI.organizationId }
@@ -727,7 +733,11 @@ async function saveEnvironment(
       await envManager.save(envToSave);
       Logger.info("Environment added", { name: env.name, method: env.authMethod });
 
-      if (whoAmI) {
+      if (env.authMethod === "devicecode") {
+        vscode.window.showInformationMessage(
+          `\u2714 Environment "${env.name}" added. Connection will be verified on first use.`
+        );
+      } else if (whoAmI) {
         vscode.window.showInformationMessage(`\u2714 Environment "${env.name}" added and connection verified.`);
       } else {
         vscode.window.showWarningMessage(

@@ -28,6 +28,9 @@ type FieldResult =
 // ── Title helper ────────────────────────────────────────────────────────────
 
 function formatTitle(wizardTitle: string, pageTitle: string, stepNumber: number): string {
+  if (stepNumber <= 1) {
+    return `${wizardTitle} \u2014 ${pageTitle}`;
+  }
   return `${wizardTitle} (Step ${stepNumber}) \u2014 ${pageTitle}`;
 }
 

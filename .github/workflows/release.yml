@@ -69,7 +69,7 @@ jobs:
           - dataverse-plugin-trace-viewer
           - fetchxml-builder
           - dataverse-query-analyzer
-          - dataverse-workflows
+          # - dataverse-workflows
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -162,7 +162,7 @@ jobs:
           - dataverse-plugin-trace-viewer
           # - dataverse-assembly-decompiler
           - dataverse-query-analyzer
-          - dataverse-workflows
+          # - dataverse-workflows
     steps:
       - name: Download VSIX
         uses: actions/download-artifact@v4

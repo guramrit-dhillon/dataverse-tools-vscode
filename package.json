@@ -11,6 +11,8 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
+    "package": "npm run package -ws",
+    "package:prerelease": "npm run package:prerelease -ws",
     "bump": "node scripts/bump-version.js"
   },
   "devDependencies": {

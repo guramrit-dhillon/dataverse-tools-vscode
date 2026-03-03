@@ -303,7 +303,9 @@
   },
   "scripts": {
     "build": "node ../../scripts/build-extension.js --production",
-    "watch": "node ../../scripts/build-extension.js --watch"
+    "watch": "node ../../scripts/build-extension.js --watch",
+    "package": "vsce package --out ../../fetchxml-builder.vsix",
+    "package:prerelease": "vsce package --pre-release --out ../../fetchxml-builder.vsix"
   },
   "devDependencies": {
     "@types/node": "^25.2.3",

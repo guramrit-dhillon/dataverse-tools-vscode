@@ -202,7 +202,9 @@
   },
   "scripts": {
     "build": "node ../../scripts/build-extension.js --production",
-    "watch": "node ../../scripts/build-extension.js --watch"
+    "watch": "node ../../scripts/build-extension.js --watch",
+    "package": "vsce package --out ../../dataverse-assemblies.vsix",
+    "package:prerelease": "vsce package --pre-release --out ../../dataverse-assemblies.vsix"
   },
   "dependencies": {
     "dataverse-assembly-analyzer": "*"

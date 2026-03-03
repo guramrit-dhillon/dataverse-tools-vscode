@@ -9,7 +9,9 @@
     "build": "node build.js",
     "build:all": "node build.js --all",
     "watch": "echo \"No watch mode for .NET packages\"",
-    "test": "vitest run"
+    "test": "vitest run",
+    "package": "echo \"No packaging for .NET package\"",
+    "package:prerelease": "echo \"No packaging for .NET package\""
   },
   "dependencies": {
     "assembly-backend": "*"

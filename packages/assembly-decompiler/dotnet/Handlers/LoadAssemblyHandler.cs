@@ -54,7 +54,7 @@ public class LoadAssemblyHandler : ICommandHandler
             targetFramework: peFile.DetectTargetFrameworkId()
         );
 
-        var decompiler = new CSharpDecompiler(peFile, resolver, new DecompilerSettings(LanguageVersion.CSharp1)
+        var decompiler = new CSharpDecompiler(peFile, resolver, new DecompilerSettings(LanguageVersion.CSharp11_0)
         {
             ThrowOnAssemblyResolveErrors = false,
         });

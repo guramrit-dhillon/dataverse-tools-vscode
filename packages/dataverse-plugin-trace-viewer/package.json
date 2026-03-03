@@ -63,7 +63,9 @@
   },
   "scripts": {
     "build": "node ../../scripts/build-extension.js --production",
-    "watch": "node ../../scripts/build-extension.js --watch"
+    "watch": "node ../../scripts/build-extension.js --watch",
+    "package": "vsce package --out ../../dataverse-plugin-trace-viewer.vsix",
+    "package:prerelease": "vsce package --pre-release --out ../../dataverse-plugin-trace-viewer.vsix"
   },
   "devDependencies": {
     "@types/node": "^25.2.3",

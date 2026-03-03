@@ -9,6 +9,8 @@
     "build": "node build.js",
     "build:all": "echo \"No platform builds for class library\"",
     "watch": "echo \"No watch mode for .NET packages\"",
-    "test": "vitest run"
+    "test": "vitest run",
+    "package": "echo \"No packaging for class library\"",
+    "package:prerelease": "echo \"No packaging for class library\""
   }
 }

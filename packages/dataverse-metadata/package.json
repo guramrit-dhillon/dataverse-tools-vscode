@@ -33,7 +33,9 @@
   "icon": "resources/icon.png",
   "scripts": {
     "build": "node ../../scripts/build-extension.js --production",
-    "watch": "node ../../scripts/build-extension.js --watch"
+    "watch": "node ../../scripts/build-extension.js --watch",
+    "package": "vsce package --out ../../dataverse-metadata.vsix",
+    "package:prerelease": "vsce package --pre-release --out ../../dataverse-metadata.vsix"
   },
   "devDependencies": {
     "@types/node": "^25.2.3",
