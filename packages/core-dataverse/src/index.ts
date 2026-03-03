@@ -9,6 +9,7 @@
  *   - Command ID constants
  *   - Panel base class for editor tab webviews
  *   - View base class for sidebar webviews
+ *   - Wizard framework for multi-step QuickInput flows
  *
  * Authentication, EnvironmentManager, tree providers, commands, and
  * extension-specific webviews live in their respective extension packages.
@@ -20,3 +21,4 @@ export * from "./services";
 export * from "./utils";
 export * from "./webviews/Panel";
 export * from "./webviews/View";
+export * from "./wizard";
