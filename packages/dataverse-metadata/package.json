@@ -38,7 +38,7 @@
     "package:prerelease": "vsce package --pre-release --out ../../dataverse-metadata.vsix"
   },
   "dependencies": {
-    "core-dataverse": "*"
+    "core-dataverse": "0.2.1-preview"
   },
   "devDependencies": {
     "@types/node": "^25.2.3",

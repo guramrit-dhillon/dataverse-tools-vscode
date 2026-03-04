@@ -308,8 +308,8 @@
     "package:prerelease": "vsce package --pre-release --out ../../fetchxml-builder.vsix"
   },
   "dependencies": {
-    "core-dataverse": "*",
-    "shared-views": "*"
+    "core-dataverse": "0.2.1-preview",
+    "shared-views": "0.2.1-preview"
   },
   "devDependencies": {
     "@types/node": "^25.2.3",

@@ -207,7 +207,7 @@
     "package:prerelease": "vsce package --pre-release --out ../../dataverse-assemblies.vsix"
   },
   "dependencies": {
-    "dataverse-assembly-analyzer": "*"
+    "dataverse-assembly-analyzer": "0.2.1-preview"
   },
   "devDependencies": {
     "@types/node": "^25.2.3",

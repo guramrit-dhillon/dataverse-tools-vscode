@@ -14,6 +14,6 @@
     "package:prerelease": "echo \"No packaging for .NET package\""
   },
   "dependencies": {
-    "assembly-backend": "*"
+    "assembly-backend": "0.2.1-preview"
   }
 }
