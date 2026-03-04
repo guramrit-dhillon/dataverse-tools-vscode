@@ -7,7 +7,7 @@
   "license": "MIT",
   "displayName": "Dataverse Tools: FetchXML Builder",
   "description": "Visual FetchXML query builder for Dataverse — inspect entities, build queries, execute and view results",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "publisher": "gdhillon",
   "engines": {
     "vscode": "^1.96.0"

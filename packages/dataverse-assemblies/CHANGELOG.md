@@ -1,5 +1,25 @@
 # dataverse-assemblies
 
+## 0.3.0
+
+### Minor Changes
+
+- [`c378dfc`](https://github.com/guramrit-dhillon/dataverse-tools-vscode/commit/c378dfcb2d2720b63058ac8c4ff5b72d4c150e35) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - fix: use tag name for pre-release detection in CI workflows
+  - fix: handle existing tag on workflow re-run
+  - fix: remove -preview suffix from package versions
+  - chore: add auto-generated changeset for recent changes
+  - feat: add version & release workflow for one-click releases
+  - fix: pin workspace dependency versions for changesets compatibility
+  - fix: improve CI workflow reliability
+  - chore: add changesets tooling and replace bump-version script
+  - fix: dynamic release matrix with version-based change detection
+  - fix: add explicit workspace dependencies to extension packages
+  - fix: refactor workflow service to use getSolutionComponents
+  - fix: refactor metadata providers to use unified SolutionComponent type
+  - fix: refactor editEnvironmentCommand to use declarative wizard framework
+  - fix: add customization tracking and RemoveActiveCustomizations to explorer
+  - fix: correct SolutionComponentType values and add unified SolutionComponent type
+
 ## 0.2.2
 
 ### Patch Changes
