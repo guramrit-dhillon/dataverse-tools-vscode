@@ -146,6 +146,12 @@
         "title": "Remove from Solution",
         "category": "Dataverse Tools: Explorer",
         "icon": "$(remove)"
+      },
+      {
+        "command": "dataverse-tools.explorer.removeActiveCustomizations",
+        "title": "Remove Active Customizations",
+        "category": "Dataverse Tools: Explorer",
+        "icon": "$(discard)"
       }
     ],
     "menus": {
@@ -209,33 +215,38 @@
         },
         {
           "command": "dataverse-tools.explorer.addToSolution",
-          "when": "view == dataverse-tools.explorer && viewItem =~ /\\.outOfSolution$/",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /\\.outOfSolution/",
           "group": "inline@1"
         },
         {
           "command": "dataverse-tools.explorer.addToSolution",
-          "when": "view == dataverse-tools.explorer && viewItem =~ /\\.outOfSolution$/",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /\\.outOfSolution/",
           "group": "solution@1"
         },
         {
           "command": "dataverse-tools.explorer.addToSolution",
-          "when": "view == dataverse-tools.explorer && viewItem == entity.inSolution",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /^entity\\.inSolution/",
           "group": "inline@2"
         },
         {
           "command": "dataverse-tools.explorer.addToSolution",
-          "when": "view == dataverse-tools.explorer && viewItem == entity.inSolution",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /^entity\\.inSolution/",
           "group": "solution@1"
         },
         {
           "command": "dataverse-tools.explorer.removeFromSolution",
-          "when": "view == dataverse-tools.explorer && viewItem =~ /\\.inSolution$/",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /\\.inSolution/",
           "group": "inline@1"
         },
         {
           "command": "dataverse-tools.explorer.removeFromSolution",
-          "when": "view == dataverse-tools.explorer && viewItem =~ /\\.inSolution$/",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /\\.inSolution/",
           "group": "solution@2"
+        },
+        {
+          "command": "dataverse-tools.explorer.removeActiveCustomizations",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /\\.customized/",
+          "group": "solution@3"
         }
       ]
     },
@@ -345,7 +356,9 @@
     "package:prerelease": "vsce package --pre-release --out ../../dataverse-environments.vsix"
   },
   "dependencies": {
-    "@azure/identity": "^4.5.0"
+    "@azure/identity": "^4.5.0",
+    "core-dataverse": "*",
+    "shared-views": "*"
   },
   "devDependencies": {
     "@types/node": "^25.2.3",

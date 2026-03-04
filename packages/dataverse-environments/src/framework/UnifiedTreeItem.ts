@@ -72,7 +72,7 @@ export class UnifiedTreeItem extends vscode.TreeItem {
     registry?: ContributionRegistry,
     context?: ExplorerContext,
   ): UnifiedTreeItem {
-    // Determine if this node is out-of-solution
+    // Determine solution-awareness decorations from framework context maps
     let effectiveDescription = node.description;
     let effectiveIconColor = node.iconColor;
 
@@ -91,14 +91,25 @@ export class UnifiedTreeItem extends vscode.TreeItem {
         // Show inclusion mode for entities
         if (node.solutionComponent.componentType === SolutionComponentType.Entity) {
           const behavior = context.solutionComponentIds.get(key);
-          const label = behavior !== undefined ? BEHAVIOR_LABELS[behavior] : undefined;
-          if (label) {
+          const behaviorLabel = behavior !== undefined ? BEHAVIOR_LABELS[behavior] : undefined;
+          if (behaviorLabel) {
             effectiveDescription = effectiveDescription
-              ? `${effectiveDescription}  · ${label}`
-              : label;
+              ? `${effectiveDescription}  · ${behaviorLabel}`
+              : behaviorLabel;
           }
         }
       }
+    }
+
+    // Show customization indicator regardless of solution context
+    let isCustomized = false;
+    if (node.solutionComponent && context?.customizedComponentIds.has(
+      `${node.solutionComponent.componentType}:${node.solutionComponent.componentId}`,
+    )) {
+      isCustomized = true;
+      effectiveDescription = effectiveDescription
+        ? `${effectiveDescription}  · customized`
+        : "customized";
     }
 
     const iconColor = effectiveIconColor
@@ -123,6 +134,12 @@ export class UnifiedTreeItem extends vscode.TreeItem {
       }
     }
 
+    // Build compound contextValue: {base}.{solutionState}.{customized}
+    let cv = node.contextValue;
+    if (isOutOfSolution) { cv += ".outOfSolution"; }
+    else if (isInSolution) { cv += ".inSolution"; }
+    if (isCustomized) { cv += ".customized"; }
+
     return new UnifiedTreeItem({
       itemType: "provider-node",
       label: node.label,
@@ -133,11 +150,7 @@ export class UnifiedTreeItem extends vscode.TreeItem {
       description: effectiveDescription,
       tooltip: node.tooltip,
       iconPath,
-      contextValue: isOutOfSolution
-        ? `${node.contextValue}.outOfSolution`
-        : isInSolution
-          ? `${node.contextValue}.inSolution`
-          : node.contextValue,
+      contextValue: cv,
       command: node.command,
     });
   }

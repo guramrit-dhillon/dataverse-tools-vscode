@@ -28,6 +28,7 @@ export const Commands = {
   ExplorerShowSolutionOnly: "dataverse-tools.explorer.showSolutionOnly",
   AddToSolution: "dataverse-tools.explorer.addToSolution",
   RemoveFromSolution: "dataverse-tools.explorer.removeFromSolution",
+  RemoveActiveCustomizations: "dataverse-tools.explorer.removeActiveCustomizations",
   // ── FetchXML Builder ──────────────────────────────────────────────────────
   FetchXmlNewQuery: "dataverse-tools.fetchxml.newQuery",
   FetchXmlExecute: "dataverse-tools.fetchxml.execute",

@@ -227,14 +227,14 @@ export function activate(context: vscode.ExtensionContext): DataverseAccountApi 
     const isEntity = solutionComponent.componentType === SolutionComponentType.Entity;
     const isAlreadyInSolution = item?.contextValue?.endsWith(".inSolution") ?? false;
 
+    // Read current behavior from the framework's cached solution component map
+    const componentKey = `${solutionComponent.componentType}:${solutionComponent.componentId}`;
+    const currentBehavior = ctx.solutionComponentIds.get(componentKey);
+
     // For entities, offer three inclusion modes; for others, a simple confirm.
     let selectedBehavior: number | undefined;
     if (isEntity) {
       const actionLabel = isAlreadyInSolution ? "Change to" : "Add with";
-
-      // Look up current behavior to pre-select in the picker
-      const compKey = `${solutionComponent.componentType}:${solutionComponent.componentId}`;
-      const currentBehavior = ctx.solutionComponentIds?.get(compKey);
 
       type BehaviorItem = vscode.QuickPickItem & { behavior: number };
       const options: BehaviorItem[] = [
@@ -289,8 +289,6 @@ export function activate(context: vscode.ExtensionContext): DataverseAccountApi 
           // Only remove first when going from "all objects" (0) to a lower mode —
           // subcomponents need to be stripped. Other transitions (metadata ↔ shell,
           // or upgrading to all objects) can be done with AddSolutionComponent alone.
-          const compKey = `${solutionComponent.componentType}:${solutionComponent.componentId}`;
-          const currentBehavior = ctx.solutionComponentIds?.get(compKey);
           if (isAlreadyInSolution && isEntity && currentBehavior === 0 && selectedBehavior !== 0) {
             await client.post("RemoveSolutionComponent", {
               SolutionComponent: {
@@ -374,6 +372,47 @@ export function activate(context: vscode.ExtensionContext): DataverseAccountApi 
       Logger.error("Remove from solution failed", err);
       vscode.window.showErrorMessage(
         `Failed to remove from solution: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }) as (...args: unknown[]) => unknown);
+
+  registerCommand(context, Commands.RemoveActiveCustomizations, (async (arg?: unknown) => {
+    const item = arg as UnifiedTreeItem | undefined;
+    const node = item?.node;
+    if (!node?.solutionComponent) { return; }
+
+    const solutionComponent = node.solutionComponent;
+
+    const ctx = treeProvider.getContext();
+    if (!ctx?.environment) { return; }
+    const env = ctx.environment;
+
+    const confirm = await vscode.window.showWarningMessage(
+      `Remove active customizations from "${node.label}"? It will revert to its managed state.`,
+      { modal: true },
+      "Remove",
+    );
+    if (confirm !== "Remove") { return; }
+
+    try {
+      await vscode.window.withProgress(
+        { location: vscode.ProgressLocation.Notification, title: `Removing customizations from "${node.label}"…` },
+        async () => {
+          const client = new DataverseWebApiClient(env, (e) => api.getAccessToken(e));
+          await client.post("RemoveActiveCustomizations", {
+            SolutionComponentName: solutionComponent.componentType,
+            ComponentId: solutionComponent.componentId,
+          });
+          await treeProvider.refreshSolutionComponents();
+        },
+      );
+      vscode.window.showInformationMessage(
+        `Removed active customizations from "${node.label}".`,
+      );
+    } catch (err) {
+      Logger.error("Remove active customizations failed", err);
+      vscode.window.showErrorMessage(
+        `Failed to remove customizations: ${err instanceof Error ? err.message : String(err)}`,
       );
     }
   }) as (...args: unknown[]) => unknown);

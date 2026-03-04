@@ -4,6 +4,7 @@ import {
   DataverseWebApiClient,
   type DataverseAccountApi,
   type DataverseSolution,
+  type DataverseEnvironment,
   type ExplorerContext,
   type ExplorerFilter,
   type ExplorerNode,
@@ -39,10 +40,14 @@ export class UnifiedTreeProvider
   readonly onDidChangeContext = this._onDidChangeContext.event;
 
   private context: ExplorerContext | undefined;
+  /** Resolves when the initial `rebuildContext()` completes. */
+  private contextReady: Promise<void> | undefined;
 
   /** Cached solution component IDs — invalidated only on env/solution change. */
   private cachedSolutionComponentIds = new Map<string, number | undefined>();
+  private cachedCustomizedComponentIds = new Set<string>();
   private cachedSolutionId: string | undefined;
+  private cachedEnvId: string | undefined;
 
   /**
    * Cached group items keyed by provider ID.
@@ -63,10 +68,10 @@ export class UnifiedTreeProvider
     });
 
     // Re-evaluate context when environments change (e.g. env removed)
-    api.onDidChangeEnvironments(() => void this.rebuildContext());
+    api.onDidChangeEnvironments(() => { this.contextReady = this.rebuildContext(); });
 
     // Build initial context from persisted state
-    void this.rebuildContext();
+    this.contextReady = this.rebuildContext();
   }
 
   // ── Context management ─────────────────────────────────────────────────
@@ -117,42 +122,30 @@ export class UnifiedTreeProvider
       const activeSolution =
         solution && solution.uniquename !== "Default" ? solution : undefined;
 
-      // Only re-query solution components when the solution actually changed
-      if (activeSolution?.solutionid !== this.cachedSolutionId) {
-        this.cachedSolutionId = activeSolution?.solutionid;
-        this.cachedSolutionComponentIds = new Map<string, number | undefined>();
+      // Re-query solution components when the solution or environment changed
+      const needsRefresh =
+        activeSolution?.solutionid !== this.cachedSolutionId ||
+        env.id !== this.cachedEnvId;
 
-        if (activeSolution) {
-          try {
-            const client = new DataverseWebApiClient(
-              env,
-              (e) => this.api.getAccessToken(e),
-            );
-            const components = await client.getAll<{
-              componenttype: number;
-              objectid: string;
-              rootcomponentbehavior: number | null;
-            }>(
-              "solutioncomponents",
-              `$filter=_solutionid_value eq ${activeSolution.solutionid}&$select=componenttype,objectid,rootcomponentbehavior`,
-            );
-            this.cachedSolutionComponentIds = new Map(
-              components.map((c) => [`${c.componenttype}:${c.objectid}`, c.rootcomponentbehavior ?? undefined]),
-            );
-          } catch (err) {
-            Logger.error("Explorer: failed to fetch solution components", err);
-          }
-        }
+      if (needsRefresh) {
+        this.cachedSolutionId = activeSolution?.solutionid;
+        this.cachedEnvId = env.id;
+        this.cachedSolutionComponentIds = new Map();
+        this.cachedCustomizedComponentIds = new Set();
       }
 
+      // Set context immediately with current caches (possibly empty).
+      // Tree renders right away; decorations arrive when background fetch completes.
       this.context = {
         environment: env,
         solution: activeSolution,
         filter,
         solutionComponentIds: this.cachedSolutionComponentIds,
+        customizedComponentIds: this.cachedCustomizedComponentIds,
       };
     }
 
+    this.contextReady = undefined;
     this._onDidChangeContext.fire(this.context);
 
     // Notify all providers so they can invalidate caches
@@ -160,6 +153,72 @@ export class UnifiedTreeProvider
       p.onRefresh?.();
     }
 
+    this.groupItems.clear();
+    this._onDidChangeTreeData.fire();
+
+    // ── Background: fetch solution component data, then re-render with decorations ──
+    if (this.context?.solution) {
+      void this.fetchSolutionData(
+        this.context.environment,
+        this.context.solution.solutionid,
+      );
+    }
+  }
+
+  /**
+   * Fetch solution component membership and customization data in the background.
+   * Updates caches and context, then fires a tree re-render so decorations appear.
+   */
+  private async fetchSolutionData(
+    env: DataverseEnvironment,
+    solutionId: string,
+  ): Promise<void> {
+    const client = new DataverseWebApiClient(
+      env,
+      (e) => this.api.getAccessToken(e),
+    );
+
+    try {
+      const [solutionComponents, customizedComponents] = await Promise.all([
+        client.getAll<{
+          componenttype: number;
+          objectid: string;
+          rootcomponentbehavior: number | null;
+        }>(
+          "solutioncomponents",
+          `$filter=_solutionid_value eq ${solutionId}&$select=componenttype,objectid,rootcomponentbehavior`,
+        ),
+        client.getAll<{
+          msdyn_objectid: string;
+          msdyn_componenttype: number;
+        }>(
+          "msdyn_solutioncomponentsummaries",
+          "$filter=msdyn_ismanaged eq 'true' and msdyn_hasactivecustomization eq 'true'&$select=msdyn_objectid,msdyn_componenttype",
+        ),
+      ]);
+
+      this.cachedSolutionComponentIds = new Map(
+        solutionComponents.map((c) => [
+          `${c.componenttype}:${c.objectid}`,
+          c.rootcomponentbehavior ?? undefined,
+        ]),
+      );
+      this.cachedCustomizedComponentIds = new Set(
+        customizedComponents.map((c) => `${c.msdyn_componenttype}:${c.msdyn_objectid}`),
+      );
+    } catch (err) {
+      Logger.error("Explorer: failed to fetch solution data", err);
+      return;
+    }
+
+    // Update context with populated caches and re-render
+    if (!this.context) { return; }
+    this.context = {
+      ...this.context,
+      solutionComponentIds: this.cachedSolutionComponentIds,
+      customizedComponentIds: this.cachedCustomizedComponentIds,
+    };
+    this._onDidChangeContext.fire(this.context);
     this.groupItems.clear();
     this._onDidChangeTreeData.fire();
   }
@@ -176,6 +235,11 @@ export class UnifiedTreeProvider
     // ── Root level ─────────────────────────────────────────────────────
     if (!element) {
       if (!this.context) {
+        // Context still building — show loading; rebuildContext will fire
+        // onDidChangeTreeData when done, triggering a re-render.
+        if (this.contextReady) {
+          return [UnifiedTreeItem.loading()];
+        }
         return [
           UnifiedTreeItem.empty(
             "No environment selected. Click \u2630 to select one.",
@@ -304,12 +368,19 @@ export class UnifiedTreeProvider
     });
   }
 
-  // ── Solution cache ───────────────────────────────────────────────────
-
-  /** Invalidate cached solution component IDs and rebuild context. */
+  /**
+   * Re-query solution component and customization caches, then re-render
+   * the tree with updated decorations. Does NOT clear provider caches —
+   * only framework-level maps are refreshed.
+   */
   async refreshSolutionComponents(): Promise<void> {
-    this.cachedSolutionId = undefined;
-    await this.rebuildContext();
+    if (!this.context) { return; }
+    const solution = this.context.solution;
+
+    await this.fetchSolutionData(
+      this.context.environment,
+      solution?.solutionid ?? "",
+    );
   }
 
   // ── Refresh ────────────────────────────────────────────────────────────
