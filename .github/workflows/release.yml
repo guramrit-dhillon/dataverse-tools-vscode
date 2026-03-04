@@ -159,15 +159,12 @@ jobs:
       #       cp -r decompiler-$rid/* packages/assembly-decompiler/bin/$rid/
       #     done
 
-      - name: Detect pre-release version
+      - name: Detect pre-release from tag
         id: prerelease
         run: |
-          VERSION=$(node -p "require('./packages/${{ matrix.extension }}/package.json').version")
-          if [[ "$VERSION" == *-* ]]; then
-            CLEAN=${VERSION%%-*}
+          TAG=${GITHUB_REF#refs/tags/}
+          if [[ "$TAG" == *-* ]]; then
             echo "flag=--pre-release" >> "$GITHUB_OUTPUT"
-            cd packages/${{ matrix.extension }}
-            npm version "$CLEAN" --no-git-tag-version
           else
             echo "flag=" >> "$GITHUB_OUTPUT"
           fi
