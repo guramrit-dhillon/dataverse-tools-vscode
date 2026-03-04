@@ -55,21 +55,71 @@ jobs:
   #         path: packages/assembly-decompiler/bin/${{ matrix.rid }}/
   #         if-no-files-found: error
 
+  detect-changes:
+    name: Detect changed extensions
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.changed.outputs.matrix }}
+      has_changes: ${{ steps.changed.outputs.has_changes }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Compare versions against previous tag
+        id: changed
+        run: |
+          # Get the previous tag (second most recent)
+          PREV_TAG=$(git tag --sort=-version:refname | head -2 | tail -1)
+          echo "Previous tag: $PREV_TAG"
+
+          EXTENSIONS=()
+          for dir in \
+            packages/dataverse-environments \
+            packages/dataverse-assemblies \
+            packages/dataverse-metadata \
+            packages/dataverse-assembly-decompiler \
+            packages/dataverse-plugin-trace-viewer \
+            packages/fetchxml-builder \
+            packages/dataverse-query-analyzer \
+            packages/dataverse-workflows; do
+
+            ext=$(basename "$dir")
+
+            # Get version from previous tag (default 0.0.0 if package didn't exist)
+            OLD_VER=$(git show "${PREV_TAG}:${dir}/package.json" 2>/dev/null \
+              | node -p "JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')).version" 2>/dev/null \
+              || echo "0.0.0")
+
+            NEW_VER=$(node -p "require('./${dir}/package.json').version")
+
+            echo "  $ext: $OLD_VER → $NEW_VER"
+            if [ "$OLD_VER" != "$NEW_VER" ]; then
+              EXTENSIONS+=("\"$ext\"")
+            fi
+          done
+
+          if [ ${#EXTENSIONS[@]} -eq 0 ]; then
+            echo "No extensions changed."
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "matrix={\"extension\":[]}" >> "$GITHUB_OUTPUT"
+          else
+            JOINED=$(IFS=,; echo "${EXTENSIONS[*]}")
+            echo "Changed extensions: $JOINED"
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            echo "matrix={\"extension\":[${JOINED}]}" >> "$GITHUB_OUTPUT"
+          fi
+
   package:
     name: Package VSIX (${{ matrix.extension }})
-    # needs: build-dotnet
+    needs: detect-changes
+    if: needs.detect-changes.outputs.has_changes == 'true'
+    # needs: [detect-changes, build-dotnet]
     runs-on: ubuntu-latest
     strategy:
-      matrix:
-        extension:
-          - dataverse-environments
-          # - dataverse-assemblies
-          # - dataverse-metadata
-          # - dataverse-assembly-decompiler
-          - dataverse-plugin-trace-viewer
-          - fetchxml-builder
-          - dataverse-query-analyzer
-          # - dataverse-workflows
+      matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -131,6 +181,7 @@ jobs:
   release:
     name: Create Release
     needs: package
+    if: always() && needs.package.result == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -148,21 +199,12 @@ jobs:
 
   publish:
     name: Publish (${{ matrix.extension }})
-    needs: package
+    needs: [detect-changes, package]
+    if: always() && needs.package.result == 'success' && startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
     strategy:
       max-parallel: 1
-      matrix:
-        extension:
-          - dataverse-environments
-          - fetchxml-builder
-          # - dataverse-assemblies
-          # - dataverse-metadata
-          - dataverse-plugin-trace-viewer
-          # - dataverse-assembly-decompiler
-          - dataverse-query-analyzer
-          # - dataverse-workflows
+      matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
     steps:
       - name: Download VSIX
         uses: actions/download-artifact@v4
@@ -175,8 +217,7 @@ jobs:
       - name: Detect pre-release flag
         id: prerelease
         run: |
-          # Check if the VSIX was built as pre-release by inspecting the package.json in the artifact
-          # We use the tag name as the source of truth: v1.0.0-preview, v1.0.0-beta, etc.
+          # Use the tag name as the source of truth: v1.0.0-preview, v1.0.0-beta, etc.
           TAG=${GITHUB_REF#refs/tags/}
           if [[ "$TAG" == *-* ]]; then
             echo "flag=--pre-release" >> "$GITHUB_OUTPUT"
