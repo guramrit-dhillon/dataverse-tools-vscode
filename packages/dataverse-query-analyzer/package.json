@@ -7,7 +7,7 @@
   "license": "MIT",
   "displayName": "Dataverse Tools: Query Analyzer",
   "description": "SQL query editor for Dataverse with intellisense, results display, and query analysis via the TDS endpoint",
-  "version": "0.2.1-preview",
+  "version": "0.2.1",
   "publisher": "gdhillon",
   "engines": {
     "vscode": "^1.96.0"
@@ -97,8 +97,8 @@
     "package:prerelease": "vsce package --pre-release --out ../../dataverse-query-analyzer.vsix"
   },
   "dependencies": {
-    "core-dataverse": "0.2.1-preview",
-    "shared-views": "0.2.1-preview",
+    "core-dataverse": "0.2.1",
+    "shared-views": "0.2.1",
     "tedious": "^19.0.0"
   },
   "devDependencies": {

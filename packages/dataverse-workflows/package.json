@@ -2,7 +2,7 @@
   "name": "dataverse-workflows",
   "displayName": "Dataverse Tools: Workflows",
   "description": "Browse and manage Dataverse workflow processes in VS Code",
-  "version": "0.2.1-preview",
+  "version": "0.2.1",
   "publisher": "gdhillon",
   "license": "MIT",
   "repository": {
@@ -90,7 +90,7 @@
     "package:prerelease": "vsce package --pre-release --out ../../dataverse-workflows.vsix"
   },
   "dependencies": {
-    "core-dataverse": "0.2.1-preview"
+    "core-dataverse": "0.2.1"
   },
   "devDependencies": {
     "@types/node": "^25.2.3",

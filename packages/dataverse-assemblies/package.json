@@ -7,7 +7,7 @@
   "license": "MIT",
   "displayName": "Dataverse Tools: Assemblies",
   "description": "Code-centric Dataverse assembly deployment and step management for VS Code",
-  "version": "0.2.1-preview",
+  "version": "0.2.1",
   "publisher": "gdhillon",
   "engines": {
     "vscode": "^1.96.0"
@@ -207,7 +207,7 @@
     "package:prerelease": "vsce package --pre-release --out ../../dataverse-assemblies.vsix"
   },
   "dependencies": {
-    "dataverse-assembly-analyzer": "0.2.1-preview"
+    "dataverse-assembly-analyzer": "0.2.1"
   },
   "devDependencies": {
     "@types/node": "^25.2.3",

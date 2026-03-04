@@ -7,7 +7,7 @@
   "license": "MIT",
   "displayName": "Dataverse Tools: Decompiler",
   "description": "Browse and decompile C# source from Dataverse plugin assemblies",
-  "version": "0.2.1-preview",
+  "version": "0.2.1",
   "publisher": "gdhillon",
   "engines": {
     "vscode": "^1.96.0"
@@ -56,8 +56,8 @@
     "package:prerelease": "vsce package --pre-release --out ../../dataverse-assembly-decompiler.vsix"
   },
   "dependencies": {
-    "assembly-decompiler": "0.2.1-preview",
-    "core-dataverse": "0.2.1-preview"
+    "assembly-decompiler": "0.2.1",
+    "core-dataverse": "0.2.1"
   },
   "devDependencies": {
     "@types/node": "^25.2.3",

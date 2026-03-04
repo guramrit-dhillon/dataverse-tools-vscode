@@ -7,7 +7,7 @@
   "license": "MIT",
   "displayName": "Dataverse Tools: FetchXML Builder",
   "description": "Visual FetchXML query builder for Dataverse — inspect entities, build queries, execute and view results",
-  "version": "0.2.1-preview",
+  "version": "0.2.1",
   "publisher": "gdhillon",
   "engines": {
     "vscode": "^1.96.0"
@@ -308,8 +308,8 @@
     "package:prerelease": "vsce package --pre-release --out ../../fetchxml-builder.vsix"
   },
   "dependencies": {
-    "core-dataverse": "0.2.1-preview",
-    "shared-views": "0.2.1-preview"
+    "core-dataverse": "0.2.1",
+    "shared-views": "0.2.1"
   },
   "devDependencies": {
     "@types/node": "^25.2.3",

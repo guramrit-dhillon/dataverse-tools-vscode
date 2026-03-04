@@ -1,6 +1,6 @@
 {
   "name": "assembly-decompiler",
-  "version": "0.2.1-preview",
+  "version": "0.2.1",
   "private": true,
   "description": "Node.js wrapper for the AssemblyDecompiler .NET backend",
   "main": "index.js",
@@ -14,6 +14,6 @@
     "package:prerelease": "echo \"No packaging for class library\""
   },
   "dependencies": {
-    "assembly-backend": "0.2.1-preview"
+    "assembly-backend": "0.2.1"
   }
 }

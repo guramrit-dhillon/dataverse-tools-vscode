@@ -7,7 +7,7 @@
   "license": "MIT",
   "displayName": "Dataverse Tools: Trace Viewer",
   "description": "View and analyze trace logs for Dataverse plugins in VS Code",
-  "version": "0.2.1-preview",
+  "version": "0.2.1",
   "publisher": "gdhillon",
   "engines": {
     "vscode": "^1.96.0"
@@ -68,8 +68,8 @@
     "package:prerelease": "vsce package --pre-release --out ../../dataverse-plugin-trace-viewer.vsix"
   },
   "dependencies": {
-    "core-dataverse": "0.2.1-preview",
-    "shared-views": "0.2.1-preview"
+    "core-dataverse": "0.2.1",
+    "shared-views": "0.2.1"
   },
   "devDependencies": {
     "@types/node": "^25.2.3",

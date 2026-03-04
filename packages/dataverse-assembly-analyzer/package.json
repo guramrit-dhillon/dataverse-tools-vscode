@@ -1,6 +1,6 @@
 {
   "name": "dataverse-assembly-analyzer",
-  "version": "0.2.1-preview",
+  "version": "0.2.1",
   "private": true,
   "description": "Node.js wrapper for the Dataverse PluginAnalyzer .NET CLI tool",
   "main": "index.js",
@@ -14,6 +14,6 @@
     "package:prerelease": "echo \"No packaging for .NET package\""
   },
   "dependencies": {
-    "assembly-backend": "0.2.1-preview"
+    "assembly-backend": "0.2.1"
   }
 }

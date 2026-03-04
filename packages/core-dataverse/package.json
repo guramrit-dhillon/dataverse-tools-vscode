@@ -1,6 +1,6 @@
 {
   "name": "core-dataverse",
-  "version": "0.2.1-preview",
+  "version": "0.2.1",
   "private": true,
   "main": "src/index.ts",
   "scripts": {
