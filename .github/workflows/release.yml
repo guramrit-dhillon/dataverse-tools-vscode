@@ -76,11 +76,18 @@ jobs:
           echo "Previous tag: $PREV_TAG"
 
           EXTENSIONS=()
+          # for dir in \
+          #   packages/dataverse-environments \
+          #   packages/dataverse-assemblies \
+          #   packages/dataverse-metadata \
+          #   packages/dataverse-assembly-decompiler \
+          #   packages/dataverse-plugin-trace-viewer \
+          #   packages/fetchxml-builder \
+          #   packages/dataverse-query-analyzer \
+          #   packages/dataverse-workflows; do
+
           for dir in \
             packages/dataverse-environments \
-            packages/dataverse-assemblies \
-            packages/dataverse-metadata \
-            packages/dataverse-assembly-decompiler \
             packages/dataverse-plugin-trace-viewer \
             packages/fetchxml-builder \
             packages/dataverse-query-analyzer \
