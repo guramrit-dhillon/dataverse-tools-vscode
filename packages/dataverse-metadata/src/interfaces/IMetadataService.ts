@@ -1,6 +1,10 @@
-import { type DataverseEnvironment, type DataverseEntity, type DataverseSolution } from "core-dataverse";
+import { type DataverseEnvironment, type DataverseSolution, type SolutionComponent } from "core-dataverse";
 
 export interface IMetadataService {
-  listEntities(env: DataverseEnvironment, solutionId?: string): Promise<DataverseEntity[]>;
+  listEntities(
+    env: DataverseEnvironment,
+    solutionId?: string,
+    includeAllComponents?: boolean,
+  ): Promise<SolutionComponent[]>;
   listSolutions(env: DataverseEnvironment): Promise<DataverseSolution[]>;
 }

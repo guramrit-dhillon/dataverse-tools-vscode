@@ -1,11 +1,11 @@
 import {
   SolutionComponentType,
-  type DataverseEntity,
   type DetailItem,
   type DetailProperty,
   type ExplorerContext,
   type ExplorerNode,
   type NodeProvider,
+  type SolutionComponent,
 } from "core-dataverse";
 import type { IMetadataService } from "../interfaces/IMetadataService";
 
@@ -22,52 +22,55 @@ export class EntitiesNodeProvider implements NodeProvider {
   constructor(private readonly metadataService: IMetadataService) {}
 
   async getRoots(context: ExplorerContext): Promise<ExplorerNode[]> {
-    const solutionId = context.filter.showOutOfSolution
-      ? undefined
-      : context.solution?.solutionid;
-    const entities = await this.metadataService.listEntities(
+    const solutionId = context.solution?.solutionid;
+    const includeAllComponents = context.filter.showOutOfSolution && !!solutionId;
+
+    const components = await this.metadataService.listEntities(
       context.environment,
       solutionId,
+      includeAllComponents,
     );
-    return entities.map((e) => this.toNode(e));
+
+    return components
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((c) => this.toNode(c));
   }
 
   async getChildren(): Promise<ExplorerNode[]> {
-    // Entities are leaf nodes for now — no children
     return [];
   }
 
   getDetailItem(node: ExplorerNode): DetailItem | undefined {
-    const e = node.data?.entity as DataverseEntity | undefined;
-    if (!e) { return undefined; }
+    const c = node.data?.entity as SolutionComponent | undefined;
+    if (!c) { return undefined; }
 
     const props: DetailProperty[] = [
-      { label: "Display Name", value: e.DisplayName || "\u2014" },
-      { label: "Logical Name", value: e.LogicalName, mono: true },
-      { label: "ID", value: e.MetadataId, mono: true },
+      { label: "Display Name", value: c.displayName || "\u2014" },
+      { label: "Logical Name", value: c.name, mono: true },
+      { label: "ID", value: c.objectId, mono: true },
     ];
 
     return {
       icon: "$(table)",
-      label: e.DisplayName || e.LogicalName,
+      label: c.displayName || c.name,
       properties: props,
     };
   }
 
-  private toNode(entity: DataverseEntity): ExplorerNode {
+  private toNode(c: SolutionComponent): ExplorerNode {
     return {
-      id: `entities:entity:${entity.MetadataId}`,
-      label: entity.DisplayName || entity.LogicalName,
-      description: entity.LogicalName,
-      tooltip: `${entity.DisplayName}\n${entity.LogicalName}`,
+      id: `entities:entity:${c.objectId}`,
+      label: c.displayName || c.name,
+      description: c.name,
+      tooltip: `${c.displayName}\n${c.name}`,
       icon: "table",
       contextValue: "entity",
       children: "none",
       solutionComponent: {
         componentType: SolutionComponentType.Entity,
-        componentId: entity.MetadataId,
+        componentId: c.objectId,
       },
-      data: { entity },
+      data: { entity: c },
     };
   }
 }
