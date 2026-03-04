@@ -1,0 +1,77 @@
+name: Auto Changeset
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  generate-changeset:
+    name: Generate changeset
+    runs-on: ubuntu-latest
+    # Skip commits made by this workflow to avoid infinite loops
+    if: "github.event.head_commit.message != 'chore: auto-generate changeset'"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Check for existing changeset
+        id: check
+        run: |
+          # Count .changeset/*.md files (excluding README.md and config.json)
+          COUNT=$(find .changeset -name '*.md' ! -name 'README.md' | wc -l | tr -d ' ')
+          echo "existing=$COUNT" >> "$GITHUB_OUTPUT"
+          if [ "$COUNT" -gt "0" ]; then
+            echo "Changeset already exists ($COUNT file(s)). Skipping auto-generation."
+          fi
+
+      - name: Determine base ref
+        if: steps.check.outputs.existing == '0'
+        id: base
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "ref=origin/${{ github.base_ref }}" >> "$GITHUB_OUTPUT"
+          else
+            # For push to master: compare against the previous tag
+            PREV_TAG=$(git tag --sort=-version:refname | head -1)
+            if [ -n "$PREV_TAG" ]; then
+              echo "ref=$PREV_TAG" >> "$GITHUB_OUTPUT"
+            else
+              # No tags yet — use first commit
+              echo "ref=$(git rev-list --max-parents=0 HEAD)" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: Remove stale auto-changesets
+        if: steps.check.outputs.existing == '0'
+        run: |
+          find .changeset -name 'auto-*.md' -delete 2>/dev/null || true
+
+      - name: Generate changeset from commits
+        if: steps.check.outputs.existing == '0'
+        run: node scripts/generate-changeset.js "${{ steps.base.outputs.ref }}"
+
+      - name: Commit changeset
+        if: steps.check.outputs.existing == '0'
+        run: |
+          if git diff --name-only | grep -q '.changeset/auto-'; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add .changeset/auto-*.md
+            git commit -m "chore: auto-generate changeset"
+            git push
+          else
+            echo "No changeset file generated (no extension changes detected)."
+          fi
