@@ -1,0 +1,90 @@
+name: Version & Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      pre_release:
+        description: "Publish as pre-release on marketplace?"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  version-and-tag:
+    name: Bump versions & create tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Check for pending changesets
+        id: pending
+        run: |
+          COUNT=$(find .changeset -name '*.md' ! -name 'README.md' | wc -l | tr -d ' ')
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+          if [ "$COUNT" -eq "0" ]; then
+            echo "No pending changesets found. Nothing to release."
+          else
+            echo "Found $COUNT pending changeset(s)."
+          fi
+
+      - name: Run changeset version
+        if: steps.pending.outputs.count != '0'
+        run: npx changeset version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Determine tag name
+        if: steps.pending.outputs.count != '0'
+        id: tag
+        run: |
+          # Find the highest version across all packages
+          HIGHEST=$(node -e "
+            const fs = require('fs');
+            const path = require('path');
+            const pkgs = fs.readdirSync('packages')
+              .map(d => path.join('packages', d, 'package.json'))
+              .filter(p => fs.existsSync(p))
+              .map(p => JSON.parse(fs.readFileSync(p, 'utf8')).version);
+            pkgs.sort((a, b) => {
+              const pa = a.split('.').map(Number);
+              const pb = b.split('.').map(Number);
+              return pb[0] - pa[0] || pb[1] - pa[1] || pb[2] - pa[2];
+            });
+            console.log(pkgs[0]);
+          ")
+          # Strip any pre-release suffix before applying our own
+          CLEAN=${HIGHEST%%-*}
+          if [ "${{ inputs.pre_release }}" = "true" ]; then
+            TAG="v${CLEAN}-preview"
+          else
+            TAG="v${CLEAN}"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Tag: $TAG"
+
+      - name: Commit version bumps
+        if: steps.pending.outputs.count != '0'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore: version packages"
+
+      - name: Create tag and push
+        if: steps.pending.outputs.count != '0'
+        run: |
+          git tag "${{ steps.tag.outputs.tag }}"
+          git push origin HEAD
+          git push origin "${{ steps.tag.outputs.tag }}"
