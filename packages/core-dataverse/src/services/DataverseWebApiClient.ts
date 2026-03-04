@@ -1,5 +1,5 @@
 import axios, { type AxiosInstance } from "axios";
-import { type DataverseEnvironment, type ODataCollection } from "../types";
+import { SolutionComponentType, type DataverseEnvironment, type ODataCollection, type SolutionComponent } from "../types";
 import { retry, isTransientHttpError, DataverseError } from "../utils";
 
 const API_VERSION = "v9.2";
@@ -97,5 +97,103 @@ export class DataverseWebApiClient {
     } catch (err: unknown) {
       throw DataverseError.fromRequest(err) ?? err;
     }
+  }
+
+  /**
+   * Query solution component summaries filtered by component types.
+   * When `solutionId` is provided, returns only components in that solution.
+   * When `includeAllComponents` is true (with a solutionId), returns ALL
+   * components ignoring the solution filter (useful for "show out-of-solution").
+   * When `solutionId` is omitted, returns all components of the given types.
+   *
+   * Uses `msdyn_solutioncomponentsummaries` as the data source.
+   * Solution membership and root behavior are handled by the framework
+   * separately (via direct `solutioncomponents` queries on the context).
+   */
+  async getSolutionComponents(
+    solutionId: string | undefined,
+    componentTypes: number[],
+    includeAllComponents = false,
+    componentScope: "all" | "unmanaged" = "all",
+  ): Promise<SolutionComponent[]> {
+    const summaryTypeFilter = componentTypes.map((t) => `msdyn_componenttype eq ${t}`).join(" or ");
+    const managedFilter = componentScope === "unmanaged" ? " and msdyn_ismanaged eq 'false'" : "";
+    const extraFilters = this.getExtraFilters(componentTypes);
+    const summaryQuery = solutionId && !includeAllComponents
+      ? `$filter=msdyn_solutionid eq ${solutionId} and (${summaryTypeFilter})${managedFilter}${extraFilters}`
+      : `$filter=(${summaryTypeFilter})${managedFilter}${extraFilters}`;
+
+    type RawSummary = {
+      msdyn_objectid: string;
+      msdyn_componenttype: number;
+      msdyn_name: string;
+      msdyn_displayname: string | null;
+      msdyn_schemaname: string | null;
+      msdyn_ismanaged: string | null;
+      msdyn_iscustom: string | null;
+      msdyn_hasactivecustomization: string | null;
+      msdyn_modifiedon: string | null;
+      msdyn_createdon: string | null;
+      msdyn_description: string | null;
+      msdyn_uniquename: string | null;
+      msdyn_status: number | null;
+      msdyn_standardstatus: number | null;
+      msdyn_subtype: number | null;
+      msdyn_primaryentityname: string | null;
+      msdyn_workflowcategory: number | null;
+      [key: string]: unknown;
+    };
+
+    const selectFields = [
+      "msdyn_objectid", "msdyn_componenttype", "msdyn_name", "msdyn_displayname",
+      "msdyn_schemaname", "msdyn_ismanaged", "msdyn_iscustom", "msdyn_hasactivecustomization",
+      "msdyn_modifiedon", "msdyn_createdon",
+      ...this.getExtraSelectFields(componentTypes),
+    ];
+
+    const summaries = await this.getAll<RawSummary>(
+      "msdyn_solutioncomponentsummaries",
+      `${summaryQuery}&$select=${selectFields.join(",")}`,
+    );
+
+    return summaries.map((s) => ({
+      componentType: s.msdyn_componenttype as SolutionComponentType,
+      objectId: s.msdyn_objectid,
+      name: s.msdyn_name,
+      displayName: s.msdyn_displayname ?? undefined,
+      schemaName: s.msdyn_schemaname ?? undefined,
+      isManaged: s.msdyn_ismanaged === "true",
+      isCustom: s.msdyn_iscustom === "true",
+      hasActiveCustomization: s.msdyn_hasactivecustomization === "true" ? true : undefined,
+      modifiedOn: s.msdyn_modifiedon ?? undefined,
+      createdOn: s.msdyn_createdon ?? undefined,
+      description: s.msdyn_description ?? undefined,
+      uniqueName: s.msdyn_uniquename ?? undefined,
+      status: s.msdyn_status ?? undefined,
+      statusCode: s.msdyn_standardstatus ?? undefined,
+      subType: s.msdyn_subtype ?? undefined,
+      primaryEntityName: s.msdyn_primaryentityname ?? undefined,
+      category: s.msdyn_workflowcategory ?? undefined,
+    }));
+  }
+
+  private getExtraSelectFields(componentTypes: number[]): string[] {
+    const fields: string[] = [];
+    if (componentTypes.includes(SolutionComponentType.Workflow)) {
+      fields.push(
+        "msdyn_description", "msdyn_uniquename", "msdyn_status", "msdyn_standardstatus",
+        "msdyn_subtype", "msdyn_primaryentityname", "msdyn_workflowcategory",
+      );
+    }
+    return fields;
+  }
+
+  private getExtraFilters(componentTypes: number[]): string {
+    const filters: string[] = [];
+    if (componentTypes.includes(SolutionComponentType.Workflow)) {
+      // Only return workflow definitions, not activations or templates
+      filters.push("msdyn_subtype eq '1'");
+    }
+    return filters.length > 0 ? ` and ${filters.join(" and ")}` : "";
   }
 }

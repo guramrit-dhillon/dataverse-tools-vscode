@@ -219,6 +219,7 @@ export interface WorkflowProcess {
   statuscode: number;
   primaryentity: string;
   ismanaged?: boolean;
+  hasactivecustomization?: boolean;
   description?: string;
   modifiedon?: string;
   createdon?: string;

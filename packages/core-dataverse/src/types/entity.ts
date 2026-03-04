@@ -5,6 +5,7 @@ export interface DataverseEntity {
   DisplayName: string;
   IsManaged: boolean;
   IsCustomEntity: boolean;
+  HasActiveCustomization?: boolean;
 }
 
 export interface DataverseSolution {

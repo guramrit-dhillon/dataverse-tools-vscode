@@ -22,7 +22,8 @@ export const SolutionComponentType = {
   Entity: 1,
   OptionSet: 9,
   EntityRelationship: 10,
-  Workflow: 26,
+  SavedQuery: 26,
+  Workflow: 29,
   SystemForm: 60,
   WebResource: 61,
   PluginType: 90,
@@ -36,11 +37,42 @@ export type SolutionComponentType =
   (typeof SolutionComponentType)[keyof typeof SolutionComponentType];
 
 /**
+ * Unified solution component record, combining data from `solutioncomponents`
+ * and `msdyn_solutioncomponentsummaries`. Callers get a single view regardless
+ * of the underlying source.
+ *
+ * Returned by {@link DataverseWebApiClient.getSolutionComponents}.
+ */
+export interface SolutionComponent {
+  readonly componentType: SolutionComponentType;
+  readonly objectId: string;
+  readonly name: string;
+  readonly displayName?: string;
+  readonly schemaName?: string;
+  readonly isManaged: boolean;
+  readonly isCustom: boolean;
+  readonly hasActiveCustomization?: boolean;
+  readonly modifiedOn?: string;
+  readonly createdOn?: string;
+  readonly description?: string;
+  readonly uniqueName?: string;
+  readonly status?: number;
+  readonly statusCode?: number;
+  readonly subType?: number;
+  readonly primaryEntityName?: string;
+  readonly category?: number;
+}
+
+/**
  * Annotation that providers attach to an {@link ExplorerNode} to declare its
  * corresponding Dataverse solution component. The framework uses this to:
  *   1. Check whether the component is in the active solution
- *   2. Apply `FileDecorationProvider` dimming for out-of-solution items
- *   3. Show a "+" badge for items that can be added to the solution
+ *   2. Apply decorations (dimming, behavior labels, customization indicator)
+ *   3. Determine context values for menu contributions
+ *
+ * Providers only set `componentType` and `componentId`. All solution-awareness
+ * data (membership, root behavior, customization status) is owned by the
+ * framework via {@link ExplorerContext}.
  *
  * Nodes without this annotation are excluded from solution-awareness features.
  */
@@ -112,11 +144,17 @@ export interface ExplorerContext {
    *
    * Behavior values: `0` = Include Subcomponents, `1` = Do not include
    * subcomponents, `2` = Include As Shell Only, `undefined` = not set.
-   *
-   * Providers can use this to annotate nodes or to decide what to return when
-   * `filter.showOutOfSolution` is `false`, but should NOT populate it themselves.
    */
   readonly solutionComponentIds: ReadonlyMap<string, number | undefined>;
+
+  /**
+   * Set of component IDs that have an active unmanaged customization layer.
+   * Populated by the framework from `msdyn_solutioncomponentsummaries`.
+   * Always populated (regardless of active solution).
+   *
+   * Keyed as `"componentType:componentId"`.
+   */
+  readonly customizedComponentIds: ReadonlySet<string>;
 }
 
 // ─── Explorer Node ───────────────────────────────────────────────────────────
