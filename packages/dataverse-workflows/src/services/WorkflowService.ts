@@ -1,27 +1,12 @@
 import {
   DataverseWebApiClient,
+  SolutionComponentType,
   WorkflowStateCode,
   WorkflowType,
   type DataverseEnvironment,
   type WorkflowProcess,
 } from "core-dataverse";
 import type { IWorkflowService } from "../interfaces/IWorkflowService";
-
-const SELECT_FIELDS = [
-  "workflowid",
-  "name",
-  "uniquename",
-  "category",
-  "type",
-  "statecode",
-  "statuscode",
-  "primaryentity",
-  "ismanaged",
-  "description",
-  "modifiedon",
-  "createdon",
-  "_ownerid_value",
-].join(",");
 
 export class WorkflowService implements IWorkflowService {
   constructor(
@@ -32,43 +17,36 @@ export class WorkflowService implements IWorkflowService {
     return new DataverseWebApiClient(env, this.getToken);
   }
 
-  async listWorkflows(env: DataverseEnvironment, solutionId?: string): Promise<WorkflowProcess[]> {
-    if (solutionId) {
-      return this.listWorkflowsBySolution(env, solutionId);
-    }
-    return this.client(env).getAll<WorkflowProcess>(
-      "workflows",
-      `$select=${SELECT_FIELDS}&$filter=type eq ${WorkflowType.Definition}&$orderby=name`,
-    );
-  }
-
-  /**
-   * Fetch workflows that belong to a specific solution via
-   * `msdyn_solutioncomponentsummaries` (component type 29 = Process).
-   */
-  private async listWorkflowsBySolution(
+  async listWorkflows(
     env: DataverseEnvironment,
-    solutionId: string,
+    solutionId?: string,
+    includeAllComponents = false,
+    componentScope: "all" | "unmanaged" = "all",
   ): Promise<WorkflowProcess[]> {
-    const client = this.client(env);
-
-    // msdyn_componenttype 29 = Process/Workflow in solution component summaries
-    const filter = `(msdyn_solutionid eq ${solutionId}) and (msdyn_componenttype eq 29)`;
-    const result = await client.get<{ value: { msdyn_objectid: string }[] }>(
-      `msdyn_solutioncomponentsummaries?$filter=${filter}&$select=msdyn_objectid`,
+    const components = await this.client(env).getSolutionComponents(
+      solutionId,
+      [SolutionComponentType.Workflow],
+      includeAllComponents,
+      componentScope,
     );
 
-    if (result.value.length === 0) { return []; }
-
-    const ids = new Set(result.value.map((c) => c.msdyn_objectid));
-
-    // Fetch full workflow records for these IDs
-    const all = await client.getAll<WorkflowProcess>(
-      "workflows",
-      `$select=${SELECT_FIELDS}&$filter=type eq ${WorkflowType.Definition}&$orderby=name`,
-    );
-
-    return all.filter((w) => ids.has(w.workflowid));
+    return components
+      .map((c): WorkflowProcess => ({
+        workflowid: c.objectId,
+        name: c.name,
+        uniquename: c.uniqueName,
+        category: c.category ?? 0,
+        type: (c.subType ?? WorkflowType.Definition) as WorkflowType,
+        statecode: c.status ?? 0,
+        statuscode: c.statusCode ?? 0,
+        primaryentity: c.primaryEntityName ?? "none",
+        ismanaged: c.isManaged ?? undefined,
+        hasactivecustomization: c.hasActiveCustomization,
+        description: c.description,
+        modifiedon: c.modifiedOn,
+        createdon: c.createdOn,
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
   }
 
   async activateWorkflow(env: DataverseEnvironment, workflowId: string): Promise<void> {

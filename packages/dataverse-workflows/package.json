@@ -89,6 +89,9 @@
     "package": "vsce package --out ../../dataverse-workflows.vsix",
     "package:prerelease": "vsce package --pre-release --out ../../dataverse-workflows.vsix"
   },
+  "dependencies": {
+    "core-dataverse": "*"
+  },
   "devDependencies": {
     "@types/node": "^25.2.3",
     "@types/vscode": "^1.96.0",
