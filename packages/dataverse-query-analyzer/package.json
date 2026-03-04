@@ -97,6 +97,8 @@
     "package:prerelease": "vsce package --pre-release --out ../../dataverse-query-analyzer.vsix"
   },
   "dependencies": {
+    "core-dataverse": "*",
+    "shared-views": "*",
     "tedious": "^19.0.0"
   },
   "devDependencies": {

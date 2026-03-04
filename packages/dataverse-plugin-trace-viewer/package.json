@@ -67,6 +67,10 @@
     "package": "vsce package --out ../../dataverse-plugin-trace-viewer.vsix",
     "package:prerelease": "vsce package --pre-release --out ../../dataverse-plugin-trace-viewer.vsix"
   },
+  "dependencies": {
+    "core-dataverse": "*",
+    "shared-views": "*"
+  },
   "devDependencies": {
     "@types/node": "^25.2.3",
     "@types/react": "^19.2.14",
