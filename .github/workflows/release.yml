@@ -91,7 +91,8 @@ jobs:
             packages/dataverse-plugin-trace-viewer \
             packages/fetchxml-builder \
             packages/dataverse-query-analyzer \
-            packages/dataverse-workflows; do
+            packages/dataverse-workflows \
+            packages/dataverse-tools-pack; do
 
             ext=$(basename "$dir")
 
