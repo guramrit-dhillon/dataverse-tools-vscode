@@ -11,7 +11,7 @@
   "license": "MIT",
   "displayName": "Dataverse Tools: Web Resources",
   "description": "Browse, edit, and publish Dataverse web resources from VS Code — with syntax highlighting, Ctrl+S save-to-Dataverse, and one-click publish.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "gdhillon",
   "engines": {
     "vscode": "^1.96.0"
