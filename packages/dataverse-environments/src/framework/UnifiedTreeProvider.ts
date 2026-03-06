@@ -156,12 +156,17 @@ export class UnifiedTreeProvider
     this.groupItems.clear();
     this._onDidChangeTreeData.fire();
 
-    // ── Background: fetch solution component data, then re-render with decorations ──
-    if (this.context?.solution) {
-      void this.fetchSolutionData(
-        this.context.environment,
-        this.context.solution.solutionid,
-      );
+    // ── Background: pre-warm auth token + fetch solution data ──
+    if (this.context) {
+      // Pre-warm the token so subsequent provider calls don't pay acquisition cost
+      void this.api.getAccessToken(this.context.environment).catch(() => { /* will retry on actual use */ });
+
+      if (this.context.solution) {
+        void this.fetchSolutionData(
+          this.context.environment,
+          this.context.solution.solutionid,
+        );
+      }
     }
   }
 
@@ -232,14 +237,14 @@ export class UnifiedTreeProvider
   async getChildren(
     element?: UnifiedTreeItem,
   ): Promise<UnifiedTreeItem[]> {
+    // Wait for any pending context rebuild before proceeding
+    if (this.contextReady) {
+      await this.contextReady;
+    }
+
     // ── Root level ─────────────────────────────────────────────────────
     if (!element) {
       if (!this.context) {
-        // Context still building — show loading; rebuildContext will fire
-        // onDidChangeTreeData when done, triggering a re-render.
-        if (this.contextReady) {
-          return [UnifiedTreeItem.loading()];
-        }
         return [
           UnifiedTreeItem.empty(
             "No environment selected. Click \u2630 to select one.",
