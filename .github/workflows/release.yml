@@ -92,6 +92,7 @@ jobs:
             packages/fetchxml-builder \
             packages/dataverse-query-analyzer \
             packages/dataverse-workflows \
+            packages/dataverse-web-resources \
             packages/dataverse-tools-pack; do
 
             ext=$(basename "$dir")

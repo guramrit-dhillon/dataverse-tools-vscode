@@ -28,7 +28,8 @@
     "gdhillon.dataverse-plugin-trace-viewer",
     "gdhillon.fetchxml-builder",
     "gdhillon.dataverse-query-analyzer",
-    "gdhillon.dataverse-workflows"
+    "gdhillon.dataverse-workflows",
+    "gdhillon.dataverse-web-resources"
   ],
   "scripts": {
     "build": "echo 'No build step for extension pack'",
