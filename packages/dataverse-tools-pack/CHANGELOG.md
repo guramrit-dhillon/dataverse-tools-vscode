@@ -1,5 +1,11 @@
 # dataverse-tools-pack
 
+## 0.4.1
+
+### Patch Changes
+
+- [`63345a2`](https://github.com/guramrit-dhillon/dataverse-tools-vscode/commit/63345a27e851359c362a800c33613ef2f75b9032) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - docs(dataverse-tools-pack): add VS Code and Open VSX links column to README
+
 ## 0.4.0
 
 ### Minor Changes

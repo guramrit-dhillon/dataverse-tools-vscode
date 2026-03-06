@@ -7,7 +7,7 @@
   "license": "MIT",
   "displayName": "Dataverse Tools",
   "description": "Complete toolkit for Dynamics 365 / Power Platform plugin development — deploy, register, trace, decompile, and query Dataverse from VS Code.",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "publisher": "gdhillon",
   "engines": {
     "vscode": "^1.96.0"
