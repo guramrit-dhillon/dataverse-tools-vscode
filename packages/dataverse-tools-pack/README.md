@@ -4,14 +4,14 @@ A complete toolkit for Dynamics 365 / Power Platform plugin development in VS Co
 
 ## Included Extensions
 
-| Extension                                                                                  | Description                                                                    |
-| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
-| [Dataverse Tools: Environments](vscode:extension/gdhillon.dataverse-environments)          | Manage Dataverse authentication and connections                                |
-| [Dataverse Tools: Trace Viewer](vscode:extension/gdhillon.dataverse-plugin-trace-viewer)   | Browse and inspect plugin trace logs                                           |
-| [Dataverse Tools: FetchXML Builder](vscode:extension/gdhillon.fetchxml-builder)            | Build and execute FetchXML queries                                             |
-| [Dataverse Tools: Query Analyzer](vscode:extension/gdhillon.dataverse-query-analyzer)      | SQL-like query analyzer for Dataverse                                          |
-| [Dataverse Tools: Workflows](vscode:extension/gdhillon.dataverse-workflows)                | View and manage Dataverse workflows                                            |
-| [Dataverse Tools: Web Resources](vscode:extension/gdhillon.dataverse-web-resources)        | Browse, edit, and publish web resources with Ctrl+S save-to-server             |
+| Extension                               | Description                                                        | Links                                                                                                                                                                                                               |
+| --------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Dataverse Tools: Environments**       | Manage Dataverse authentication and connections                    | [VS Code](https://marketplace.visualstudio.com/items?itemName=gdhillon.dataverse-environments) · [Open VSX](https://open-vsx.org/extension/gdhillon/dataverse-environments)                                         |
+| **Dataverse Tools: Trace Viewer**       | Browse and inspect plugin trace logs                               | [VS Code](https://marketplace.visualstudio.com/items?itemName=gdhillon.dataverse-plugin-trace-viewer) · [Open VSX](https://open-vsx.org/extension/gdhillon/dataverse-plugin-trace-viewer)                           |
+| **Dataverse Tools: FetchXML Builder**   | Build and execute FetchXML queries                                 | [VS Code](https://marketplace.visualstudio.com/items?itemName=gdhillon.fetchxml-builder) · [Open VSX](https://open-vsx.org/extension/gdhillon/fetchxml-builder)                                                     |
+| **Dataverse Tools: Query Analyzer**     | SQL-like query analyzer for Dataverse                              | [VS Code](https://marketplace.visualstudio.com/items?itemName=gdhillon.dataverse-query-analyzer) · [Open VSX](https://open-vsx.org/extension/gdhillon/dataverse-query-analyzer)                                     |
+| **Dataverse Tools: Workflows**          | View and manage Dataverse workflows                                | [VS Code](https://marketplace.visualstudio.com/items?itemName=gdhillon.dataverse-workflows) · [Open VSX](https://open-vsx.org/extension/gdhillon/dataverse-workflows)                                               |
+| **Dataverse Tools: Web Resources**      | Browse, edit, and publish web resources with Ctrl+S save-to-server | [VS Code](https://marketplace.visualstudio.com/items?itemName=gdhillon.dataverse-web-resources) · [Open VSX](https://open-vsx.org/extension/gdhillon/dataverse-web-resources)                                       |
 
 
 ## Coming Soon
