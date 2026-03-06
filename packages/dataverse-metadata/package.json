@@ -7,7 +7,7 @@
   "license": "MIT",
   "displayName": "Dataverse Tools: Metadata",
   "description": "Contributes metadata providers (entities, etc.) to the Dataverse Explorer",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "publisher": "gdhillon",
   "engines": {
     "vscode": "^1.96.0"
