@@ -174,7 +174,7 @@ jobs:
         run: npm run build -w ${{ matrix.extension }}
 
       - name: Package VSIX
-        run: vsce package -o ${{ matrix.extension }}.vsix ${{ steps.prerelease.outputs.flag }}
+        run: vsce package -o ${{ matrix.extension }}.vsix ${{ steps.prerelease.outputs.flag }} --no-dependencies
         working-directory: packages/${{ matrix.extension }}
 
       - name: Upload VSIX

@@ -30,11 +30,9 @@
     "gdhillon.dataverse-query-analyzer",
     "gdhillon.dataverse-workflows"
   ],
-  "dependencies": {
-    "dataverse-assembly-analyzer": "0.2.1"
-  },
   "scripts": {
-    "package": "npx @vscode/vsce package -o out/",
-    "package:prerelease": "npx @vscode/vsce package --pre-release -o out/"
+    "build": "echo 'No build step for extension pack'",
+    "package": "npx @vscode/vsce package --no-dependencies -o out/",
+    "package:prerelease": "npx @vscode/vsce package --no-dependencies --pre-release -o out/"
   }
 }
