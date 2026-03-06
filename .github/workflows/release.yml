@@ -209,6 +209,7 @@ jobs:
     if: always() && needs.package.result == 'success' && startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       max-parallel: 1
       matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
     steps:
@@ -232,11 +233,27 @@ jobs:
           fi
 
       - name: Publish to VS Code Marketplace
-        run: vsce publish --packagePath ${{ matrix.extension }}.vsix ${{ steps.prerelease.outputs.flag }}
+        run: |
+          OUTPUT=$(vsce publish --packagePath ${{ matrix.extension }}.vsix ${{ steps.prerelease.outputs.flag }} 2>&1) && echo "$OUTPUT" || {
+            echo "$OUTPUT"
+            if echo "$OUTPUT" | grep -qiE "already been published|already exists|version.*exist"; then
+              echo "Version already published on Marketplace, skipping."
+            else
+              exit 1
+            fi
+          }
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
 
       - name: Publish to Open VSX
-        run: ovsx publish ${{ matrix.extension }}.vsix ${{ steps.prerelease.outputs.flag }}
+        run: |
+          OUTPUT=$(ovsx publish ${{ matrix.extension }}.vsix ${{ steps.prerelease.outputs.flag }} 2>&1) && echo "$OUTPUT" || {
+            echo "$OUTPUT"
+            if echo "$OUTPUT" | grep -qiE "already been published|already exists|version.*exist"; then
+              echo "Version already published on Open VSX, skipping."
+            else
+              exit 1
+            fi
+          }
         env:
           OVSX_PAT: ${{ secrets.OVSX_PAT }}
