@@ -1,0 +1,40 @@
+{
+  "name": "dataverse-tools-pack",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"
+  },
+  "license": "MIT",
+  "displayName": "Dataverse Tools",
+  "description": "Complete toolkit for Dynamics 365 / Power Platform plugin development — deploy, register, trace, decompile, and query Dataverse from VS Code.",
+  "version": "0.2.2",
+  "publisher": "gdhillon",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Extension Packs"
+  ],
+  "keywords": [
+    "dataverse",
+    "power platform",
+    "dynamics 365",
+    "plugin",
+    "crm"
+  ],
+  "icon": "resources/icon.png",
+  "extensionPack": [
+    "gdhillon.dataverse-environments",
+    "gdhillon.dataverse-plugin-trace-viewer",
+    "gdhillon.fetchxml-builder",
+    "gdhillon.dataverse-query-analyzer",
+    "gdhillon.dataverse-workflows"
+  ],
+  "dependencies": {
+    "dataverse-assembly-analyzer": "0.2.1"
+  },
+  "scripts": {
+    "package": "npx @vscode/vsce package -o out/",
+    "package:prerelease": "npx @vscode/vsce package --pre-release -o out/"
+  }
+}
