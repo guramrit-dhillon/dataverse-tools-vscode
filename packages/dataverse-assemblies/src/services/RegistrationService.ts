@@ -7,7 +7,6 @@ import {
   type SdkMessageProcessingStepImage,
   type SdkMessage,
   type SdkMessageFilter,
-  type ODataCollection,
   type DeploymentResult,
   type AssemblyAnalysisResult,
   PluginAssemblyIsolationMode,
@@ -34,11 +33,10 @@ export class RegistrationService implements IRegistrationService {
 
   // ── Read ───────────────────────────────────────────────────────────────────
 
-  async listAssemblies(env: DataverseEnvironment): Promise<PluginAssembly[]> {
-    return this.client(env).getAll<PluginAssembly>(
-      "pluginassemblies",
-      "$select=pluginassemblyid,name,version,culture,publickeytoken,isolationmode,sourcetype,description,ismanaged,modifiedon"
-    );
+  async listAssemblies(env: DataverseEnvironment, unmanagedOnly = false): Promise<PluginAssembly[]> {
+    const select = "$select=pluginassemblyid,name,version,culture,publickeytoken,isolationmode,sourcetype,description,ismanaged,modifiedon";
+    const filter = unmanagedOnly ? "&$filter=ismanaged eq false" : "";
+    return this.client(env).getAll<PluginAssembly>("pluginassemblies", `${select}${filter}`);
   }
 
   async getAssembly(env: DataverseEnvironment, assemblyId: string): Promise<PluginAssembly> {
@@ -124,6 +122,22 @@ export class RegistrationService implements IRegistrationService {
       }
     }
     return [...seen.values()].sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  async listEntityNames(env: DataverseEnvironment): Promise<string[]> {
+    const entities = await this.client(env).getAll<{ LogicalName: string }>(
+      "EntityDefinitions",
+      "$select=LogicalName&$orderby=LogicalName",
+    );
+    return entities.map((e) => e.LogicalName);
+  }
+
+  async listEntityAttributes(env: DataverseEnvironment, entityLogicalName: string): Promise<string[]> {
+    const attrs = await this.client(env).getAll<{ LogicalName: string }>(
+      `EntityDefinitions(LogicalName='${entityLogicalName}')/Attributes`,
+      "$select=LogicalName&$orderby=LogicalName",
+    );
+    return attrs.map((a) => a.LogicalName);
   }
 
   // ── Write ──────────────────────────────────────────────────────────────────

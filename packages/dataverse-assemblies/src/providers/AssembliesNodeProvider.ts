@@ -66,13 +66,10 @@ export class AssembliesNodeProvider implements NodeProvider {
 
   async getRoots(context: ExplorerContext): Promise<ExplorerNode[]> {
     return this.fetchCached("__roots__", async () => {
-      let assemblies = await this.registrationSvc.listAssemblies(
+      const assemblies = await this.registrationSvc.listAssemblies(
         context.environment,
+        context.filter.componentScope === "unmanaged",
       );
-
-      if (context.filter.componentScope === "unmanaged") {
-        assemblies = assemblies.filter((a) => !a.ismanaged);
-      }
 
       assemblies.sort((a, b) => a.name.localeCompare(b.name));
       return assemblies.map((a) => this.assemblyNode(a));

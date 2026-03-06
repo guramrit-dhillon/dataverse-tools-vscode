@@ -11,7 +11,7 @@ import {
   type SdkMessage,
   type SdkMessageFilter,
   type SdkMessageProcessingStep,
-  type DataverseEntity,
+  type SolutionComponent,
   Logger,
 } from "core-dataverse";
 import { type IRegistrationService } from "../interfaces/IRegistrationService";
@@ -159,24 +159,24 @@ export class MessagesNodeProvider implements NodeProvider {
     node: ExplorerNode,
     context: ExplorerContext,
   ): Promise<ExplorerNode[]> {
-    const entity = node.data?.entity as DataverseEntity | undefined;
+    const entity = node.data?.entity as SolutionComponent | undefined;
     if (!entity) { return []; }
 
-    return this.fetchCached(`entity:${entity.LogicalName}`, async () => {
+    return this.fetchCached(`entity:${entity.name}`, async () => {
       const steps = await this.registrationSvc.listStepsByEntity(
         context.environment,
-        entity.LogicalName,
+        entity.name,
       );
       if (steps.length === 0) { return []; }
 
       return [{
-        id: `messages:entity-plugins:${entity.LogicalName}`,
+        id: `messages:entity-plugins:${entity.name}`,
         label: "Messages (Plugins)",
         description: `${steps.length} step${steps.length === 1 ? "" : "s"}`,
         icon: "mail",
         contextValue: "entityPluginGroup",
         children: "lazy" as const,
-        data: { steps, entityLogicalName: entity.LogicalName },
+        data: { steps, entityLogicalName: entity.name },
       }];
     });
   }

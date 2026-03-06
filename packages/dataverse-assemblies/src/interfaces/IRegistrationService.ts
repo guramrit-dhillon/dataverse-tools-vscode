@@ -20,7 +20,7 @@ import {
 export interface IRegistrationService {
   // ── Read ──────────────────────────────────────────────────────────────────
 
-  listAssemblies(env: DataverseEnvironment): Promise<PluginAssembly[]>;
+  listAssemblies(env: DataverseEnvironment, unmanagedOnly?: boolean): Promise<PluginAssembly[]>;
 
   getAssembly(
     env: DataverseEnvironment,
@@ -68,6 +68,13 @@ export interface IRegistrationService {
     env: DataverseEnvironment,
     entityCode: string
   ): Promise<SdkMessage[]>;
+
+  listEntityNames(env: DataverseEnvironment): Promise<string[]>;
+
+  listEntityAttributes(
+    env: DataverseEnvironment,
+    entityLogicalName: string
+  ): Promise<string[]>;
 
   // ── Write ─────────────────────────────────────────────────────────────────
 
