@@ -4,9 +4,13 @@
     "type": "git",
     "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"
   },
+  "homepage": "https://github.com/guramrit-dhillon/dataverse-tools-vscode#readme",
+  "bugs": {
+    "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode/issues"
+  },
   "license": "MIT",
   "displayName": "Dataverse Tools: Web Resources",
-  "description": "Browse and manage Dataverse web resources in the explorer tree",
+  "description": "Browse, edit, and publish Dataverse web resources from VS Code — with syntax highlighting, Ctrl+S save-to-Dataverse, and one-click publish.",
   "version": "0.1.0",
   "publisher": "gdhillon",
   "engines": {
@@ -15,12 +19,19 @@
   "categories": [
     "Other"
   ],
+  "galleryBanner": {
+    "color": "#1e1e2e",
+    "theme": "dark"
+  },
   "keywords": [
     "dataverse",
     "power platform",
     "dynamics 365",
     "web resources",
-    "crm"
+    "crm",
+    "plugin",
+    "javascript",
+    "css"
   ],
   "extensionDependencies": [
     "gdhillon.dataverse-environments"
@@ -34,8 +45,8 @@
   "scripts": {
     "build": "node ../../scripts/build-extension.js --production",
     "watch": "node ../../scripts/build-extension.js --watch",
-    "package": "vsce package --out ../../dataverse-web-resources.vsix",
-    "package:prerelease": "vsce package --pre-release --out ../../dataverse-web-resources.vsix"
+    "package": "vsce package --no-dependencies -o dataverse-web-resources.vsix",
+    "package:prerelease": "vsce package --pre-release --no-dependencies -o dataverse-web-resources.vsix"
   },
   "contributes": {
     "commands": [
