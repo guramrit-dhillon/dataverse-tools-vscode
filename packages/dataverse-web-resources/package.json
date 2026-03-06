@@ -1,0 +1,91 @@
+{
+  "name": "dataverse-web-resources",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"
+  },
+  "license": "MIT",
+  "displayName": "Dataverse Tools: Web Resources",
+  "description": "Browse and manage Dataverse web resources in the explorer tree",
+  "version": "0.1.0",
+  "publisher": "gdhillon",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "dataverse",
+    "power platform",
+    "dynamics 365",
+    "web resources",
+    "crm"
+  ],
+  "extensionDependencies": [
+    "gdhillon.dataverse-environments"
+  ],
+  "activationEvents": [
+    "workspaceContains:**/*.csproj",
+    "onView:dataverse-tools.explorer"
+  ],
+  "main": "./out/extension.js",
+  "icon": "resources/icon.png",
+  "scripts": {
+    "build": "node ../../scripts/build-extension.js --production",
+    "watch": "node ../../scripts/build-extension.js --watch",
+    "package": "vsce package --out ../../dataverse-web-resources.vsix",
+    "package:prerelease": "vsce package --pre-release --out ../../dataverse-web-resources.vsix"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "dataverse-tools.webresources.refresh",
+        "title": "Refresh Web Resources",
+        "icon": "$(refresh)",
+        "category": "Dataverse Tools"
+      },
+      {
+        "command": "dataverse-tools.webresources.openContent",
+        "title": "Open Web Resource",
+        "icon": "$(go-to-file)",
+        "category": "Dataverse Tools"
+      },
+      {
+        "command": "dataverse-tools.webresources.saveAndPublish",
+        "title": "Save and Publish",
+        "icon": "$(cloud-upload)",
+        "category": "Dataverse Tools"
+      }
+    ],
+    "menus": {
+      "view/item/context": [
+        {
+          "command": "dataverse-tools.webresources.openContent",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /^webresource($|\\.)/",
+          "group": "1_actions@1"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "dataverse-tools.webresources.saveAndPublish",
+          "when": "resourceScheme == dataverse-webresource",
+          "group": "navigation@1"
+        }
+      ]
+    }
+  },
+  "dependencies": {
+    "core-dataverse": "0.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.3",
+    "@types/vscode": "^1.96.0",
+    "@typescript-eslint/eslint-plugin": "^8.55.0",
+    "@typescript-eslint/parser": "^8.55.0",
+    "esbuild": "^0.21.0",
+    "eslint": "^9.39.2",
+    "typescript": "^5.3.0",
+    "typescript-eslint": "^8.55.0"
+  }
+}
