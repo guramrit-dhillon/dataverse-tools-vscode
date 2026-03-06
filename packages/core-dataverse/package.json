@@ -8,9 +8,7 @@
     "package": "echo 'Core library - packaged by extension esbuild'",
     "package:prerelease": "echo 'Core library - packaged by extension esbuild'"
   },
-  "dependencies": {
-    "axios": "^1.6.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@vscode/codicons": "^0.0.44"
   }

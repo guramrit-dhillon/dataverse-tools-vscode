@@ -1,6 +1,5 @@
-import axios, { type AxiosInstance } from "axios";
 import { SolutionComponentType, type DataverseEnvironment, type ODataCollection, type SolutionComponent } from "../types";
-import { retry, isTransientHttpError, DataverseError } from "../utils";
+import { retry, isTransientHttpError, DataverseError, HttpError } from "../utils";
 
 const API_VERSION = "v9.2";
 const TIMEOUT_MS = 30_000;
@@ -27,42 +26,59 @@ export class DataverseWebApiClient {
 
   // ── Low-level ──────────────────────────────────────────────────────────────
 
-  /** Builds a fresh axios instance with a valid Bearer token. */
-  private async instance(extraHeaders?: Record<string, string>): Promise<AxiosInstance> {
+  /** Builds common headers with a valid Bearer token. */
+  private async headers(extraHeaders?: Record<string, string>): Promise<Record<string, string>> {
     const token = await this.getToken(this.env);
-    return axios.create({
-      baseURL: this.baseURL,
-      timeout: TIMEOUT_MS,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json; charset=utf-8",
-        Accept: "application/json",
-        "OData-MaxVersion": "4.0",
-        "OData-Version": "4.0",
-        Prefer: 'return=representation,odata.include-annotations="*"',
-        ...extraHeaders,
-      },
-    });
+    return {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json; charset=utf-8",
+      Accept: "application/json",
+      "OData-MaxVersion": "4.0",
+      "OData-Version": "4.0",
+      Prefer: 'return=representation,odata.include-annotations="*"',
+      ...extraHeaders,
+    };
+  }
+
+  /** Executes a fetch request and throws HttpError on non-ok responses. */
+  private async fetchJson<T>(url: string, init: RequestInit): Promise<T> {
+    const res = await fetch(url, { ...init, signal: AbortSignal.timeout(TIMEOUT_MS) });
+    if (!res.ok) {
+      const data = await res.json().catch(() => undefined);
+      throw new HttpError(res.status, data);
+    }
+    if (res.status === 204) {
+      return undefined as T;
+    }
+    return res.json() as Promise<T>;
+  }
+
+  private resolveUrl(path: string): string {
+    // Absolute URLs (e.g. @odata.nextLink) are used as-is
+    if (path.startsWith("http://") || path.startsWith("https://")) {
+      return path;
+    }
+    return `${this.baseURL}/${path}`;
   }
 
   // ── Read ───────────────────────────────────────────────────────────────────
 
   async get<T>(path: string, extraHeaders?: Record<string, string>): Promise<T> {
-    const http = await this.instance(extraHeaders);
-    const res = await this.request(() => http.get<T>(path));
-    return res.data;
+    const hdrs = await this.headers(extraHeaders);
+    return this.request(() => this.fetchJson<T>(this.resolveUrl(path), { method: "GET", headers: hdrs }));
   }
 
   /** Follows `@odata.nextLink` pages automatically and returns a flat array. */
   async getAll<T>(entity: string, query: string): Promise<T[]> {
-    const http = await this.instance();
+    const hdrs = await this.headers();
     const results: T[] = [];
-    let url: string | undefined = `${entity}?${query}`;
+    let url: string | undefined = `${this.baseURL}/${entity}?${query}`;
 
     while (url) {
-      const res = await this.request(() => http.get<ODataCollection<T>>(url!));
-      results.push(...res.data.value);
-      url = res.data["@odata.nextLink"];
+      const currentUrl: string = url;
+      const res = await this.request(() => this.fetchJson<ODataCollection<T>>(currentUrl, { method: "GET", headers: hdrs }));
+      results.push(...res.value);
+      url = res["@odata.nextLink"];
     }
 
     return results;
@@ -71,22 +87,20 @@ export class DataverseWebApiClient {
   // ── Write ──────────────────────────────────────────────────────────────────
 
   async post<T>(path: string, body: unknown): Promise<T> {
-    const http = await this.instance();
-    const res = await this.request(() => http.post<T>(path, body));
-    return res.data;
+    const hdrs = await this.headers();
+    return this.request(() => this.fetchJson<T>(this.resolveUrl(path), { method: "POST", headers: hdrs, body: JSON.stringify(body) }));
   }
 
   async patch<T = unknown>(path: string, body: unknown): Promise<T> {
-    const http = await this.instance();
-    const res = await this.request(() => http.patch<T>(path, body));
-    return res.data;
+    const hdrs = await this.headers();
+    return this.request(() => this.fetchJson<T>(this.resolveUrl(path), { method: "PATCH", headers: hdrs, body: JSON.stringify(body) }));
   }
 
   // ── Delete ─────────────────────────────────────────────────────────────────
 
   async delete(path: string): Promise<void> {
-    const http = await this.instance();
-    await this.request(() => http.delete(path));
+    const hdrs = await this.headers();
+    await this.request(() => this.fetchJson<void>(this.resolveUrl(path), { method: "DELETE", headers: hdrs }));
   }
 
   // ── Helpers ────────────────────────────────────────────────────────────────

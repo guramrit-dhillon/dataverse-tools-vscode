@@ -1,3 +1,4 @@
+import { HttpError } from "./http-error";
 import { Logger } from "./logger";
 
 export interface RetryOptions {
@@ -14,7 +15,7 @@ export interface RetryOptions {
  *
  * @example
  * const result = await retry(
- *   () => axios.get(url, { headers }),
+ *   () => fetch(url, { headers }).then(r => r.json()),
  *   { attempts: 3, delayMs: 500 }
  * );
  */
@@ -55,17 +56,13 @@ function sleep(ms: number): Promise<void> {
 
 /** Returns true for transient HTTP errors that are safe to retry. */
 export function isTransientHttpError(err: unknown): boolean {
-  if (!isAxiosError(err)) {
+  // Timeout / network errors from fetch are transient
+  if (err instanceof TypeError || (err instanceof DOMException && err.name === "AbortError") || (err instanceof Error && err.name === "TimeoutError")) {
+    return true;
+  }
+  if (!(err instanceof HttpError)) {
     return false;
   }
-  const status = err.response?.status;
   // 429 Too Many Requests, 502/503/504 gateway errors
-  return status === 429 || status === 502 || status === 503 || status === 504;
-}
-
-function isAxiosError(err: unknown): err is {
-  response?: { status: number };
-  code?: string;
-} {
-  return typeof err === "object" && err !== null && "isAxiosError" in err;
+  return err.status === 429 || err.status === 502 || err.status === 503 || err.status === 504;
 }

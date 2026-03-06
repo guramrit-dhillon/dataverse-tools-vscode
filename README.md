@@ -267,7 +267,7 @@ npm run build:all -w assembly-decompiler
 |---|---|
 | Extensions | TypeScript, VS Code API, esbuild |
 | Webviews | React, CodeMirror (SQL editor) |
-| HTTP | Axios, OData v9.2 |
+| HTTP | Native fetch, OData v9.2 |
 | .NET backends | .NET 8, MetadataLoadContext, ILSpy |
 | Auth | `@azure/identity` (MSAL, Azure CLI, device code, client credentials) |
 | CI/CD | GitHub Actions — lint, build, test, multi-platform .NET builds, VSIX packaging |
