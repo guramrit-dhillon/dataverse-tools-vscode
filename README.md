@@ -1,6 +1,8 @@
 # Dataverse Tools for VS Code
 
-A modern, code-centric alternative to the XrmToolBox Plugin Registration Tool. Manage Dataverse environments, deploy plugin assemblies, register steps, build FetchXML queries, run SQL, browse metadata, view trace logs, and decompile assemblies — all without leaving VS Code.
+Deploy plugins, register steps, query data, debug trace logs, browse metadata, manage workflows, edit web resources, and decompile assemblies — without leaving VS Code.
+
+A modern replacement for the XrmToolBox Plugin Registration Tool, built entirely inside VS Code.
 
 > **Status:** Preview (`0.1.0-preview`)
 > **Requires:** VS Code 1.96+
@@ -10,28 +12,33 @@ A modern, code-centric alternative to the XrmToolBox Plugin Registration Tool. M
 
 ## Why Dataverse Tools?
 
-The legacy Plugin Registration Tool requires switching between your IDE and a separate desktop app. Dataverse Tools brings the full plugin lifecycle into VS Code so you can **build, deploy, register, debug, and query** in one place.
+Dynamics 365 / Power Platform development has always meant context-switching. You write code in VS Code, then open XrmToolBox to deploy, open the maker portal to check your changes, open a trace log viewer to debug, and so on.
 
-- **Deploy on build** — prompted to deploy your assembly the moment a build succeeds
-- **Differential deployment** — only uploads when the DLL actually changed (SHA-256 hash comparison)
-- **Multi-environment** — switch between dev, test, and prod orgs in seconds
-- **Modular** — install only the extensions you need; each has a single responsibility
+Dataverse Tools puts the whole workflow in one place:
+
+- **Deploy the moment you build** — a prompt appears as soon as your build succeeds; one click deploys to Dataverse
+- **Smart uploads** — only uploads when the DLL actually changed; large assemblies are skipped automatically
+- **One explorer for everything** — assemblies, entities, workflows, web resources, and trace logs all live in the same sidebar
+- **Switch orgs in seconds** — dev, test, and prod environments available from the same tree
+- **Modular** — install only the extensions you need; each does one thing
 
 ---
 
 ## Extensions
 
-The suite is composed of seven extensions that share a common foundation. Install them individually or together.
+Nine extensions share a common foundation. Install them all at once with the [Dataverse Tools](https://marketplace.visualstudio.com/items?itemName=gdhillon.dataverse-tools) extension pack, or pick the ones you need.
 
 | Extension | What it does |
 |---|---|
-| **Environments** | Authentication, environment management, unified explorer tree framework |
-| **Assemblies** | Deploy assemblies, register plugin steps, manage pre/post images |
-| **Metadata** | Browse entities, attributes, relationships, and messages in the explorer |
+| **Environments** | Connect to environments, manage sign-in, and provide the shared explorer sidebar |
+| **Assemblies** | Deploy plugin assemblies, register steps, and manage pre/post images |
+| **Metadata** | Browse entities, attributes, relationships, and SDK messages in the explorer |
 | **FetchXML Builder** | Visual query builder with execution, results table, and CSV export |
-| **Query Analyzer** | SQL editor for the Dataverse TDS endpoint with autocomplete |
+| **Query Analyzer** | SQL editor for the Dataverse TDS endpoint with live autocomplete |
 | **Trace Viewer** | Search and inspect plugin execution trace logs |
-| **Decompiler** | Browse decompiled C# source from deployed plugin assemblies |
+| **Workflows** | Browse, activate, deactivate, and trigger Dataverse process automation |
+| **Web Resources** | Edit and publish JS, CSS, and HTML resources with Ctrl+S |
+| **Decompiler** | Browse decompiled C# source from any deployed plugin assembly |
 
 ### Architecture
 
@@ -79,21 +86,16 @@ All extensions depend on **Environments** for authentication and the explorer fr
 
 ## Features at a glance
 
-### Environment Management
+### Environments — Connect and stay signed in
 
 <!-- SCREENSHOT: The "Add Environment" wizard showing Global Discovery results
      (list of orgs grouped by region) or the auth method picker.
      Crop to just the wizard dialog. -->
 <!-- ![Add Environment wizard](docs/images/add-environment.png) -->
 
-- Add environments via **Global Discovery Service** (auto-discovers all orgs in your tenant) or manual URL
-- Four authentication methods: **VS Code auth**, **Azure CLI**, **device code flow**, **service principal** (client credentials)
-- Service principal secrets stored in the OS keychain via VS Code SecretStorage — never written to disk
-- Silent token refresh with proactive renewal 60 seconds before expiry
-- Test connection (WhoAmI) with latency reporting
-- Persistent environment selection across sessions
+Connect using your Microsoft account, Azure CLI, device code, or a service principal — configured per environment. The extension auto-discovers all the Dataverse orgs in your tenant via Global Discovery, so you don't have to remember URLs. Tokens refresh silently 60 seconds before expiry. Switch between environments in one click.
 
-### Assembly Deployment & Plugin Registration
+### Assemblies — Deploy plugins and register steps
 
 <!-- SCREENSHOT: Explorer tree showing assembly → plugin type → step hierarchy
      with the right-click context menu open (Deploy, Add Step, Enable/Disable, etc.).
@@ -104,81 +106,56 @@ All extensions depend on **Environments** for authentication and the explorer fr
      stage, mode, rank, and filtering attributes fields. -->
 <!-- ![Step configuration panel](docs/images/step-config.png) -->
 
-- **One-click deploy** — right-click a `.dll` or get prompted after a successful build
-- **Differential deployment** — SHA-256 hash stored in the assembly `description` field; unchanged assemblies are skipped
-- **Full step lifecycle** — add, edit, enable, disable, delete processing steps
-- Configure message, entity filter, stage, execution mode, rank, and filtering attributes
-- **Pre/post entity images** — add, configure, and remove image registrations
-- **Download** deployed assemblies back to disk
-- Rename and delete assemblies, plugin types, and steps with safety prompts
-- Toggle managed assembly visibility in the tree
+Right-click a `.dll` or get prompted automatically when a build succeeds. A SHA-256 hash is compared before uploading — unchanged assemblies are skipped. The step registration wizard walks you through message, entity, stage, mode, rank, filtering attributes, and secure/unsecure config. Enable or disable steps in place. Attach pre/post entity images. Download assemblies back to disk.
 
-### Metadata Explorer
-- Browse entities with display names and logical names
-- Expand to see attributes, relationships, and SDK messages
-- Filter by managed/unmanaged components
-- Solution scoping — browse components within a specific solution or across the org
-- Add/remove components to/from solutions (with inclusion mode selection)
+### Metadata — Browse your environment's schema
 
-### FetchXML Builder
+Know exactly what entities, attributes, relationships, and SDK messages exist in your environment. Expand any entity to see field types and logical names — the names you use in plugin code, FetchXML, and SQL queries. Filter by solution or managed/unmanaged state.
+
+### FetchXML Builder — Build queries visually
 
 <!-- SCREENSHOT: FetchXML Builder showing the tree on the left, node properties
      panel on the right, and ideally query results in a bottom panel.
      Full-width capture. -->
 <!-- ![FetchXML Builder](docs/images/fetchxml-builder.png) -->
 
-- **Visual tree editor** — build queries by adding entity, link-entity, attribute, filter, condition, and order nodes
-- **Smart child rules** — only valid child nodes are offered per parent type
-- **Metadata-driven autocomplete** — entity and attribute pickers powered by live Dataverse metadata
-- **Type-aware operators** — condition operators adapt to the attribute type (string, number, date, lookup, picklist, etc.)
-- **Aggregation support** — count, sum, avg, min, max with group-by and date grouping
-- **Execute and view results** — data table with column sorting, cross-column filter, and export to CSV
-- **Formatted values** — option set labels, currency formatting, lookup display names
-- **Bidirectional XML editing** — edit raw FetchXML in a VS Code editor tab; changes sync back to the tree
-- **FetchXML language support** — syntax highlighting for `.fetchxml` files
-- Open/save queries to files, copy to clipboard
-- Built-in CSV viewer for `.csv` files
+A tree editor where you click to add nodes — entity, attribute, link-entity, filter, condition, order. Entity and attribute pickers are driven by live metadata. Condition operators adapt to the field type. Aggregate queries, relationship joins, and formatted result values (option set labels, currency symbols, lookup names) are all supported. Edit the raw XML directly when you need to — changes sync back to the tree. Built-in CSV viewer for result export.
 
-### Query Analyzer (SQL)
+### Query Analyzer — SQL for Dataverse
 
 <!-- SCREENSHOT: Query Analyzer panel with a SQL query in the editor,
      autocomplete dropdown visible, and results table below. -->
 <!-- ![Query Analyzer](docs/images/query-analyzer.png) -->
 
-- CodeMirror-based SQL editor with **metadata-driven autocomplete**
-- Execute queries against the Dataverse **TDS endpoint** (port 5558)
-- Results displayed in the same data table used by the FetchXML Builder
-- "Query This Entity" context menu action in the explorer tree
-- Configurable query timeout
+Write standard SQL against the Dataverse TDS endpoint. Table and column autocomplete is driven by live metadata. Results appear in a sortable, filterable data table with CSV/JSON export. Query history records the last 50 runs with duration and row count. Named queries persist per workspace.
 
-### Trace Viewer
+### Trace Viewer — Debug what your plugins did
 
 <!-- SCREENSHOT: Trace Viewer panel showing a list of trace logs with
      filters at the top and an expanded trace showing exception/context details. -->
 <!-- ![Trace Viewer](docs/images/trace-viewer.png) -->
 
-- Browse plugin execution trace logs from any connected environment
-- Filter by plugin type, message name, and date range
-- View full execution context, exception details, stack traces, and input/output parameters
-- Launch from the command palette or directly from an assembly/plugin type in the tree
+Right-click any assembly or plugin type in the tree and open its trace logs pre-filtered. Filter by plugin type, message, entity, correlation ID, or date range. Toggle to show only failed executions. Expand any row to see the full exception, stack trace, plugin context, and any messages logged with `ITracingService`.
 
-### Decompiler
+### Workflows — Manage process automation
+
+Browse classic workflows, actions, business rules, business process flows, and modern flows — all grouped in one tree. Activate, deactivate, or delete drafts without opening the browser. Trigger on-demand workflows against a specific record by entering its ID.
+
+### Web Resources — Edit files, Ctrl+S publishes
+
+Open any JavaScript, CSS, or HTML web resource as a proper editor tab with syntax highlighting. Ctrl+S writes the change back to Dataverse. A prompt then offers to publish immediately, or save it for a batch publish later. The upload button in the editor title bar saves and publishes in one step.
+
+### Decompiler — Read deployed assembly code
 
 <!-- SCREENSHOT: Decompiler showing the namespace → type tree on the left
      and decompiled C# source code in the editor on the right. -->
 <!-- ![Decompiler](docs/images/decompiler.png) -->
 
-- Expand the **Code** node under any assembly in the explorer tree to browse decompiled source
-- Namespace → type hierarchy with class/interface/struct/enum icons
-- Full C# syntax highlighting in a read-only virtual document — no temp files on disk
-- ILSpy-based decompilation engine running as a long-lived .NET backend with idle timeout
+Expand the **Code** node under any assembly in the explorer tree. Browse namespaces and types. Click a class to open the decompiled C# as a read-only document — works on managed assemblies without the original source.
 
 ### GitHub Copilot Chat Integration
-Four language model tools are exposed for Copilot Chat:
-- **List Dataverse Environments** — returns all configured environments
-- **Get Environment Details** — returns details for a specific environment
-- **Test Dataverse Connection** — runs WhoAmI with confirmation
-- **Execute FetchXML Query** — runs a query and returns results as JSON
+
+Four language model tools exposed for Copilot Chat: list environments, get environment details, test a connection, and execute a FetchXML query with results returned as JSON.
 
 ---
 
@@ -227,8 +204,11 @@ packages/
 ├── dataverse-metadata/          Entity metadata providers for the explorer
 ├── fetchxml-builder/            FetchXML visual builder + executor
 ├── dataverse-query-analyzer/    SQL query editor (TDS endpoint)
-├── plugin-trace-viewer/         Plugin trace log viewer
+├── dataverse-plugin-trace-viewer/ Plugin trace log viewer
 ├── dataverse-assembly-decompiler/ Assembly code browser
+├── dataverse-workflows/         Workflow and process automation browser
+├── dataverse-web-resources/     Web resource editor + Ctrl+S publish
+├── dataverse-tools-pack/        Extension pack (installs all of the above)
 ├── assembly-backend/            Shared .NET host (stdio/exec JSON-RPC)
 ├── dataverse-assembly-analyzer/ .NET Plugin Analyzer CLI
 └── assembly-decompiler/         .NET ILSpy decompiler backend
