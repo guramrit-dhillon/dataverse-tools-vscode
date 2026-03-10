@@ -127,17 +127,17 @@ export class RegistrationService implements IRegistrationService {
   async listEntityNames(env: DataverseEnvironment): Promise<string[]> {
     const entities = await this.client(env).getAll<{ LogicalName: string }>(
       "EntityDefinitions",
-      "$select=LogicalName&$orderby=LogicalName",
+      "$select=LogicalName",
     );
-    return entities.map((e) => e.LogicalName);
+    return entities.map((e) => e.LogicalName).sort((a, b) => a.localeCompare(b));
   }
 
   async listEntityAttributes(env: DataverseEnvironment, entityLogicalName: string): Promise<string[]> {
     const attrs = await this.client(env).getAll<{ LogicalName: string }>(
       `EntityDefinitions(LogicalName='${entityLogicalName}')/Attributes`,
-      "$select=LogicalName&$orderby=LogicalName",
+      "$select=LogicalName",
     );
-    return attrs.map((a) => a.LogicalName);
+    return attrs.map((a) => a.LogicalName).sort((a, b) => a.localeCompare(b));
   }
 
   // ── Write ──────────────────────────────────────────────────────────────────
@@ -160,13 +160,25 @@ export class RegistrationService implements IRegistrationService {
 
   async upsertStep(env: DataverseEnvironment, step: SdkMessageProcessingStep): Promise<SdkMessageProcessingStep> {
     const client = this.client(env);
+    // Strip navigation property objects and replace with @odata.bind to avoid deep-insert errors
+    const { sdkmessageid, sdkmessagefilterid, eventhandler_plugintype, ...scalar } = step as any;
+    const body: Record<string, unknown> = { ...scalar };
+    if (sdkmessageid?.sdkmessageid) {
+      body["sdkmessageid@odata.bind"] = `/sdkmessages(${sdkmessageid.sdkmessageid})`;
+    }
+    if (sdkmessagefilterid?.sdkmessagefilterid) {
+      body["sdkmessagefilterid@odata.bind"] = `/sdkmessagefilters(${sdkmessagefilterid.sdkmessagefilterid})`;
+    }
+    if (eventhandler_plugintype?.plugintypeid) {
+      body["eventhandler_plugintype@odata.bind"] = `/plugintypes(${eventhandler_plugintype.plugintypeid})`;
+    }
     if (step.sdkmessageprocessingstepid) {
       return client.patch<SdkMessageProcessingStep>(
         `sdkmessageprocessingsteps(${step.sdkmessageprocessingstepid})`,
-        step
+        body
       );
     }
-    return client.post<SdkMessageProcessingStep>("sdkmessageprocessingsteps", step);
+    return client.post<SdkMessageProcessingStep>("sdkmessageprocessingsteps", body);
   }
 
   async upsertStepImage(
@@ -174,13 +186,19 @@ export class RegistrationService implements IRegistrationService {
     image: SdkMessageProcessingStepImage
   ): Promise<SdkMessageProcessingStepImage> {
     const client = this.client(env);
+    // Strip navigation property object and bind with @odata.bind
+    const { sdkmessageprocessingstepid, ...scalar } = image as any;
+    const body: Record<string, unknown> = { ...scalar };
+    if (sdkmessageprocessingstepid?.sdkmessageprocessingstepid) {
+      body["sdkmessageprocessingstepid@odata.bind"] = `/sdkmessageprocessingsteps(${sdkmessageprocessingstepid.sdkmessageprocessingstepid})`;
+    }
     if (image.sdkmessageprocessingstepimageid) {
       return client.patch<SdkMessageProcessingStepImage>(
         `sdkmessageprocessingstepimages(${image.sdkmessageprocessingstepimageid})`,
-        image
+        body
       );
     }
-    return client.post<SdkMessageProcessingStepImage>("sdkmessageprocessingstepimages", image);
+    return client.post<SdkMessageProcessingStepImage>("sdkmessageprocessingstepimages", body);
   }
 
   async setStepState(env: DataverseEnvironment, stepId: string, enabled: boolean): Promise<void> {
