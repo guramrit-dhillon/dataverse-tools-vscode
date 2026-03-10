@@ -46,6 +46,7 @@ export class Panel {
         switch (msg.type) {
           case "ready":
             this.#panel.webview.postMessage({ type: "init", payload: this.#latestOptions });
+            this.onReady();
             break;
           default:
             this.#handleMessage(msg, (response) => {
@@ -59,6 +60,9 @@ export class Panel {
       this.#disposables
     );
   }
+
+  /** Called once when the webview signals it is ready. Override to push additional data. */
+  protected onReady(): void {}
 
   protected initListeners(listeners: { [messageType: string]: (payload: any, successCallback: (msg: any) => void, errorCallback: (msg: any) => void) => any }): void {
     this.#listeners = listeners;
