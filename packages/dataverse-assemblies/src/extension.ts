@@ -9,6 +9,7 @@ import {
   type PluginAssembly,
   type PluginType,
   type SdkMessageProcessingStep,
+  type SdkMessageProcessingStepImage,
   type TraceLogTarget,
   registerCommand,
 } from "core-dataverse";
@@ -19,8 +20,12 @@ import { addStepCommand } from "./commands/addStepCommand";
 import { editStepCommand } from "./commands/editStepCommand";
 import { toggleStepStateCommand } from "./commands/toggleStepStateCommand";
 import { deleteNodeCommand } from "./commands/deleteNodeCommand";
-import { manageImagesCommand } from "./commands/manageImagesCommand";
+import { registerImageCommand } from "./commands/registerImageCommand";
+import { unregisterImageCommand } from "./commands/unregisterImageCommand";
+import { imageWizard } from "./commands/imageQuickInput";
 import { renameNodeCommand } from "./commands/renameNodeCommand";
+import { editStepConfigCommand } from "./commands/editStepConfigCommand";
+import { StepConfigFileSystemProvider } from "./fs/StepConfigFileSystemProvider";
 
 /**
  * Dataverse Tools: Assemblies Extension
@@ -53,7 +58,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const container = new ServiceContainer(api, context);
 
   // ── Register providers with explorer framework ────────────────────────────
+  const stepConfigFsProvider = new StepConfigFileSystemProvider();
   context.subscriptions.push(
+    vscode.workspace.registerFileSystemProvider(StepConfigFileSystemProvider.SCHEME, stepConfigFsProvider, { isCaseSensitive: true }),
     api.explorer.registerProvider(container.assembliesProvider),
     api.explorer.registerProvider(container.messagesProvider),
   );
@@ -95,7 +102,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       api,
       container.registrationService,
       refresh,
-      context.extensionUri,
       pluginType,
       getEnv()
     );
@@ -110,7 +116,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       api,
       container.registrationService,
       refresh,
-      context.extensionUri,
       step,
       getEnv()
     );
@@ -132,18 +137,65 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     return toggleStepStateCommand(api, container.registrationService, refresh, step, false, getEnv());
   }) as (...args: unknown[]) => unknown);
 
-  registerCommand(context, Commands.ManageImages, ((arg?: unknown) => {
+  registerCommand(context, Commands.RegisterImage, ((arg?: unknown) => {
     const node = extractNode(arg);
     if (!node || !node.contextValue.startsWith("step.")) { return; }
     const step = node.data?.step as SdkMessageProcessingStep | undefined;
     if (!step) { return; }
-    return manageImagesCommand(api, container.registrationService, context.extensionUri, step, getEnv());
+    return registerImageCommand(api, container.registrationService, refresh, step, getEnv());
+  }) as (...args: unknown[]) => unknown);
+
+  registerCommand(context, Commands.EditImage, (async (arg?: unknown) => {
+    const node = extractNode(arg);
+    if (!node || node.contextValue !== "image") { return; }
+    const image = node.data?.image as SdkMessageProcessingStepImage | undefined;
+    const step = node.data?.step as SdkMessageProcessingStep | undefined;
+    const env = getEnv();
+    if (!image || !step || !env) { return; }
+
+    const saved = await imageWizard(step, env, container.registrationService, image);
+    if (saved) { refresh(); }
+  }) as (...args: unknown[]) => unknown);
+
+  registerCommand(context, Commands.UnregisterImage, ((arg?: unknown) => {
+    const node = extractNode(arg);
+    if (!node || node.contextValue !== "image") { return; }
+    const image = node.data?.image as SdkMessageProcessingStepImage | undefined;
+    if (!image) { return; }
+    return unregisterImageCommand(api, container.registrationService, refresh, image, getEnv());
   }) as (...args: unknown[]) => unknown);
 
   registerCommand(context, Commands.DeleteNode, ((arg?: unknown) => {
     const node = extractNode(arg);
     if (!node) { return; }
     return deleteNodeCommand(api, container.registrationService, refresh, node, getEnv());
+  }) as (...args: unknown[]) => unknown);
+
+  registerCommand(context, Commands.EditStepConfig, ((arg?: unknown) => {
+    const node = extractNode(arg);
+    if (!node || !node.contextValue.startsWith("step.")) { return; }
+    const step = node.data?.step as SdkMessageProcessingStep | undefined;
+    const env = getEnv();
+    if (!step || !env) { return; }
+    return editStepConfigCommand(container.registrationService, step, env, "unsecure", stepConfigFsProvider);
+  }) as (...args: unknown[]) => unknown);
+
+  registerCommand(context, Commands.EditStepSecureConfig, ((arg?: unknown) => {
+    const node = extractNode(arg);
+    if (!node || !node.contextValue.startsWith("step.")) { return; }
+    const step = node.data?.step as SdkMessageProcessingStep | undefined;
+    const env = getEnv();
+    if (!step || !env) { return; }
+    return editStepConfigCommand(container.registrationService, step, env, "secure", stepConfigFsProvider);
+  }) as (...args: unknown[]) => unknown);
+
+  registerCommand(context, Commands.EditStepDescription, ((arg?: unknown) => {
+    const node = extractNode(arg);
+    if (!node || !node.contextValue.startsWith("step.")) { return; }
+    const step = node.data?.step as SdkMessageProcessingStep | undefined;
+    const env = getEnv();
+    if (!step || !env) { return; }
+    return editStepConfigCommand(container.registrationService, step, env, "description", stepConfigFsProvider);
   }) as (...args: unknown[]) => unknown);
 
   registerCommand(context, Commands.RenameNode, ((arg?: unknown) => {

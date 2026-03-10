@@ -52,6 +52,24 @@
         "icon": "$(edit)"
       },
       {
+        "command": "dataverse-tools.editStepConfig",
+        "title": "Edit Unsecure Config…",
+        "category": "Dataverse Tools: Assemblies",
+        "icon": "$(gear)"
+      },
+      {
+        "command": "dataverse-tools.editStepSecureConfig",
+        "title": "Edit Secure Config…",
+        "category": "Dataverse Tools: Assemblies",
+        "icon": "$(lock)"
+      },
+      {
+        "command": "dataverse-tools.editStepDescription",
+        "title": "Edit Description…",
+        "category": "Dataverse Tools: Assemblies",
+        "icon": "$(note)"
+      },
+      {
         "command": "dataverse-tools.enableStep",
         "title": "Enable Step",
         "category": "Dataverse Tools: Assemblies"
@@ -68,10 +86,22 @@
         "icon": "$(cloud-download)"
       },
       {
-        "command": "dataverse-tools.manageImages",
-        "title": "Manage Images",
+        "command": "dataverse-tools.registerImage",
+        "title": "Register Image",
         "category": "Dataverse Tools: Assemblies",
-        "icon": "$(layers)"
+        "icon": "$(add)"
+      },
+      {
+        "command": "dataverse-tools.editImage",
+        "title": "Edit Image",
+        "category": "Dataverse Tools: Assemblies",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "dataverse-tools.unregisterImage",
+        "title": "Unregister Image",
+        "category": "Dataverse Tools: Assemblies",
+        "icon": "$(trash)"
       },
       {
         "command": "dataverse-tools.changeActivityGroup",
@@ -143,9 +173,34 @@
           "group": "dataverse@1"
         },
         {
-          "command": "dataverse-tools.manageImages",
+          "command": "dataverse-tools.registerImage",
           "when": "view == dataverse-tools.explorer && viewItem =~ /^step\\.(enabled|disabled)/",
           "group": "dataverse@1"
+        },
+        {
+          "command": "dataverse-tools.editStepConfig",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /^step\\.(enabled|disabled)/",
+          "group": "dataverse@3"
+        },
+        {
+          "command": "dataverse-tools.editStepSecureConfig",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /^step\\.(enabled|disabled)/",
+          "group": "dataverse@3"
+        },
+        {
+          "command": "dataverse-tools.editStepDescription",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /^step\\.(enabled|disabled)/",
+          "group": "dataverse@3"
+        },
+        {
+          "command": "dataverse-tools.editImage",
+          "when": "view == dataverse-tools.explorer && viewItem == image",
+          "group": "dataverse@1"
+        },
+        {
+          "command": "dataverse-tools.unregisterImage",
+          "when": "view == dataverse-tools.explorer && viewItem == image",
+          "group": "dataverse@9"
         },
         {
           "command": "dataverse-tools.enableStep",
