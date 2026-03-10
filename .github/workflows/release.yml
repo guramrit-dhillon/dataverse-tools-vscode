@@ -93,6 +93,8 @@ jobs:
             packages/dataverse-query-analyzer \
             packages/dataverse-workflows \
             packages/dataverse-web-resources \
+            packages/dataverse-assemblies \
+            packages/dataverse-assembly-decompiler \
             packages/dataverse-tools-pack; do
 
             ext=$(basename "$dir")
