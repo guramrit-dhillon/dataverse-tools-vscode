@@ -1,5 +1,27 @@
 # dataverse-assemblies
 
+## 0.5.0
+
+### Minor Changes
+
+- [`31e9114`](https://github.com/guramrit-dhillon/dataverse-tools-vscode/commit/31e911493e70773adc5274c46b1f303c42caca20) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - ci(release): add assemblies and decompiler to extension detection matrix
+  - docs: update extension pack and root README
+  - docs(management-tools): rewrite metadata, workflows, and web resources READMEs
+  - docs(query-tools): rewrite FetchXML builder and query analyzer READMEs
+  - docs(plugin-tools): rewrite decompiler and trace viewer READMEs
+  - docs(dataverse-environments): rewrite README from user perspective
+  - docs(dataverse-assemblies): update README for quick-input wizard workflow
+  - feat(dataverse-assemblies): wire new commands in extension and package manifest
+  - feat(dataverse-assemblies): show step images as lazy-loaded children in the tree
+  - feat(dataverse-assemblies): add virtual file system provider for step config editing
+  - feat(dataverse-assemblies): replace image webview panel with quick-input commands
+  - feat(dataverse-assemblies): replace step webview panel with quick-input wizard
+  - fix(dataverse-assemblies): use OData bind notation in upsertStep and upsertStepImage
+  - feat(shared-views): add filterMode prop to Autocomplete for client-side filtering
+  - feat(core-dataverse): add onReady hook to Panel and new command constants
+  - feat(core-dataverse): add textarea wizard page type and multi-select QuickPick support
+  - chore(changeset): set updateInternalDependencies to none
+
 ## 0.4.0
 
 ### Minor Changes
