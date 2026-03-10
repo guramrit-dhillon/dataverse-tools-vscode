@@ -30,6 +30,10 @@ export interface QuickPickConfig {
   busy?: boolean;
   /** Action string of the item to pre-select (highlight). */
   activeAction?: string;
+  /** When true the QuickPick renders with checkboxes. Use `onMultiSelect` to handle the result. */
+  canPickMany?: boolean;
+  /** Action strings of items that should be pre-checked (only meaningful when `canPickMany` is true). */
+  selectedActions?: string[];
 }
 
 /** Control handle passed to `onSelect`, allowing the consumer to update the QuickPick UI during async work. */
@@ -53,7 +57,10 @@ export interface QuickPickPageDef<S> {
     items?: QuickPickWizardItem[];
   };
   render: (state: S, signal: AbortSignal) => QuickPickConfig | Promise<QuickPickConfig>;
+  /** Called when the user picks a single item (normal mode). */
   onSelect: (action: string, item: QuickPickWizardItem, state: S, ui: QuickPickControl) => StepResult<S> | Promise<StepResult<S>>;
+  /** Called when the user confirms a multi-select page (only used when `canPickMany` is true). */
+  onMultiSelect?: (items: QuickPickWizardItem[], state: S, ui: QuickPickControl) => StepResult<S> | Promise<StepResult<S>>;
 }
 
 // ── Input page ──────────────────────────────────────────────────────────────
@@ -69,6 +76,23 @@ export interface InputConfig {
 export interface InputPageDef<S> {
   type: "input";
   render: (state: S) => InputConfig;
+  onSubmit: (value: string, state: S) => StepResult<S> | Promise<StepResult<S>>;
+}
+
+// ── Textarea page ────────────────────────────────────────────────────────────
+
+export interface TextAreaConfig {
+  /** Instruction shown in the floating QuickPick above the editor. */
+  prompt?: string;
+  /** Initial content placed in the temporary document. */
+  value?: string;
+  /** VS Code language ID for syntax highlighting (e.g. "json", "xml"). Defaults to "plaintext". */
+  language?: string;
+}
+
+export interface TextAreaPageDef<S> {
+  type: "textarea";
+  render: (state: S) => TextAreaConfig;
   onSubmit: (value: string, state: S) => StepResult<S> | Promise<StepResult<S>>;
 }
 
@@ -101,7 +125,7 @@ export type WizardPage<S> = {
   title: string;
   /** When true, this page is never pushed to the back-history stack. Back from this page returns to the previous non-ephemeral page. */
   ephemeral?: boolean;
-} & (QuickPickPageDef<S> | InputPageDef<S> | MultiInputPageDef<S>);
+} & (QuickPickPageDef<S> | InputPageDef<S> | MultiInputPageDef<S> | TextAreaPageDef<S>);
 
 // ── Wizard config ───────────────────────────────────────────────────────────
 

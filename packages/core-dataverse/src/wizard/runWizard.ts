@@ -6,6 +6,7 @@ import type {
   QuickPickPageDef,
   InputPageDef,
   MultiInputPageDef,
+  TextAreaPageDef,
   QuickPickConfig,
   QuickPickControl,
   QuickPickWizardItem,
@@ -82,6 +83,7 @@ function showQuickPickPage<S>(
       if (resolved) { return; }
       qp.placeholder = config.placeholder ?? "";
       qp.busy = config.busy ?? false;
+      qp.canSelectMany = config.canPickMany ?? false;
       qp.items = config.items.map((item): TaggedItem => ({
         label: item.label,
         description: item.description,
@@ -94,6 +96,10 @@ function showQuickPickPage<S>(
       if (config.activeAction !== undefined) {
         const active = qp.items.find((i) => i._wizardAction === config.activeAction);
         if (active) { qp.activeItems = [active]; }
+      }
+      if (config.selectedActions !== undefined && config.selectedActions.length > 0) {
+        const selectedSet = new Set(config.selectedActions);
+        qp.selectedItems = qp.items.filter((i) => i._wizardAction && selectedSet.has(i._wizardAction));
       }
     };
 
@@ -126,9 +132,6 @@ function showQuickPickPage<S>(
     }
 
     qp.onDidAccept(() => {
-      const selected = qp.selectedItems[0] as TaggedItem | undefined;
-      if (!selected?._wizardAction || !selected._wizardItem) { return; }
-
       qp.enabled = false;
 
       const ui: QuickPickControl = {
@@ -137,6 +140,19 @@ function showQuickPickPage<S>(
         setPlaceholder(text) { qp.placeholder = text; },
         setEnabled(enabled) { qp.enabled = enabled; },
       };
+
+      if (qp.canSelectMany && page.onMultiSelect) {
+        const selectedWizardItems = (qp.selectedItems as TaggedItem[])
+          .map((i) => i._wizardItem)
+          .filter((i): i is QuickPickWizardItem => !!i);
+        Promise.resolve(page.onMultiSelect(selectedWizardItems, state, ui))
+          .then((stepResult) => { finish({ outcome: "complete", stepResult }); })
+          .catch(fail);
+        return;
+      }
+
+      const selected = qp.selectedItems[0] as TaggedItem | undefined;
+      if (!selected?._wizardAction || !selected._wizardItem) { qp.enabled = true; return; }
 
       Promise.resolve(page.onSelect(selected._wizardAction, selected._wizardItem, state, ui))
         .then((stepResult) => { finish({ outcome: "complete", stepResult }); })
@@ -150,7 +166,7 @@ function showQuickPickPage<S>(
     });
 
     qp.onDidHide(() => {
-      finish({ outcome: "cancel" });
+      finish(canGoBack ? { outcome: "back" } : { outcome: "cancel" });
     });
   });
 }
@@ -222,7 +238,7 @@ function showInputPage<S>(
     });
 
     ib.onDidHide(() => {
-      finish({ outcome: "cancel" });
+      finish(canGoBack ? { outcome: "back" } : { outcome: "cancel" });
     });
 
     ib.show();
@@ -286,7 +302,7 @@ function showSingleField(
     });
 
     ib.onDidHide(() => {
-      finish({ outcome: "cancel" });
+      finish(canGoBack ? { outcome: "back" } : { outcome: "cancel" });
     });
 
     ib.show();
@@ -360,6 +376,94 @@ async function showMultiInputPage<S>(
   return { outcome: "cancel" };
 }
 
+// ── Textarea page ────────────────────────────────────────────────────────────
+
+async function showTextAreaPage<S>(
+  page: WizardPage<S> & TextAreaPageDef<S>,
+  state: S,
+  wizardTitle: string,
+  stepNumber: number,
+  canGoBack: boolean,
+): Promise<PageResult<S>> {
+  const config = page.render(state);
+
+  const doc = await vscode.workspace.openTextDocument({
+    content: config.value ?? "",
+    language: config.language ?? "plaintext",
+  });
+
+  await vscode.window.showTextDocument(doc, {
+    preview: false,
+    preserveFocus: true,
+    viewColumn: vscode.ViewColumn.Active,
+  });
+
+  /** Close the temp document without a save prompt. */
+  const closeDoc = async (): Promise<void> => {
+    const tabsToClose: vscode.Tab[] = [];
+    for (const group of vscode.window.tabGroups.all) {
+      for (const tab of group.tabs) {
+        if (
+          tab.input instanceof vscode.TabInputText &&
+          tab.input.uri.toString() === doc.uri.toString()
+        ) {
+          tabsToClose.push(tab);
+        }
+      }
+    }
+    if (tabsToClose.length > 0) {
+      await vscode.window.tabGroups.close(tabsToClose, true);
+    }
+  };
+
+  return new Promise<PageResult<S>>((resolve, reject) => {
+    let resolved = false;
+    const qp = vscode.window.createQuickPick();
+    qp.title = formatTitle(wizardTitle, page.title, stepNumber);
+    qp.placeholder = config.prompt ?? "Edit the content in the editor, then press ↵ to confirm";
+    qp.ignoreFocusOut = true;
+    qp.items = [{ label: "$(check) Confirm" }];
+    if (canGoBack) {
+      qp.buttons = [vscode.QuickInputButtons.Back];
+    }
+
+    const finish = (result: PageResult<S>): void => {
+      if (resolved) { return; }
+      resolved = true;
+      qp.dispose();
+      closeDoc().then(() => resolve(result)).catch(() => resolve(result));
+    };
+
+    const fail = (err: unknown): void => {
+      if (resolved) { return; }
+      resolved = true;
+      qp.dispose();
+      closeDoc().then(() => reject(err)).catch(() => reject(err));
+    };
+
+    qp.onDidAccept(() => {
+      const content = doc.getText();
+      qp.enabled = false;
+      qp.busy = true;
+      Promise.resolve(page.onSubmit(content, state))
+        .then((stepResult) => { finish({ outcome: "complete", stepResult }); })
+        .catch(fail);
+    });
+
+    qp.onDidTriggerButton((button) => {
+      if (button === vscode.QuickInputButtons.Back) {
+        finish({ outcome: "back" });
+      }
+    });
+
+    qp.onDidHide(() => {
+      finish(canGoBack ? { outcome: "back" } : { outcome: "cancel" });
+    });
+
+    qp.show();
+  });
+}
+
 // ── Main runner ─────────────────────────────────────────────────────────────
 
 export async function runWizard<S>(config: WizardConfig<S>): Promise<S | undefined> {
@@ -388,6 +492,8 @@ export async function runWizard<S>(config: WizardConfig<S>): Promise<S | undefin
         result = await showQuickPickPage(page as WizardPage<S> & QuickPickPageDef<S>, state, config.title, stepNumber, canGoBack);
       } else if (page.type === "input") {
         result = await showInputPage(page as WizardPage<S> & InputPageDef<S>, state, config.title, stepNumber, canGoBack);
+      } else if (page.type === "textarea") {
+        result = await showTextAreaPage(page as WizardPage<S> & TextAreaPageDef<S>, state, config.title, stepNumber, canGoBack);
       } else {
         result = await showMultiInputPage(page as WizardPage<S> & MultiInputPageDef<S>, state, config.title, stepNumber, canGoBack);
       }
