@@ -1,86 +1,106 @@
 # Dataverse Tools: Environments
 
-Manage Dataverse connections and authentication directly from VS Code. This is the foundational extension in the **Dataverse Tools** suite — all other extensions depend on it for auth, environment access, and the shared explorer tree.
+Connect to your Dynamics 365 / Power Platform environments and stay signed in — without ever leaving VS Code. This is the foundation of the Dataverse Tools suite. Every other extension depends on it for authentication and environment access.
 
-## Features
+Install this first. Set it up once. Everything else just works.
 
-### Environment Management
-- **Add environments** via a guided wizard with auto-discovery from the Global Discovery Service — browse all orgs in your tenant grouped by region, or enter a custom URL
-- **Edit environments** — change auth method or credentials without removing and re-adding
-- **Remove environments** — safely clears cached tokens and stored secrets
-- **Test connection** — validates connectivity with a WhoAmI call and reports latency
+No more re-entering credentials or juggling separate connection tools.
 
-### Authentication
-Four methods, configured per environment:
+## What You Can Do
 
-| Method | Description |
+- **Connect to environments** using your Microsoft account, Azure CLI, device code, or a service principal
+- **Auto-discover your orgs** — the extension browses your tenant's Global Discovery Service so you don't have to remember URLs
+- **Switch between environments** instantly — dev, test, and prod in the same sidebar
+- **Test your connection** — verify it works and see the response time before you start working
+- **Scope the explorer to a solution** — browse only what's inside a specific managed or unmanaged solution
+- **Add and remove solution components** directly from the tree, without opening the browser
+- **Use with GitHub Copilot** — list environments, get details, or test a connection from Copilot Chat
+
+---
+
+## Getting Started
+
+1. Install this extension — it's required by every other Dataverse Tools extension
+2. Open any workspace in VS Code (the extension activates automatically when a `.csproj` file is present)
+3. Click the **Dataverse Tools** icon in the Activity Bar to open the explorer
+4. Click **Add Environment** and follow the wizard
+5. Sign in — the extension handles token refresh automatically from here on
+
+---
+
+## Connecting to an Environment
+
+Click **Add Environment** in the explorer header. The wizard offers two ways to connect:
+
+- **Global Discovery** — signs you in first, then shows all the Dataverse orgs in your tenant grouped by region. Pick one.
+- **Custom URL** — paste your org URL directly if you already know it.
+
+After connecting, the environment appears in the explorer. Right-click it at any time to **Edit**, **Remove**, or **Test Connection**.
+
+---
+
+## Authentication Methods
+
+Four methods, set per environment:
+
+| Method | Best for |
 |---|---|
-| **VS Code** | Browser-based sign-in via VS Code's built-in Microsoft authentication provider. Silent token refresh when possible. |
-| **Azure CLI** | Uses your existing `az login` session. Requires Azure CLI installed and signed in. |
-| **Device Code** | MSAL device code flow — works in headless/SSH environments. Optionally use a custom app registration. |
-| **Service Principal** | Client ID + secret for app-based access. Secrets stored in the OS keychain via VS Code SecretStorage — never written to disk. |
+| **VS Code** | Most users. Browser-based Microsoft login — same as signing into VS Code itself. Silent re-auth when your session is active. |
+| **Azure CLI** | Teams already using `az login`. No additional setup if you're already signed in. |
+| **Device Code** | SSH or headless environments where a browser isn't available. |
+| **Service Principal** | Automated pipelines and app-based access. Client ID + secret stored securely in your OS keychain — never written to disk. |
 
-Token caching with proactive refresh 60 seconds before JWT expiry.
+Your token is refreshed automatically 60 seconds before it expires. You won't be interrupted mid-work.
 
-### Explorer Tree
-A unified, extensible tree view in the activity bar that other Dataverse Tools extensions contribute nodes to:
+---
 
-- **Select environment** — pick which org to browse
-- **Select solution** — optionally scope the tree to a specific solution (managed or unmanaged)
-- **Solution management** — add or remove components from a solution directly from the tree, with entity inclusion mode selection (all objects / metadata only / shell)
-- **Filter controls** — toggle between all components and unmanaged only; show or hide out-of-solution items
-- **Details panel** — select any tree item to view its properties in a sidebar webview
+## The Explorer Tree
 
-### Copilot Chat Integration
-Three language model tools for use with GitHub Copilot Chat:
+The **Dataverse Explorer** sidebar is the shared home for all Dataverse Tools extensions. From here you can:
 
-| Tool | Description |
-|---|---|
-| `List Dataverse Environments` | Returns all configured environments |
-| `Get Environment Details` | Returns details for a specific environment |
-| `Test Dataverse Connection` | Runs a WhoAmI call (with confirmation prompt) |
+- **Select an environment** — click the environment picker in the tree header
+- **Select a solution** — optionally scope everything to a specific solution
+- **Filter the view** — toggle between all components and unmanaged-only
+- **Browse what's deployed** — assemblies, entities, workflows, web resources, and more
 
-### Extension API
-Exports `DataverseAccountApi` for other extensions in the suite:
-- `getAccessToken()` — acquire/refresh tokens for any environment
-- `getEnvironments()` / `onDidChangeEnvironments` — read and watch environment list
-- `pickEnvironment()` — reusable environment + solution picker
-- `showDetails()` — push detail items to the shared Details panel
-- `explorer.registerProvider()` — register tree node providers
-- `explorer.getContext()` / `onDidChangeContext` — read and watch explorer state
-- `explorer.refresh()` — trigger tree refresh
+Each installed extension contributes its own section to the tree. What you see depends on which extensions are installed.
 
-## Commands
-
-| Command | Description |
-|---|---|
-| `Dataverse Tools: Add Environment` | Launch the environment setup wizard |
-| `Dataverse Tools: Edit Environment` | Change auth method or credentials |
-| `Dataverse Tools: Remove Environment` | Remove an environment |
-| `Dataverse Tools: Test Connection` | Verify connectivity and report latency |
-| `Dataverse Tools: Select Environment` | Choose the active environment for the explorer |
-| `Dataverse Tools: Refresh` | Refresh the explorer tree |
-| `Dataverse Tools: Add to Solution` | Add a component to the active solution |
-| `Dataverse Tools: Remove from Solution` | Remove a component from the active solution |
+---
 
 ## Settings
 
-| Setting | Default | Description |
+| Setting | Default | What It Does |
 |---|---|---|
-| `dataverse-tools.authMethod` | `vscode` | Default auth method shown in the Add Environment wizard (`vscode`, `azcli`, `devicecode`, `clientcredentials`) |
-| `dataverse-tools.logLevel` | `info` | Log verbosity (`debug`, `info`, `warn`, `error`) |
-| `dataverse-tools.requestTimeoutMs` | `30000` | HTTP request timeout in milliseconds |
+| `dataverse-tools.authMethod` | `vscode` | Default auth method pre-selected in the Add Environment wizard |
+| `dataverse-tools.logLevel` | `info` | Log verbosity for the output channel (`debug`, `info`, `warn`, `error`) |
+| `dataverse-tools.requestTimeoutMs` | `30000` | How long to wait for a Dataverse API response before timing out |
+
+---
 
 ## Requirements
 
-- VS Code 1.96+
-- For Azure CLI auth: `az` CLI installed and signed in
-- For Service Principal auth: an Azure AD app registration with Dataverse permissions
+- **VS Code** 1.96 or later
+- For **Azure CLI** auth: the `az` CLI must be installed and signed in
+- For **Service Principal** auth: an Azure AD app registration with Dataverse permissions
+
+---
+
+## Part of Dataverse Tools
+
+This extension is part of the [Dataverse Tools](https://github.com/guramrit-dhillon/dataverse-tools-vscode) suite — a collection of VS Code extensions for Dynamics 365 / Power Platform developers.
+
+Other extensions in the suite:
+- **Dataverse Tools: Assemblies** — deploy and register plugin assemblies and steps
+- **Dataverse Tools: Trace Viewer** — view and filter plugin trace logs
+- **Dataverse Tools: FetchXML Builder** — build and run FetchXML queries
+- **Dataverse Tools: Query Analyzer** — query Dataverse with SQL
+- **Dataverse Tools: Workflows** — browse and manage process automation
+- **Dataverse Tools: Web Resources** — edit and publish web resources
+- **Dataverse Tools: Metadata** — browse entity schema in the explorer
+- **Dataverse Tools: Decompiler** — read decompiled plugin code from Dataverse
+
+---
 
 ## Acknowledgements
 
 Inspired by the connection management in the [Plugin Registration Tool](https://learn.microsoft.com/en-us/power-apps/developer/data-platform/download-tools-nuget) from the Dynamics 365 SDK and [XrmToolBox](https://www.xrmtoolbox.com/).
-
-## Part of Dataverse Tools
-
-This extension is part of the [Dataverse Tools](https://github.com/guramrit-dhillon/dataverse-tools-vscode) suite for Dynamics 365 / Power Platform developers.
