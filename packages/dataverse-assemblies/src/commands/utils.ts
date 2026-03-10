@@ -4,12 +4,6 @@ import {
   type ExplorerNode,
   type PluginAssembly,
   type PluginType,
-  StepMode,
-  StepStage,
-  StepStateCode,
-  StepStatusCode,
-  StepSupportedDeployment,
-  StepInvocationSource,
   Logger,
   type DeploymentResult,
 } from "core-dataverse";
@@ -95,18 +89,6 @@ export function resolveItem(node: ExplorerNode): { currentName: string; prompt: 
   return { currentName: "", prompt: "" };
 }
 
-export function defaultStep(_pluginTypeId: string): Partial<SdkMessageProcessingStep> {
-  return {
-    rank: 1,
-    mode: StepMode.Synchronous,
-    stage: StepStage.PostOperation,
-    invocationsource: StepInvocationSource.Parent,
-    supporteddeployment: StepSupportedDeployment.ServerOnly,
-    asyncautodelete: false,
-    statecode: StepStateCode.Enabled,
-    statuscode: StepStatusCode.Enabled,
-  };
-}
 
 export function withProgress<T>(title: string, task: () => Promise<T>): Promise<T> {
   return Promise.resolve(

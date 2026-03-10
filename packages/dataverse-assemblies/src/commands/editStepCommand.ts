@@ -1,50 +1,23 @@
-import { type DataverseAccountApi, type DataverseEnvironment, type SdkMessageProcessingStep, Logger } from "core-dataverse";
-import * as vscode from "vscode";
+import { type DataverseAccountApi, type DataverseEnvironment, type PluginType, type SdkMessageProcessingStep } from "core-dataverse";
 import { type IRegistrationService } from "../interfaces/IRegistrationService";
-import { StepConfigurationPanel } from "../webviews/StepConfigurationPanel";
-import { withProgress } from "./utils";
-
-/**
- * Open the Webview pre-filled with an existing step for editing.
- */
+import { stepWizard } from "./stepWizard";
 
 export async function editStepCommand(
-  api: DataverseAccountApi,
+  _api: DataverseAccountApi,
   registrationSvc: IRegistrationService,
   onRefresh: () => void,
-  extensionUri: vscode.Uri,
   step: SdkMessageProcessingStep,
   env: DataverseEnvironment | undefined
 ): Promise<void> {
   if (!env || !step.sdkmessageprocessingstepid) { return; }
 
-  const stepId = step.sdkmessageprocessingstepid;
-  const images = await withProgress("Loading step images…", () =>
-    registrationSvc.listStepImages(env, stepId)
-  );
-
-  StepConfigurationPanel.render(
-    extensionUri,
-    {
-      mode: "edit",
-      pluginTypeId: step.eventhandler_plugintype?.plugintypeid ?? "",
-      pluginTypeName: step.eventhandler_plugintype?.name ?? "",
-      step,
-      images,
-    },
-    async (updatedStep) => {
-      try {
-        await registrationSvc.upsertStep(env, updatedStep);
-        onRefresh();
-        vscode.window.showInformationMessage(`Step "${updatedStep.name}" updated.`);
-      } catch (err) {
-        Logger.error("Failed to update step", err);
-        vscode.window.showErrorMessage(
-          `Failed to update step: ${err instanceof Error ? err.message : String(err)}`
-        );
-      }
-    },
-    env,
-    registrationSvc
-  );
+  const pluginType: PluginType = {
+    plugintypeid: step.eventhandler_plugintype?.plugintypeid ?? "",
+    typename:     step.eventhandler_plugintype?.name ?? "",
+    friendlyname: step.eventhandler_plugintype?.name ?? "",
+    name:         step.eventhandler_plugintype?.name ?? "",
+    assemblyname: "",
+  };
+  const saved = await stepWizard(pluginType, env, registrationSvc, step);
+  if (saved) { onRefresh(); }
 }
