@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import "./autocomplete.css";
 
 export interface AutocompleteOption {
@@ -19,6 +19,13 @@ interface AutocompleteProps {
   required?: boolean;
   clearOnBlur?: boolean;
   debounceMs?: number;
+  /**
+   * When set, the component filters `options` internally using the typed query.
+   * The parent should pass the full unfiltered list; `onSearch` is still called
+   * for any external side-effects but filtering is handled here.
+   * When omitted, the parent is responsible for filtering (current behaviour).
+   */
+  filterMode?: "contains" | "startsWith";
 }
 
 export function Autocomplete({
@@ -33,6 +40,7 @@ export function Autocomplete({
   required,
   clearOnBlur = true,
   debounceMs = 300,
+  filterMode,
 }: AutocompleteProps): React.ReactElement {
   const [inputText, setInputText] = useState(value?.label ?? "");
   const [open, setOpen] = useState(false);
@@ -40,6 +48,15 @@ export function Autocomplete({
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
+
+  // When filterMode is set, filter options internally; otherwise use options as-is
+  const visibleOptions = useMemo(() => {
+    if (!filterMode || !inputText) { return options; }
+    const q = inputText.toLowerCase();
+    return filterMode === "startsWith"
+      ? options.filter((o) => o.label.toLowerCase().startsWith(q))
+      : options.filter((o) => o.label.toLowerCase().includes(q));
+  }, [options, inputText, filterMode]);
 
   // Sync input text when value changes externally
   useEffect(() => {
@@ -120,16 +137,16 @@ export function Autocomplete({
     switch (e.key) {
       case "ArrowDown":
         e.preventDefault();
-        setHighlightIndex((prev) => (prev < options.length - 1 ? prev + 1 : 0));
+        setHighlightIndex((prev) => (prev < visibleOptions.length - 1 ? prev + 1 : 0));
         break;
       case "ArrowUp":
         e.preventDefault();
-        setHighlightIndex((prev) => (prev > 0 ? prev - 1 : options.length - 1));
+        setHighlightIndex((prev) => (prev > 0 ? prev - 1 : visibleOptions.length - 1));
         break;
       case "Enter":
         e.preventDefault();
-        if (highlightIndex >= 0 && highlightIndex < options.length) {
-          handleSelect(options[highlightIndex]);
+        if (highlightIndex >= 0 && highlightIndex < visibleOptions.length) {
+          handleSelect(visibleOptions[highlightIndex]);
         }
         break;
       case "Escape":
@@ -172,10 +189,10 @@ export function Autocomplete({
           className="autocomplete-dropdown"
           role="listbox"
         >
-          {options.length === 0 && !loading && (
+          {visibleOptions.length === 0 && !loading && (
             <li className="autocomplete-empty">No results</li>
           )}
-          {options.map((opt, i) => (
+          {visibleOptions.map((opt, i) => (
             <li
               key={opt.key}
               id={`${fieldId}-opt-${i}`}
