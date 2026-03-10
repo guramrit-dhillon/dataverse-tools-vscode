@@ -9,6 +9,7 @@ import {
   type PluginAssembly,
   type PluginType,
   type SdkMessageProcessingStep,
+  type SdkMessageProcessingStepImage,
   PluginAssemblyIsolationMode,
   StepMode,
   StepStage,
@@ -139,6 +140,19 @@ export class AssembliesNodeProvider implements NodeProvider {
       });
     }
 
+    // Step → list images
+    if (node.contextValue === "step.enabled" || node.contextValue === "step.disabled") {
+      const step = node.data?.step as SdkMessageProcessingStep | undefined;
+      if (!step?.sdkmessageprocessingstepid) { return []; }
+      return this.fetchCached(`images:${step.sdkmessageprocessingstepid}`, async () => {
+        const images = await this.registrationSvc.listStepImages(
+          context.environment,
+          step.sdkmessageprocessingstepid!,
+        );
+        return images.map((img) => this.imageNode(img, step));
+      });
+    }
+
     return [];
   }
 
@@ -242,12 +256,33 @@ export class AssembliesNodeProvider implements NodeProvider {
       icon: disabled ? "debug-pause" : "zap",
       iconColor: disabled ? "disabledForeground" : undefined,
       contextValue: disabled ? "step.disabled" : "step.enabled",
-      children: "none",
+      children: "lazy",
       solutionComponent: {
         componentType: SolutionComponentType.SdkMessageProcessingStep,
         componentId: step.sdkmessageprocessingstepid!,
       },
       data: { step },
+    };
+  }
+
+  private imageNode(image: SdkMessageProcessingStepImage, step: SdkMessageProcessingStep): ExplorerNode {
+    const typeLabel = (
+      { 0: "Pre-Image", 1: "Post-Image", 2: "Pre+Post" } as Record<number, string>
+    )[image.imagetype] ?? "Image";
+    return {
+      id: `assemblies:image:${image.sdkmessageprocessingstepimageid}`,
+      label: image.name,
+      description: `${typeLabel} | ${image.entityalias}`,
+      tooltip: [
+        `Name: ${image.name}`,
+        `Alias: ${image.entityalias}`,
+        `Type: ${typeLabel}`,
+        image.attributes ? `Attributes: ${image.attributes}` : null,
+      ].filter(Boolean).join("\n"),
+      icon: "layers",
+      contextValue: "image",
+      children: "none",
+      data: { image, step },
     };
   }
 
