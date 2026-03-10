@@ -1,93 +1,115 @@
 # Dataverse Tools: FetchXML Builder
 
-Visual FetchXML query builder for Dataverse. Build queries with a tree editor, execute them against a live environment, and browse results — all within VS Code.
+Build Dataverse queries visually — without writing XML. Click to add conditions, pick entities from a dropdown, execute against your environment, and see the results in a table.
 
-## Features
+FetchXML is the native query language for Dataverse. It's powerful, but writing it by hand is slow and error-prone. This builder generates it for you, and still lets you drop into the raw XML when you need to.
 
-### Visual Tree Editor
-Build FetchXML queries using a structured tree instead of writing raw XML:
-- **7 node types** — `fetch`, `entity`, `attribute`, `link-entity`, `filter`, `condition`, `order`
-- **Add, delete, duplicate, and reorder** nodes with inline tree actions
-- **Smart child rules** — only valid child nodes are offered based on the parent type
+## What You Can Do
 
-### Node Properties Panel
-A sidebar form that adapts to the selected node type:
-- **Entity & attribute pickers** — autocomplete powered by live Dataverse metadata
-- **Relationship browser** — select 1:N, N:1, or N:N relationships to auto-populate link-entity join fields
-- **Type-aware condition operators** — operator list adapts based on the attribute type (text, number, date, boolean, lookup, picklist, etc.)
-- **Aggregate support** — aggregate function, group by, and date grouping options on attribute nodes
-- **Fetch options** — top, count, page, distinct, no-lock, aggregate mode, return total record count
+- **Build queries visually** by clicking to add nodes — entity, attribute, filter, condition, join, and sort
+- **Pick entities and fields from live metadata** — dropdowns are populated from your connected environment, no memorising logical names required
+- **Set filter conditions** with type-aware operators — date, number, text, lookup, and option set fields each get the right options
+- **Join related entities** — browse relationships and let the builder fill in the join fields automatically
+- **Aggregate data** — count, sum, average, min, max with group-by and date grouping support
+- **Execute your query** and see formatted results — option set labels instead of codes, currency symbols, lookup display names
+- **Edit the raw XML at any time** — a live editor tab syncs bidirectionally with the tree; change one and the other updates
+- **Export results** to CSV or copy the full set to clipboard
+- **Save and open queries** from `.fetchxml` files
+- **Ask GitHub Copilot** to run a FetchXML query against your environment and return results as JSON
 
-### Query Execution & Results
-- **Execute against any connected environment** — results open in a dedicated panel
-- **Column name modes** — toggle between logical names, friendly display names, or both
-- **Formatted values** — option set labels, currency formatting, lookup display names via OData annotations
-- **Filter, sort, export** — cross-column text filter, column sorting, export to CSV, copy to clipboard
-- **Result tabs** — view raw FetchXML and JSON alongside the data table
-- **Status bar** — row count and query duration
+---
 
-### XML Editing
-- **Live XML preview** — edit the raw FetchXML in a VS Code editor tab, synced bidirectionally with the tree
-- **FetchXML language** — syntax highlighting for `.fetchxml` files
-- **XSD validation** — automatic schema association when the Red Hat XML extension is installed
+## Getting Started
 
-### File I/O
-- **Open / Save** — load and save `.fetchxml` or `.xml` files
-- **Copy to clipboard** — one-click copy of the serialized FetchXML
-- **Session persistence** — your last query and environment selection are restored on next activation
+1. Install this extension and [Dataverse Tools: Environments](https://marketplace.visualstudio.com/items?itemName=gdhillon.dataverse-environments)
+2. Connect to an environment using the Environments extension
+3. Open the command palette and run **FetchXML Builder: New Query**
+   — or right-click any entity in the Metadata explorer and choose **Open in FetchXML Builder**
 
-### CSV Viewer
-- Built-in custom editor for `.csv` files with the same data table used for query results
-- Filter, sort, export, and copy — available via right-click → "Open With..." on any CSV file
+---
 
-### Copilot Chat Integration
-Language model tool for GitHub Copilot Chat:
+## Building a Query
 
-| Tool | Description |
+The builder opens with a tree panel on the left and a properties panel on the right.
+
+**The tree** shows the structure of your query:
+
+```
+fetch
+  └── entity: account
+        ├── attribute: name
+        ├── attribute: revenue
+        ├── filter (AND)
+        │     └── condition: statecode = 0
+        └── order: createdon (desc)
+```
+
+- Click any node to edit its properties in the right panel
+- Click **+** on a node to add a valid child — only the nodes that make sense in that position are offered
+- Use the arrow buttons to reorder sibling nodes
+- Right-click a node to **duplicate** or **delete** it
+
+**The properties panel** adapts to the selected node:
+
+| Node type | What you can set |
 |---|---|
-| `Execute FetchXML Query` | Run a FetchXML query against a Dataverse environment and return results as JSON. Shows a confirmation prompt before execution. |
+| **entity** | Pick the entity to query from a searchable list |
+| **link-entity** | Browse relationships to auto-fill the join — or set the fields manually |
+| **attribute** | Pick a field from the entity's attributes; set aggregate function for aggregate queries |
+| **filter** | AND or OR grouping |
+| **condition** | Pick a field, then choose from operators that match its type |
+| **order** | Pick a field and choose ascending or descending |
 
-## Commands
+---
 
-| Command | Description |
-|---|---|
-| `FetchXML Builder: New Query` | Start a new empty query |
-| `FetchXML Builder: Execute Query` | Execute the current query |
-| `FetchXML Builder: Edit XML` | Open the live XML editor |
-| `FetchXML Builder: Select Environment` | Choose the target environment |
-| `FetchXML Builder: Copy FetchXML` | Copy query XML to clipboard |
-| `FetchXML Builder: Open from File...` | Load a query from a file |
-| `FetchXML Builder: Save to File...` | Save the query to a file |
-| `Add Child Node` | Add a child to the selected tree node |
-| `Delete Node` | Remove the selected node |
-| `Duplicate Node` | Duplicate the selected node |
-| `Move Up / Move Down` | Reorder nodes within their parent |
+## Executing and Viewing Results
 
-## Supported Node Types
+Click **Execute** in the toolbar to run the query against your connected environment.
 
-| Node | Purpose | Allowed Children |
-|---|---|---|
-| `fetch` | Root query element | `entity` |
-| `entity` | Primary entity to query | `attribute`, `link-entity`, `filter`, `order` |
-| `link-entity` | Join to a related entity | `attribute`, `link-entity`, `filter`, `order` |
-| `filter` | AND/OR condition group | `condition`, `filter` (nested) |
-| `condition` | Single filter condition | — |
-| `attribute` | Column to return | — |
-| `order` | Sort order | — |
+Results appear in a dedicated panel with:
 
-## Dependencies
+- **Formatted values** — option set labels shown instead of numeric codes, lookup names instead of GUIDs, currencies with symbols
+- **Column headers** toggle between display names and logical names
+- **Sort** by clicking any column header; **filter** across all columns at once
+- **Export** to CSV or **copy** the full result to clipboard
+- **Result tabs** — switch between the data table, raw FetchXML, and the JSON response
 
-- **Dataverse Tools: Environments** — required for authentication and environment access
+The status bar shows the row count and how long the query took.
+
+---
+
+## Working with the XML
+
+Click **Edit XML** to open the raw FetchXML in a VS Code editor tab. Edit it directly — changes sync back to the visual tree automatically. You can switch between both views freely.
+
+`.fetchxml` files get syntax highlighting. If the Red Hat XML extension is installed, schema validation is applied automatically.
+
+---
+
+## CSV Viewer
+
+The extension registers as a custom editor for `.csv` files. Open any CSV with **Open With...** to view it in the same data table used for query results — with filtering, sorting, export, and clipboard copy.
+
+---
 
 ## Requirements
 
-- VS Code 1.96+
-- A configured Dataverse environment (via the Environments extension)
+- **VS Code** 1.96 or later
+- **[Dataverse Tools: Environments](https://marketplace.visualstudio.com/items?itemName=gdhillon.dataverse-environments)** — required for authentication and environment access
+
+---
+
+## Part of Dataverse Tools
+
+This extension is part of the [Dataverse Tools](https://github.com/guramrit-dhillon/dataverse-tools-vscode) suite — a collection of VS Code extensions for Dynamics 365 / Power Platform developers.
+
+Other extensions in the suite:
+- **Dataverse Tools: Environments** — connect and manage environments
+- **Dataverse Tools: Metadata** — browse entity and attribute names to use in your queries
+- **Dataverse Tools: Query Analyzer** — prefer SQL over FetchXML? Use this instead
+
+---
 
 ## Acknowledgements
 
 Inspired by [FetchXML Builder](https://fetchxmlbuilder.com/) by Jonas Rapp — the original and most popular FetchXML tool for [XrmToolBox](https://www.xrmtoolbox.com/).
-
-## Part of Dataverse Tools
-
-This extension is part of the [Dataverse Tools](https://github.com/guramrit-dhillon/dataverse-tools-vscode) suite for Dynamics 365 / Power Platform developers.
