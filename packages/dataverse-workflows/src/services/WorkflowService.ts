@@ -1,6 +1,7 @@
 import {
   DataverseWebApiClient,
   SolutionComponentType,
+  WorkflowCategory,
   WorkflowStateCode,
   WorkflowType,
   type DataverseEnvironment,
@@ -47,6 +48,36 @@ export class WorkflowService implements IWorkflowService {
         createdon: c.createdOn,
       }))
       .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  async listWorkflowsByEntity(
+    env: DataverseEnvironment,
+    entityLogicalName: string,
+  ): Promise<WorkflowProcess[]> {
+    const select = "$select=workflowid,name,uniquename,category,type,statecode,statuscode,primaryentity,ismanaged,description,modifiedon,createdon";
+    const filter = `$filter=primaryentity eq '${entityLogicalName}' and type eq 1 and category ne ${WorkflowCategory.ModernFlow}`;
+    const records = await this.client(env).getAll<WorkflowProcess>(
+      "workflows",
+      `${select}&${filter}`,
+    );
+    return records.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  async getWorkflow(env: DataverseEnvironment, workflowId: string): Promise<WorkflowProcess> {
+    return this.client(env).get<WorkflowProcess>(
+      `workflows(${workflowId})?$select=workflowid,name,uniquename,category,type,statecode,statuscode,primaryentity,ismanaged,description,modifiedon,createdon`,
+    );
+  }
+
+  async getWorkflowXaml(env: DataverseEnvironment, workflowId: string): Promise<string> {
+    const result = await this.client(env).get<{ xaml?: string }>(
+      `workflows(${workflowId})?$select=xaml`,
+    );
+    return result.xaml ?? "";
+  }
+
+  async updateWorkflow(env: DataverseEnvironment, workflowId: string, updates: Partial<WorkflowProcess>): Promise<void> {
+    await this.client(env).patch(`workflows(${workflowId})`, updates);
   }
 
   async activateWorkflow(env: DataverseEnvironment, workflowId: string): Promise<void> {
