@@ -1,5 +1,16 @@
 # dataverse-workflows
 
+## 0.7.0
+
+### Minor Changes
+
+- [`42522a1`](https://github.com/guramrit-dhillon/dataverse-tools-vscode/commit/42522a1755206ec2d359924fa5757bae7d190aff) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - fix(workflows): register new commands, reorder context menu, rename Properties
+  - feat(workflows): add entity contributions and lift category labels to module scope
+  - feat(workflows): wire Properties and XAML commands into extension
+  - feat(workflows): add Properties wizard and XAML viewer commands
+  - feat(workflows): expand service layer with XAML, update, and entity queries
+  - feat(core-dataverse): add workflow and designer command IDs
+
 ## 0.6.0
 
 ### Minor Changes
