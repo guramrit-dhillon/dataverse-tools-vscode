@@ -56,24 +56,46 @@
         "title": "Trigger On-Demand…",
         "category": "Dataverse Tools: Workflows",
         "icon": "$(run)"
+      },
+      {
+        "command": "dataverse-tools.workflows.editProperties",
+        "title": "Properties…",
+        "category": "Dataverse Tools: Workflows",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "dataverse-tools.workflows.openXaml",
+        "title": "Open",
+        "category": "Dataverse Tools: Workflows",
+        "icon": "$(file-code)"
       }
     ],
     "menus": {
       "view/item/context": [
         {
+          "command": "dataverse-tools.workflows.openXaml",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /^dv\\.(wf|action|bpf|businessrule|dialog|modernflow)\\./",
+          "group": "dataverse@1"
+        },
+        {
           "command": "dataverse-tools.workflows.activate",
           "when": "view == dataverse-tools.explorer && viewItem =~ /^dv\\.(wf|action|bpf|businessrule|dialog|modernflow)\\.draft/",
-          "group": "dataverse@1"
+          "group": "dataverse@2"
         },
         {
           "command": "dataverse-tools.workflows.deactivate",
           "when": "view == dataverse-tools.explorer && viewItem =~ /^dv\\.(wf|action|bpf|businessrule|dialog|modernflow)\\.(activated|ondemand)/",
-          "group": "dataverse@1"
+          "group": "dataverse@2"
         },
         {
           "command": "dataverse-tools.workflows.triggerOnDemand",
           "when": "view == dataverse-tools.explorer && viewItem == dv.wf.ondemand",
-          "group": "dataverse@2"
+          "group": "dataverse@3"
+        },
+        {
+          "command": "dataverse-tools.workflows.editProperties",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /^dv\\.(wf|action|bpf|businessrule|dialog|modernflow)\\./",
+          "group": "dataverse@4"
         },
         {
           "command": "dataverse-tools.workflows.delete",
