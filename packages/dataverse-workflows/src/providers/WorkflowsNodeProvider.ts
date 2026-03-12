@@ -8,6 +8,7 @@ import {
   type ExplorerContext,
   type ExplorerNode,
   type NodeProvider,
+  type SolutionComponent,
   type WorkflowProcess,
 } from "core-dataverse";
 import type { IWorkflowService } from "../interfaces/IWorkflowService";
@@ -37,6 +38,15 @@ const CATEGORY_CONTEXT: Record<number, string> = {
   [WorkflowCategory.Action]: "dv.action",
   [WorkflowCategory.BPF]: "dv.bpf",
   [WorkflowCategory.ModernFlow]: "dv.modernflow",
+};
+
+const CATEGORY_LABEL_SINGULAR: Record<number, string> = {
+  [WorkflowCategory.Workflow]: "Classic Workflow",
+  [WorkflowCategory.Dialog]: "Dialog",
+  [WorkflowCategory.BusinessRule]: "Business Rule",
+  [WorkflowCategory.Action]: "Action",
+  [WorkflowCategory.BPF]: "Business Process Flow",
+  [WorkflowCategory.ModernFlow]: "Modern Flow",
 };
 
 const CATEGORY_ORDER: WorkflowCategory[] = [
@@ -100,6 +110,16 @@ export class WorkflowsNodeProvider implements NodeProvider {
         .sort((a, b) => a.name.localeCompare(b.name))
         .map((w) => this.workflowNode(w));
     }
+
+    // Entity workflow group → individual workflow nodes (contributed under entity)
+    if (node.contextValue === "entityWorkflowGroup") {
+      const workflows = node.data?.workflows as WorkflowProcess[] | undefined;
+      if (!workflows || workflows.length === 0) { return []; }
+      return [...workflows]
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((w) => this.workflowNode(w));
+    }
+
     return [];
   }
 
@@ -108,18 +128,10 @@ export class WorkflowsNodeProvider implements NodeProvider {
     if (!w) { return undefined; }
 
     const activated = w.statecode === WorkflowStateCode.Activated;
-    const categoryLabels: Record<number, string> = {
-      0: "Classic Workflow",
-      1: "Dialog",
-      2: "Business Rule",
-      3: "Action",
-      4: "Business Process Flow",
-      5: "Modern Flow",
-    };
 
     const props: DetailProperty[] = [
       { label: "Name", value: w.name },
-      { label: "Category", value: categoryLabels[w.category] ?? String(w.category) },
+      { label: "Category", value: CATEGORY_LABEL_SINGULAR[w.category] ?? String(w.category) },
       { label: "Primary Entity", value: w.primaryentity },
       { label: "Status", value: activated ? "Activated" : "Draft", badge: activated ? "green" : "grey" },
     ];
@@ -151,6 +163,38 @@ export class WorkflowsNodeProvider implements NodeProvider {
   onRefresh(): void {
     this.cache.clear();
     this.inflight.clear();
+  }
+
+  // ── Cross-provider contributions ──────────────────────────────────────────
+
+  canContributeChildren(contextValue: string): boolean {
+    return contextValue === "entity";
+  }
+
+  async contributeChildren(
+    node: ExplorerNode,
+    context: ExplorerContext,
+  ): Promise<ExplorerNode[]> {
+    const entity = node.data?.entity as SolutionComponent | undefined;
+    if (!entity) { return []; }
+
+    return this.fetchCached(`entity:${entity.name}`, async () => {
+      const workflows = await this.workflowSvc.listWorkflowsByEntity(
+        context.environment,
+        entity.name,
+      );
+      if (workflows.length === 0) { return []; }
+
+      return [{
+        id: `workflows:entity:${entity.name}`,
+        label: "Workflows",
+        description: `${workflows.length}`,
+        icon: "git-merge",
+        contextValue: "entityWorkflowGroup",
+        children: "lazy" as const,
+        data: { workflows, entityLogicalName: entity.name },
+      }];
+    });
   }
 
   // ── Private ────────────────────────────────────────────────────────────────
