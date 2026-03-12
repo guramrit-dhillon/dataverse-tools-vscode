@@ -13,6 +13,8 @@ import { activateWorkflowCommand } from "./commands/activateWorkflowCommand";
 import { deactivateWorkflowCommand } from "./commands/deactivateWorkflowCommand";
 import { deleteWorkflowCommand } from "./commands/deleteWorkflowCommand";
 import { triggerWorkflowCommand } from "./commands/triggerWorkflowCommand";
+import { workflowPropertiesWizard } from "./commands/workflowPropertiesWizard";
+import { openWorkflowXamlCommand, WorkflowXamlContentProvider, WORKFLOW_XAML_SCHEME } from "./commands/openWorkflowXamlCommand";
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
   const outputChannel = vscode.window.createOutputChannel("Dataverse Tools: Workflows");
@@ -36,6 +38,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
   context.subscriptions.push(
     api.explorer.registerProvider(container.workflowsProvider),
+  );
+
+  const xamlProvider = new WorkflowXamlContentProvider();
+  context.subscriptions.push(
+    vscode.workspace.registerTextDocumentContentProvider(WORKFLOW_XAML_SCHEME, xamlProvider),
   );
 
   const refresh = () => api.explorer.refresh("workflows");
@@ -63,6 +70,18 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     const w = extractWorkflow(arg);
     if (!w) { return; }
     return triggerWorkflowCommand(container.workflowService, w, getEnv());
+  });
+
+  registerCommand(context, Commands.WorkflowEditProperties, (arg: unknown) => {
+    const w = extractWorkflow(arg);
+    if (!w) { return; }
+    return workflowPropertiesWizard(container.workflowService, refresh, w, getEnv());
+  });
+
+  registerCommand(context, Commands.WorkflowOpenXaml, (arg: unknown) => {
+    const w = extractWorkflow(arg);
+    if (!w) { return; }
+    return openWorkflowXamlCommand(container.workflowService, xamlProvider, w, getEnv());
   });
 
   Logger.info("Dataverse Tools: Workflows extension activated.");
