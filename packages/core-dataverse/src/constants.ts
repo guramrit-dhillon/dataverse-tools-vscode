@@ -60,6 +60,14 @@ export const Commands = {
   WorkflowDeactivate: "dataverse-tools.workflows.deactivate",
   WorkflowDelete: "dataverse-tools.workflows.delete",
   WorkflowTriggerOnDemand: "dataverse-tools.workflows.triggerOnDemand",
+  WorkflowEditProperties: "dataverse-tools.workflows.editProperties",
+  WorkflowOpenXaml: "dataverse-tools.workflows.openXaml",
+  /** Registered by dataverse-workflows; activates dataverse-workflow-designer if installed. */
+  WorkflowDesign: "dataverse-tools.workflows.design",
+  // ── Workflow Designer ──────────────────────────────────────────────────
+  WorkflowDesignerOpen: "dataverse-tools.workflowDesigner.open",
+  WorkflowDesignerDesign: "dataverse-tools.workflowDesigner.design",
+  WorkflowDesignerSave: "dataverse-tools.workflowDesigner.save",
 } as const;
 
 export const Views = {
@@ -81,4 +89,5 @@ export const ExtensionIds = {
   QueryAnalyzer: "gdhillon.dataverse-query-analyzer",
   AssemblyDecompiler: "gdhillon.dataverse-assembly-decompiler",
   Workflows: "gdhillon.dataverse-workflows",
+  WorkflowDesigner: "gdhillon.dataverse-workflow-designer",
 } as const;
