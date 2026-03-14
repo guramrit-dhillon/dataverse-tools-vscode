@@ -2,7 +2,7 @@
 
 Deploy and manage Dynamics 365 / Power Platform plugins without leaving VS Code. Build your code, deploy it, configure your steps and images — all from the sidebar.
 
-No more switching to XrmToolBox or the legacy Plugin Registration Tool.
+No more switching to XrmToolBox — deploy and manage plugins without leaving VS Code.
 
 ## What You Can Do
 
@@ -218,7 +218,7 @@ Other extensions in the suite:
 
 ## Acknowledgements
 
-Inspired by the [Plugin Registration Tool](https://learn.microsoft.com/en-us/power-apps/developer/data-platform/download-tools-nuget) from the Dynamics 365 SDK and the [XrmToolBox](https://www.xrmtoolbox.com/) community.
+Inspired by the [Dynamics 365 SDK tools](https://learn.microsoft.com/en-us/power-apps/developer/data-platform/download-tools-nuget) and the [XrmToolBox](https://www.xrmtoolbox.com/) community.
 
 ---
 

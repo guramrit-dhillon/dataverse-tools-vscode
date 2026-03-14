@@ -104,7 +104,7 @@ Other extensions in the suite:
 
 ## Acknowledgements
 
-Inspired by the connection management in the [Plugin Registration Tool](https://learn.microsoft.com/en-us/power-apps/developer/data-platform/download-tools-nuget) from the Dynamics 365 SDK and [XrmToolBox](https://www.xrmtoolbox.com/).
+Inspired by the connection management in the [Dynamics 365 SDK tools](https://learn.microsoft.com/en-us/power-apps/developer/data-platform/download-tools-nuget) and [XrmToolBox](https://www.xrmtoolbox.com/).
 
 ---
 
