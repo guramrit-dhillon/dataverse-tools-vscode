@@ -72,3 +72,12 @@ Other extensions in the suite:
 - **Dataverse Tools: Web Resources** — edit and publish web resources
 - **Dataverse Tools: Metadata** — browse entity schema in the explorer
 - **Dataverse Tools: Decompiler** — read decompiled plugin code from Dataverse
+
+---
+
+## Feedback & Community
+
+Found a bug, have a feature request, or want to suggest a new extension?
+
+- **Bug reports & feature requests** — [GitHub Issues](https://github.com/guramrit-dhillon/dataverse-tools-vscode/issues)
+- **Questions & discussion** — [GitHub Discussions](https://github.com/guramrit-dhillon/dataverse-tools-vscode/discussions)

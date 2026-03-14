@@ -89,3 +89,12 @@ Other extensions in the suite:
 - **Dataverse Tools: Metadata** — browse entity schema in the explorer
 - **Dataverse Tools: Decompiler** — read decompiled plugin code from Dataverse
 - **Dataverse Tools: Audit Viewer** — view audit history for Dataverse records
+
+---
+
+## Feedback & Community
+
+Found a bug, have a feature request, or want to suggest a new extension?
+
+- **Bug reports & feature requests** — [GitHub Issues](https://github.com/guramrit-dhillon/dataverse-tools-vscode/issues)
+- **Questions & discussion** — [GitHub Discussions](https://github.com/guramrit-dhillon/dataverse-tools-vscode/discussions)

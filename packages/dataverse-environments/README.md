@@ -105,3 +105,12 @@ Other extensions in the suite:
 ## Acknowledgements
 
 Inspired by the connection management in the [Plugin Registration Tool](https://learn.microsoft.com/en-us/power-apps/developer/data-platform/download-tools-nuget) from the Dynamics 365 SDK and [XrmToolBox](https://www.xrmtoolbox.com/).
+
+---
+
+## Feedback & Community
+
+Found a bug, have a feature request, or want to suggest a new extension?
+
+- **Bug reports & feature requests** — [GitHub Issues](https://github.com/guramrit-dhillon/dataverse-tools-vscode/issues)
+- **Questions & discussion** — [GitHub Discussions](https://github.com/guramrit-dhillon/dataverse-tools-vscode/discussions)

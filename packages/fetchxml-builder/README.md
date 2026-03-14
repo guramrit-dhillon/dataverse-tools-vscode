@@ -119,3 +119,12 @@ Other extensions in the suite:
 ## Acknowledgements
 
 Inspired by [FetchXML Builder](https://fetchxmlbuilder.com/) by Jonas Rapp — the original and most popular FetchXML tool for [XrmToolBox](https://www.xrmtoolbox.com/).
+
+---
+
+## Feedback & Community
+
+Found a bug, have a feature request, or want to suggest a new extension?
+
+- **Bug reports & feature requests** — [GitHub Issues](https://github.com/guramrit-dhillon/dataverse-tools-vscode/issues)
+- **Questions & discussion** — [GitHub Discussions](https://github.com/guramrit-dhillon/dataverse-tools-vscode/discussions)

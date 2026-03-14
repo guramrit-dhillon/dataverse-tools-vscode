@@ -274,6 +274,18 @@ npm run build:all -w assembly-decompiler
 
 ---
 
+## Feedback & Community
+
+Have a bug to report, a feature to request, or an idea for a new extension? Open an issue on [GitHub Issues](https://github.com/guramrit-dhillon/dataverse-tools-vscode/issues).
+
+- **Bug reports** — include steps to reproduce, VS Code version, and any error messages from the Output panel (`Dataverse Tools` channel)
+- **Feature requests** — describe the problem you're trying to solve, not just the solution you want
+- **Questions & discussion** — use [GitHub Discussions](https://github.com/guramrit-dhillon/dataverse-tools-vscode/discussions) for general questions, tips, and conversation
+
+See [EXTENSION-STATUS.md](EXTENSION-STATUS.md) for a full list of planned and proposed extensions.
+
+---
+
 ## Acknowledgements
 
 Inspired by the community tools built for [XrmToolBox](https://www.xrmtoolbox.com/) — including the Plugin Registration Tool, [FetchXML Builder](https://fetchxmlbuilder.com/) by Jonas Rapp, [SQL 4 CDS](https://github.com/MarkMpn/Sql4Cds) by Mark Carrington, and the Plugin Trace Viewer. This project aims to bring that ecosystem natively into VS Code.
