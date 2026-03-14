@@ -98,6 +98,7 @@ Other extensions in the suite:
 - **Dataverse Tools: Web Resources** — edit and publish web resources
 - **Dataverse Tools: Metadata** — browse entity schema in the explorer
 - **Dataverse Tools: Decompiler** — read decompiled plugin code from Dataverse
+- **Dataverse Tools: Audit Viewer** — view audit history for Dataverse records
 
 ---
 

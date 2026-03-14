@@ -105,8 +105,14 @@ This extension is part of the [Dataverse Tools](https://github.com/guramrit-dhil
 
 Other extensions in the suite:
 - **Dataverse Tools: Environments** — connect and manage environments
-- **Dataverse Tools: Metadata** — browse entity and attribute names to use in your queries
+- **Dataverse Tools: Assemblies** — deploy and register plugin assemblies and steps
+- **Dataverse Tools: Trace Viewer** — view and filter plugin trace logs
 - **Dataverse Tools: Query Analyzer** — prefer SQL over FetchXML? Use this instead
+- **Dataverse Tools: Workflows** — browse and manage process automation
+- **Dataverse Tools: Web Resources** — edit and publish web resources
+- **Dataverse Tools: Metadata** — browse entity and attribute names to use in your queries
+- **Dataverse Tools: Decompiler** — read decompiled plugin code from Dataverse
+- **Dataverse Tools: Audit Viewer** — view audit history for Dataverse records
 
 ---
 
