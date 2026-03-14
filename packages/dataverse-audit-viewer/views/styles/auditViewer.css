@@ -1,0 +1,255 @@
+/* ── Audit viewer page-specific styles ─────────────────────────────────── */
+
+/* ── Filter panel ─────────────────────────────────────────────────────── */
+.filter-panel {
+    padding: 12px 14px 10px;
+    border-bottom: 1px solid var(--vscode-panel-border);
+    flex-shrink: 0;
+}
+
+.filter-panel .env-bar {
+    margin-bottom: 8px;
+}
+
+.filter-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    align-items: flex-end;
+    margin-bottom: 8px;
+}
+
+.filter-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-actions button {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* ── Input overrides ──────────────────────────────────────────────────── */
+input[type="text"],
+input[type="number"] {
+    padding: 4px 7px;
+    height: 26px;
+}
+
+.record-id-input {
+    width: 280px;
+    font-family: var(--vscode-editor-font-family, monospace);
+    font-size: 12px;
+}
+
+/* ── Button overrides ─────────────────────────────────────────────────── */
+button {
+    padding: 4px 14px;
+    height: 26px;
+    white-space: nowrap;
+}
+
+/* ── Table pane ───────────────────────────────────────────────────────── */
+.table-pane {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.table-pane > .progress-bar {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+.table-pane .data-table tbody tr.audit-row {
+    cursor: pointer;
+}
+
+/* ── Diff pane ────────────────────────────────────────────────────────── */
+.diff-pane {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid var(--vscode-panel-border);
+}
+
+.diff-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 10px 6px 14px;
+    border-bottom: 1px solid var(--vscode-panel-border);
+    flex-shrink: 0;
+}
+
+.diff-header-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--vscode-descriptionForeground);
+}
+
+.diff-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+/* ── Meta badges ──────────────────────────────────────────────────────── */
+.diff-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 10px 14px 8px;
+    flex-shrink: 0;
+}
+
+.diff-badge {
+    background: var(--vscode-badge-background);
+    color: var(--vscode-badge-foreground);
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 11px;
+    user-select: text;
+    -webkit-user-select: text;
+    cursor: text;
+}
+
+.diff-badge-operation {
+    font-weight: 600;
+}
+
+.diff-badge-txn {
+    font-family: var(--vscode-editor-font-family, monospace);
+    font-size: 10px;
+    opacity: 0.8;
+}
+
+/* ── Diff table ───────────────────────────────────────────────────────── */
+.diff-table-wrapper {
+    flex: 1;
+    overflow: auto;
+    padding: 0 14px 14px;
+}
+
+.diff-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.diff-table th {
+    text-align: left;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--vscode-descriptionForeground);
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--vscode-panel-border);
+    position: sticky;
+    top: 0;
+    background: var(--vscode-editor-background);
+    z-index: 1;
+}
+
+.diff-col-attr {
+    width: 30%;
+}
+
+.diff-col-old {
+    width: 30%;
+}
+
+.diff-col-arrow {
+    width: 24px;
+    text-align: center;
+}
+
+.diff-col-new {
+    width: 30%;
+}
+
+.diff-row td {
+    padding: 5px 8px;
+    border-bottom: 1px solid var(--vscode-panel-border);
+    vertical-align: top;
+    word-break: break-word;
+}
+
+.diff-attr-name {
+    font-weight: 500;
+    color: var(--vscode-foreground);
+}
+
+.diff-old {
+    background: var(--vscode-diffEditor-removedTextBackground, rgba(255, 0, 0, 0.08));
+    border-radius: 3px;
+    font-family: var(--vscode-editor-font-family, monospace);
+    font-size: 11px;
+}
+
+.diff-arrow {
+    text-align: center;
+    color: var(--vscode-descriptionForeground);
+    font-size: 14px;
+}
+
+.diff-new {
+    background: var(--vscode-diffEditor-insertedTextBackground, rgba(0, 255, 0, 0.08));
+    border-radius: 3px;
+    font-family: var(--vscode-editor-font-family, monospace);
+    font-size: 11px;
+}
+
+.diff-empty {
+    color: var(--vscode-descriptionForeground);
+    font-style: italic;
+    opacity: 0.7;
+}
+
+/* ── Loading state ────────────────────────────────────────────────────── */
+.diff-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 30px 20px;
+    color: var(--vscode-descriptionForeground);
+    font-size: 13px;
+}
+
+/* ── No changes state ─────────────────────────────────────────────────── */
+.diff-no-changes {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 40px 20px;
+    flex: 1;
+}
+
+.diff-no-changes-text {
+    color: var(--vscode-descriptionForeground);
+    font-size: 13px;
+}
+
+.diff-no-changes-hint {
+    color: var(--vscode-descriptionForeground);
+    font-size: 11px;
+    opacity: 0.7;
+}
+
+/* ── Animations ──────────────────────────────────────────────────────── */
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}

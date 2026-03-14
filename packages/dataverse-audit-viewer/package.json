@@ -1,0 +1,100 @@
+{
+  "name": "dataverse-audit-viewer",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"
+  },
+  "license": "MIT",
+  "displayName": "Dataverse Tools: Audit Viewer",
+  "description": "View and analyze audit history for Dataverse records in VS Code",
+  "version": "0.6.0",
+  "publisher": "gdhillon",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "dataverse",
+    "power platform",
+    "dynamics 365",
+    "audit",
+    "crm"
+  ],
+  "extensionDependencies": [
+    "gdhillon.dataverse-environments"
+  ],
+  "activationEvents": [
+    "workspaceContains:**/*.csproj"
+  ],
+  "main": "./out/extension.js",
+  "icon": "resources/icon.png",
+  "contributes": {
+    "commands": [
+      {
+        "command": "dataverse-tools.auditViewer.open",
+        "title": "View Audit History\u2026",
+        "category": "Dataverse Tools: Audit Viewer",
+        "icon": "$(history)"
+      },
+      {
+        "command": "dataverse-tools.auditViewer.changeEnvironment",
+        "title": "Change Environment",
+        "category": "Dataverse Tools: Audit Viewer",
+        "icon": "$(plug)"
+      },
+      {
+        "command": "dataverse-tools.auditViewer.viewEntityAudit",
+        "title": "View Audit History",
+        "category": "Dataverse Tools: Audit Viewer",
+        "icon": "$(history)"
+      }
+    ],
+    "menus": {
+      "view/item/context": [
+        {
+          "command": "dataverse-tools.auditViewer.open",
+          "when": "view == dataverse-tools.environments && viewItem == environment",
+          "group": "2_tools@3"
+        },
+        {
+          "command": "dataverse-tools.auditViewer.viewEntityAudit",
+          "when": "view == dataverse-tools.explorer && viewItem =~ /^entity/",
+          "group": "dataverse@4"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "dataverse-tools.auditViewer.changeEnvironment",
+          "when": "activeWebviewPanelId == dataverse-tools.auditViewer"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "build": "node ../../scripts/build-extension.js --production",
+    "watch": "node ../../scripts/build-extension.js --watch",
+    "package": "vsce package --out ../../dataverse-audit-viewer.vsix",
+    "package:prerelease": "vsce package --pre-release --out ../../dataverse-audit-viewer.vsix"
+  },
+  "dependencies": {
+    "core-dataverse": "0.2.1",
+    "shared-views": "0.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.3",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@types/vscode": "^1.96.0",
+    "@typescript-eslint/eslint-plugin": "^8.55.0",
+    "@typescript-eslint/parser": "^8.55.0",
+    "@vscode/test-electron": "^2.5.2",
+    "esbuild": "^0.21.0",
+    "eslint": "^9.39.2",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "typescript": "^5.3.0",
+    "typescript-eslint": "^8.55.0"
+  }
+}
