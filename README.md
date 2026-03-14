@@ -4,9 +4,9 @@
 [![Release](https://github.com/guramrit-dhillon/dataverse-tools-vscode/actions/workflows/release.yml/badge.svg)](https://github.com/guramrit-dhillon/dataverse-tools-vscode/actions/workflows/release.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Deploy plugins, register steps, query data, debug trace logs, browse metadata, manage workflows, edit web resources, and decompile assemblies — without leaving VS Code.
+Browse metadata, query data, deploy plugins, manage workflows, edit web resources, debug trace logs, view audit history, and decompile assemblies — all without leaving VS Code.
 
-A modern replacement for the XrmToolBox Plugin Registration Tool, built entirely inside VS Code.
+A modern, code-centric alternative to the XrmToolBox ecosystem for Dynamics 365 and Power Platform developers.
 
 > **Requires:** VS Code 1.96+
 > **License:** MIT
@@ -15,15 +15,16 @@ A modern replacement for the XrmToolBox Plugin Registration Tool, built entirely
 
 ## Why Dataverse Tools?
 
-Dynamics 365 / Power Platform development has always meant context-switching. You write code in VS Code, then open XrmToolBox to deploy, open the maker portal to check your changes, open a trace log viewer to debug, and so on.
+Dynamics 365 / Power Platform development has always meant context-switching — maker portal for metadata, XrmToolBox for deployment, browser for queries, separate viewers for traces and audits.
 
-Dataverse Tools puts the whole workflow in one place:
+Dataverse Tools brings it all into one place:
 
-- **Deploy the moment you build** — a prompt appears as soon as your build succeeds; one click deploys to Dataverse
-- **Smart uploads** — only uploads when the DLL actually changed; large assemblies are skipped automatically
-- **One explorer for everything** — assemblies, entities, workflows, web resources, and trace logs all live in the same sidebar
-- **Switch orgs in seconds** — dev, test, and prod environments available from the same tree
-- **Modular** — install only the extensions you need; each does one thing
+- **One explorer for everything** — entities, assemblies, workflows, web resources, and more in a single sidebar, scoped to your active solution
+- **Query your way** — build FetchXML visually or write SQL with live autocomplete, both with instant results
+- **Deploy from your editor** — one-click plugin deployment after build, with smart hash comparison to skip unchanged assemblies
+- **Edit and publish in place** — open web resources as editor tabs, Ctrl+S writes back to Dataverse
+- **Switch environments in seconds** — dev, test, and prod all available from the same tree
+- **Modular** — install only the extensions you need; each does one thing well
 
 ---
 
@@ -31,18 +32,18 @@ Dataverse Tools puts the whole workflow in one place:
 
 Ten extensions share a common foundation. Install them all at once with the [Dataverse Tools](https://marketplace.visualstudio.com/items?itemName=gdhillon.dataverse-tools-pack) extension pack, or pick the ones you need.
 
-| Extension | What it does |
-|---|---|
-| **Environments** | Connect to environments, manage sign-in, and provide the shared explorer sidebar |
-| **Assemblies** | Deploy plugin assemblies, register steps, and manage pre/post images |
-| **Metadata** | Browse entities, attributes, relationships, and SDK messages in the explorer |
-| **FetchXML Builder** | Visual query builder with execution, results table, and CSV export |
-| **Query Analyzer** | SQL editor for the Dataverse TDS endpoint with live autocomplete |
-| **Trace Viewer** | Search and inspect plugin execution trace logs |
-| **Workflows** | Browse, activate, deactivate, and trigger Dataverse process automation |
-| **Web Resources** | Edit and publish JS, CSS, and HTML resources with Ctrl+S |
-| **Decompiler** | Browse decompiled C# source from any deployed plugin assembly |
-| **Audit Viewer** | View and analyze audit history for Dataverse records |
+| Extension | What it does | Status |
+|---|---|---|
+| **Environments** | Connect to environments, manage sign-in, and provide the shared explorer sidebar | |
+| **Metadata** | Browse entities in the explorer (attributes, relationships, and messages coming soon) | `WIP` |
+| **FetchXML Builder** | Visual query builder with execution, results table, and CSV export | |
+| **Query Analyzer** | SQL editor for the Dataverse TDS endpoint with live autocomplete | |
+| **Assemblies** | Deploy plugin assemblies, register steps, and manage pre/post images | |
+| **Trace Viewer** | Search and inspect plugin execution trace logs | |
+| **Workflows** | Browse, activate, deactivate, and trigger Dataverse process automation | |
+| **Web Resources** | Edit and publish JS, CSS, and HTML resources with Ctrl+S | |
+| **Audit Viewer** | View and analyze audit history for Dataverse records | |
+| **Decompiler** | Browse decompiled C# source from any deployed plugin assembly | |
 
 ### Architecture
 
@@ -51,22 +52,22 @@ graph TD
     ENV[Environments<br><small>auth + explorer framework</small>]
     CORE[core-dataverse<br><small>shared types, services, constants</small>]
 
-    ASM[Assemblies]
     META[Metadata]
     FXB[FetchXML Builder]
     QA[Query Analyzer]
+    ASM[Assemblies]
     TV[Trace Viewer]
-    DEC[Decompiler]
-    AUD[Audit Viewer]
     WF[Workflows]
     WR[Web Resources]
+    AUD[Audit Viewer]
+    DEC[Decompiler]
 
     ANALYZER[Plugin Analyzer<br><small>.NET 8</small>]
     DECOMPILER[Assembly Decompiler<br><small>.NET 8 / ILSpy</small>]
     BACKEND[Assembly Backend<br><small>shared .NET host</small>]
 
-    ENV --> ASM & META & FXB & QA & TV & DEC & AUD & WF & WR
-    CORE -.-> ENV & ASM & META & FXB & QA & TV & DEC & AUD & WF & WR
+    ENV --> META & FXB & QA & ASM & TV & WF & WR & AUD & DEC
+    CORE -.-> ENV & META & FXB & QA & ASM & TV & WF & WR & AUD & DEC
 
     ASM --> ANALYZER
     DEC --> DECOMPILER
@@ -78,80 +79,47 @@ All extensions depend on **Environments** for authentication and the explorer fr
 
 ---
 
-<!--
-  SCREENSHOT INSTRUCTIONS
-  =======================
-  Add screenshots to a /docs/images/ directory (or /media/) at the repo root.
-  Recommended dimensions: 1200–1400px wide, PNG or WebP.
-  Capture in VS Code with a dark theme for consistency.
-
-  After adding each image, uncomment the relevant ![alt](path) line below.
--->
-
-<!-- HERO SCREENSHOT: Full VS Code window showing the Dataverse Tools activity bar,
-     explorer tree with an environment expanded (assemblies + entities visible),
-     and ideally a webview panel open (step config or query results).
-     Crop to ~1400x900. -->
-<!-- ![Dataverse Tools overview](docs/images/overview.png) -->
-
----
-
 ## Features at a glance
 
 ### Environments — Connect and stay signed in
 
-<!-- SCREENSHOT: The "Add Environment" wizard showing Global Discovery results
-     (list of orgs grouped by region) or the auth method picker.
-     Crop to just the wizard dialog. -->
+Connect using your Microsoft account, Azure CLI, device code, or a service principal — configured per environment. The extension auto-discovers all the Dataverse orgs in your tenant via Global Discovery, so you don't have to remember URLs. Tokens refresh silently in the background. Switch between environments in one click.
+
 <!-- ![Add Environment wizard](docs/images/add-environment.png) -->
 
-Connect using your Microsoft account, Azure CLI, device code, or a service principal — configured per environment. The extension auto-discovers all the Dataverse orgs in your tenant via Global Discovery, so you don't have to remember URLs. Tokens refresh silently 60 seconds before expiry. Switch between environments in one click.
+### Metadata — Browse your environment's schema `WIP`
 
-### Assemblies — Deploy plugins and register steps
+Browse all entities in your environment with display names alongside logical names — the names you use in plugin code, FetchXML, and SQL queries. Filter by solution or managed/unmanaged state.
 
-<!-- SCREENSHOT: Explorer tree showing assembly → plugin type → step hierarchy
-     with the right-click context menu open (Deploy, Add Step, Enable/Disable, etc.).
-     Crop to the sidebar + context menu. -->
-<!-- ![Assembly tree with context menu](docs/images/assembly-tree.png) -->
-
-<!-- SCREENSHOT: The Step Configuration panel (webview) showing message, entity,
-     stage, mode, rank, and filtering attributes fields. -->
-<!-- ![Step configuration panel](docs/images/step-config.png) -->
-
-Right-click a `.dll` or get prompted automatically when a build succeeds. A SHA-256 hash is compared before uploading — unchanged assemblies are skipped. The step registration wizard walks you through message, entity, stage, mode, rank, filtering attributes, and secure/unsecure config. Enable or disable steps in place. Attach pre/post entity images. Download assemblies back to disk.
-
-### Metadata — Browse your environment's schema
-
-Know exactly what entities, attributes, relationships, and SDK messages exist in your environment. Expand any entity to see field types and logical names — the names you use in plugin code, FetchXML, and SQL queries. Filter by solution or managed/unmanaged state.
+Expanding entities to browse attributes, relationships, and SDK messages is under active development.
 
 ### FetchXML Builder — Build queries visually
 
-<!-- SCREENSHOT: FetchXML Builder showing the tree on the left, node properties
-     panel on the right, and ideally query results in a bottom panel.
-     Full-width capture. -->
-<!-- ![FetchXML Builder](docs/images/fetchxml-builder.png) -->
-
 A tree editor where you click to add nodes — entity, attribute, link-entity, filter, condition, order. Entity and attribute pickers are driven by live metadata. Condition operators adapt to the field type. Aggregate queries, relationship joins, and formatted result values (option set labels, currency symbols, lookup names) are all supported. Edit the raw XML directly when you need to — changes sync back to the tree. Built-in CSV viewer for result export.
+
+<!-- ![FetchXML Builder](docs/images/fetchxml-builder.png) -->
 
 ### Query Analyzer — SQL for Dataverse
 
-<!-- SCREENSHOT: Query Analyzer panel with a SQL query in the editor,
-     autocomplete dropdown visible, and results table below. -->
+Write standard SQL against the Dataverse TDS endpoint. Table and column autocomplete is driven by live metadata cached locally. Results appear in a sortable, filterable data table with CSV/JSON export. Query history records the last 50 runs with duration and row count. Named queries persist per workspace.
+
 <!-- ![Query Analyzer](docs/images/query-analyzer.png) -->
 
-Write standard SQL against the Dataverse TDS endpoint. Table and column autocomplete is driven by live metadata. Results appear in a sortable, filterable data table with CSV/JSON export. Query history records the last 50 runs with duration and row count. Named queries persist per workspace.
+### Assemblies — Deploy plugins and register steps
+
+Right-click a `.dll` or get prompted automatically when a build succeeds. A SHA-256 hash is compared before uploading — unchanged assemblies are skipped. The step registration wizard walks you through message, entity, stage, mode, rank, filtering attributes, and secure/unsecure config. Enable or disable steps in place. Attach pre/post entity images. Download assemblies back to disk.
+
+<!-- ![Assembly tree with context menu](docs/images/assembly-tree.png) -->
 
 ### Trace Viewer — Debug what your plugins did
 
-<!-- SCREENSHOT: Trace Viewer panel showing a list of trace logs with
-     filters at the top and an expanded trace showing exception/context details. -->
-<!-- ![Trace Viewer](docs/images/trace-viewer.png) -->
-
 Right-click any assembly or plugin type in the tree and open its trace logs pre-filtered. Filter by plugin type, message, entity, correlation ID, or date range. Toggle to show only failed executions. Expand any row to see the full exception, stack trace, plugin context, and any messages logged with `ITracingService`.
+
+<!-- ![Trace Viewer](docs/images/trace-viewer.png) -->
 
 ### Workflows — Manage process automation
 
-Browse classic workflows, actions, business rules, business process flows, and modern flows — all grouped in one tree. Activate, deactivate, or delete drafts without opening the browser. Trigger on-demand workflows against a specific record by entering its ID.
+Browse classic workflows, actions, business rules, business process flows, and modern flows — all grouped by type in one tree. Activate, deactivate, or delete drafts without opening the browser. Trigger on-demand workflows against a specific record. View workflow properties or open the raw XAML as a read-only document.
 
 ### Web Resources — Edit files, Ctrl+S publishes
 
@@ -159,19 +127,17 @@ Open any JavaScript, CSS, or HTML web resource as a proper editor tab with synta
 
 ### Audit Viewer — Trace record changes
 
-Pick an entity, enter a record ID, and see the full audit trail — every field change with old and new values, who made the change, and when. Open from the explorer tree by right-clicking an entity, or from an environment context menu. Supports multiple panels for different environments.
+Pick an entity, enter a record ID, and see the full audit trail — every field change with old and new values side by side, who made the change, and when. Open from the explorer tree by right-clicking an entity, or from an environment context menu. Run multiple panels for different environments.
 
 ### Decompiler — Read deployed assembly code
 
-<!-- SCREENSHOT: Decompiler showing the namespace → type tree on the left
-     and decompiled C# source code in the editor on the right. -->
+Expand the **Code** node under any assembly in the explorer tree. Browse namespaces and types with collapsed single-child chains for easy navigation. Click a class to open the decompiled C# as a read-only document — works on managed assemblies without the original source. Powered by ILSpy.
+
 <!-- ![Decompiler](docs/images/decompiler.png) -->
 
-Expand the **Code** node under any assembly in the explorer tree. Browse namespaces and types. Click a class to open the decompiled C# as a read-only document — works on managed assemblies without the original source.
+### GitHub Copilot Integration
 
-### GitHub Copilot Chat Integration
-
-Four language model tools exposed for Copilot Chat: list environments, get environment details, test a connection, and execute a FetchXML query with results returned as JSON.
+Four language model tools are exposed for Copilot Chat: list environments, get environment details, test a connection, and execute a FetchXML query with results returned as JSON.
 
 ---
 
@@ -179,18 +145,18 @@ Four language model tools exposed for Copilot Chat: list environments, get envir
 
 ### Prerequisites
 - **VS Code** 1.96 or later
-- A **Dataverse / Dynamics 365** environment (online or on-premises)
-- **.NET 8 runtime** (only needed if using the Assemblies or Decompiler extensions)
+- A **Dataverse / Dynamics 365** environment
+- **.NET 8 runtime** (only needed for the Assemblies and Decompiler extensions)
 
 ### Installation
-Install from the VS Code Marketplace (search for "Dataverse Tools") or from `.vsix` files on the [Releases](https://github.com/guramrit-dhillon/dataverse-tools-vscode/releases) page.
+
+Install the [Dataverse Tools extension pack](https://marketplace.visualstudio.com/items?itemName=gdhillon.dataverse-tools-pack) from the VS Code Marketplace to get all extensions at once, or search "Dataverse Tools" and install individually. Pre-built `.vsix` files are available on the [Releases](https://github.com/guramrit-dhillon/dataverse-tools-vscode/releases) page.
 
 ### Quick Start
-1. Open a workspace containing a `.csproj` file (triggers automatic activation)
-2. Click the **Dataverse Tools** icon in the Activity Bar
-3. Click **Add Environment** and follow the wizard — choose Global Discovery or enter a URL
-4. Select an authentication method and sign in
-5. Your environment appears in the tree — expand to browse assemblies, entities, and more
+1. Click the **Dataverse Tools** icon in the Activity Bar
+2. Click **Add Environment** and follow the wizard — choose Global Discovery or enter a URL
+3. Select an authentication method and sign in
+4. Your environment appears in the tree — expand to browse entities, assemblies, workflows, and more
 
 ---
 
@@ -216,15 +182,15 @@ packages/
 ├── core-dataverse/              Shared types, services, constants (pure library)
 ├── shared-views/                React component library for webviews (no vscode dep)
 ├── dataverse-environments/      Auth + environment management + explorer framework
-├── dataverse-assemblies/        Plugin deployment + step registration
 ├── dataverse-metadata/          Entity metadata providers for the explorer
 ├── fetchxml-builder/            FetchXML visual builder + executor
 ├── dataverse-query-analyzer/    SQL query editor (TDS endpoint)
+├── dataverse-assemblies/        Plugin deployment + step registration
 ├── dataverse-plugin-trace-viewer/ Plugin trace log viewer
-├── dataverse-assembly-decompiler/ Assembly code browser
 ├── dataverse-workflows/         Workflow and process automation browser
 ├── dataverse-web-resources/     Web resource editor + Ctrl+S publish
 ├── dataverse-audit-viewer/      Audit history viewer for Dataverse records
+├── dataverse-assembly-decompiler/ Assembly code browser
 ├── dataverse-tools-pack/        Extension pack (installs all of the above)
 ├── assembly-backend/            Shared .NET host (stdio/exec JSON-RPC)
 ├── dataverse-assembly-analyzer/ .NET Plugin Analyzer CLI
@@ -293,13 +259,13 @@ Have a bug to report, a feature to request, or an idea for a new extension? Open
 - **Feature requests** — describe the problem you're trying to solve, not just the solution you want
 - **Questions & discussion** — use [GitHub Discussions](https://github.com/guramrit-dhillon/dataverse-tools-vscode/discussions) for general questions, tips, and conversation
 
-See [EXTENSION-STATUS.md](EXTENSION-STATUS.md) for a full list of planned and proposed extensions.
+See [EXTENSION-STATUS.md](docs/EXTENSION-STATUS.md) for a full list of planned and proposed extensions.
 
 ---
 
 ## Acknowledgements
 
-Inspired by the community tools built for [XrmToolBox](https://www.xrmtoolbox.com/) — including the Plugin Registration Tool, [FetchXML Builder](https://fetchxmlbuilder.com/) by Jonas Rapp, [SQL 4 CDS](https://github.com/MarkMpn/Sql4Cds) by Mark Carrington, and the Plugin Trace Viewer. This project aims to bring that ecosystem natively into VS Code.
+Inspired by the community tools built for [XrmToolBox](https://www.xrmtoolbox.com/) — including [FetchXML Builder](https://fetchxmlbuilder.com/) by Jonas Rapp, [SQL 4 CDS](https://github.com/MarkMpn/Sql4Cds) by Mark Carrington, and the Plugin Trace Viewer.
 
 The decompiler extension is powered by [ILSpy](https://github.com/icsharpcode/ILSpy) (MIT).
 
