@@ -1,19 +1,26 @@
 # Dataverse Tools: Metadata
 
-Browse the schema of your Dataverse environment directly from the VS Code sidebar. See every entity, its attributes, relationships, and available SDK messages — without opening a browser or memorising logical names.
+Browse the entities in your Dataverse environment directly from the VS Code sidebar — display names alongside logical names, without opening a browser or memorising schema.
 
-When you're writing a plugin, building a query, or configuring a step, you need to know what entities and fields exist. This extension puts that reference right next to your code.
+When you're writing a plugin, building a query, or configuring a step, you need to know what entities exist. This extension puts that reference right next to your code.
 
-No more switching to the maker portal just to look up a field name.
+> **Status:** Work in progress — entity listing is available; attribute, relationship, and message browsing is coming soon.
 
 ## What You Can Do
 
 - **Browse all entities** in your environment — display names alongside logical names
-- **Expand any entity** to see its attributes, relationships, and the SDK messages it supports
 - **Filter by solution** — scope the view to only what's inside your active solution
 - **Toggle managed / unmanaged** — hide managed-only components to focus on your customisations
-- **Query any entity instantly** — right-click and choose **Query This Entity** to open it in the Query Analyzer with a pre-filled SELECT query
 - **Add or remove components from a solution** — directly from the tree, without opening the browser
+
+## Coming Soon
+
+- **Expand any entity** to see its attributes, relationships, and SDK messages
+- **Query any entity instantly** — right-click to open in the Query Analyzer
+- **Copy logical name** — copy entity or attribute names to clipboard
+- **Global option sets** — browse global option sets and their values
+
+See [docs/feature-status.md](docs/feature-status.md) for the full roadmap.
 
 ---
 
@@ -30,22 +37,13 @@ No more switching to the maker portal just to look up a field name.
 ```
 Entities
   ► Account  (account)
-      ► Attributes
-            name  (Single Line of Text)
-            revenue  (Currency)
-            ownerid  (Owner)
-      ► Relationships
-            account_contacts  (1:N → Contact)
-      ► Messages
-            Create, Update, Delete, Retrieve, RetrieveMultiple
   ► Contact  (contact)
   ► Opportunity  (opportunity)
 ```
 
-- The **display name** is shown prominently; the **logical name** appears in parentheses — these are the names you use in code and FetchXML
-- Expand **Attributes** to see field types and logical names
-- Expand **Relationships** to understand how entities connect to each other
-- Expand **Messages** to see which Dataverse operations are supported — useful when deciding which message to register a plugin step against
+- The **display name** is shown prominently; the **logical name** appears in parentheses
+- These are the names you use in code, FetchXML, and SQL queries
+- Select an entity to see its details (display name, logical name, ID) in the Details panel
 
 ---
 

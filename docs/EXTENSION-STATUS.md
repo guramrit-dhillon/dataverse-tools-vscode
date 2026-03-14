@@ -36,15 +36,15 @@ Overview of all extensions in the suite — what exists, what's coming, and what
 
 | Extension | Package | Status | Feature Tracking |
 |-----------|---------|--------|------------------|
-| Dataverse Tools: Assemblies | `dataverse-assemblies` | `Released` | [feature-status.md](packages/dataverse-assemblies/docs/feature-status.md) |
-| Dataverse Tools: Metadata | `dataverse-metadata` | `Released` | [feature-status.md](packages/dataverse-metadata/docs/feature-status.md) |
-| Dataverse Tools: Decompiler | `dataverse-assembly-decompiler` | `Released` | [feature-status.md](packages/dataverse-assembly-decompiler/docs/feature-status.md) |
-| Dataverse Tools: Trace Viewer | `dataverse-plugin-trace-viewer` | `Released` | [feature-status.md](packages/dataverse-plugin-trace-viewer/docs/feature-status.md) |
-| Dataverse Tools: FetchXML Builder | `fetchxml-builder` | `Released` | [feature-status.md](packages/fetchxml-builder/docs/feature-status.md) |
-| Dataverse Tools: Query Analyzer | `dataverse-query-analyzer` | `Released` | [feature-status.md](packages/dataverse-query-analyzer/docs/feature-status.md) |
-| Dataverse Tools: Audit Viewer | `dataverse-audit-viewer` | `Released` | [feature-status.md](packages/dataverse-audit-viewer/docs/feature-status.md) |
-| Dataverse Tools: Web Resources | `dataverse-web-resources` | `Released` | [feature-status.md](packages/dataverse-web-resources/docs/feature-status.md) |
-| Dataverse Tools: Workflows | `dataverse-workflows` | `Released` | [feature-status.md](packages/dataverse-workflows/docs/feature-status.md) |
+| Dataverse Tools: Assemblies | `dataverse-assemblies` | `Released` | [feature-status.md](../packages/dataverse-assemblies/docs/feature-status.md) |
+| Dataverse Tools: Metadata | `dataverse-metadata` | `Released` | [feature-status.md](../packages/dataverse-metadata/docs/feature-status.md) |
+| Dataverse Tools: Decompiler | `dataverse-assembly-decompiler` | `Released` | [feature-status.md](../packages/dataverse-assembly-decompiler/docs/feature-status.md) |
+| Dataverse Tools: Trace Viewer | `dataverse-plugin-trace-viewer` | `Released` | [feature-status.md](../packages/dataverse-plugin-trace-viewer/docs/feature-status.md) |
+| Dataverse Tools: FetchXML Builder | `fetchxml-builder` | `Released` | [feature-status.md](../packages/fetchxml-builder/docs/feature-status.md) |
+| Dataverse Tools: Query Analyzer | `dataverse-query-analyzer` | `Released` | [feature-status.md](../packages/dataverse-query-analyzer/docs/feature-status.md) |
+| Dataverse Tools: Audit Viewer | `dataverse-audit-viewer` | `Released` | [feature-status.md](../packages/dataverse-audit-viewer/docs/feature-status.md) |
+| Dataverse Tools: Web Resources | `dataverse-web-resources` | `Released` | [feature-status.md](../packages/dataverse-web-resources/docs/feature-status.md) |
+| Dataverse Tools: Workflows | `dataverse-workflows` | `Released` | [feature-status.md](../packages/dataverse-workflows/docs/feature-status.md) |
 
 ## Extensions — Ideas
 
