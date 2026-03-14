@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { type FetchNode, type FetchNodeKind, ALLOWED_CHILDREN } from "../model/FetchXmlNode";
-import { Commands } from "core-dataverse";
+import { Commands } from "../constants";
 
 const KIND_ICONS: Record<FetchNodeKind, string> = {
   fetch: "file-code",

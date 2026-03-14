@@ -1,13 +1,12 @@
 import * as vscode from "vscode";
 import {
   type DataverseEnvironment,
-  type SdkMessageProcessingStep,
-  type SdkMessageProcessingStepImage,
   type WizardPage,
   type QuickPickWizardItem,
   runWizard,
   Logger,
 } from "core-dataverse";
+import type { SdkMessageProcessingStep, SdkMessageProcessingStepImage } from "../types";
 import { type IRegistrationService } from "../interfaces/IRegistrationService";
 
 // ── Wizard state ─────────────────────────────────────────────────────────────

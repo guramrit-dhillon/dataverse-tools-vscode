@@ -6,8 +6,8 @@ import {
   Logger,
   registerCommand,
   ExtensionIds,
-  Commands,
 } from "core-dataverse";
+import { Commands } from "./constants";
 import { FetchXmlTreeProvider } from "./providers/FetchXmlTreeProvider";
 import { FetchXmlTreeItem } from "./providers/FetchXmlTreeItem";
 import { NodePropertiesView } from "./webviews/NodePropertiesView";

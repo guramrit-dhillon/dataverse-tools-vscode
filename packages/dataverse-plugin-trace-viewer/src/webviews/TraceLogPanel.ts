@@ -2,10 +2,10 @@ import * as vscode from "vscode";
 import {
   type DataverseAccountApi,
   type DataverseEnvironment,
-  type TraceLogFilter,
   Logger,
   Panel,
 } from "core-dataverse";
+import type { TraceLogFilter } from "../types/dataverse";
 import type { TraceLogService } from "../services/TraceLogService";
 
 /** Options sent to the webview on init / re-activate. */

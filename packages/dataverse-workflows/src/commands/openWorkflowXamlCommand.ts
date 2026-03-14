@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import type { DataverseEnvironment, WorkflowProcess } from "core-dataverse";
-import { Logger } from "core-dataverse";
+import { Logger, type DataverseEnvironment } from "core-dataverse";
+import type { WorkflowProcess } from "../types/dataverse";
 import type { IWorkflowService } from "../interfaces/IWorkflowService";
 
 export const WORKFLOW_XAML_SCHEME = "dataverse-workflow-xaml";

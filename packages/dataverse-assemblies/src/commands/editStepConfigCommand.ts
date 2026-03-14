@@ -1,8 +1,8 @@
 import * as vscode from "vscode";
 import {
   type DataverseEnvironment,
-  type SdkMessageProcessingStep,
 } from "core-dataverse";
+import type { SdkMessageProcessingStep } from "../types";
 import { type IRegistrationService } from "../interfaces/IRegistrationService";
 import { type StepConfigFileSystemProvider } from "../fs/StepConfigFileSystemProvider";
 

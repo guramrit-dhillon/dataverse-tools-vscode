@@ -1,13 +1,13 @@
 import * as vscode from "vscode";
 import {
   Logger,
-  Commands,
   ExtensionIds,
   type DataverseAccountApi,
   type ExplorerNode,
-  type WorkflowProcess,
   registerCommand,
 } from "core-dataverse";
+import { Commands } from "./constants";
+import type { WorkflowProcess } from "./types/dataverse";
 import { ServiceContainer } from "./container/ServiceContainer";
 import { activateWorkflowCommand } from "./commands/activateWorkflowCommand";
 import { deactivateWorkflowCommand } from "./commands/deactivateWorkflowCommand";

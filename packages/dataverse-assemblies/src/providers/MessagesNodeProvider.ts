@@ -1,19 +1,21 @@
 import {
-  StepStateCode,
-  StepMode,
-  StepStage,
   SolutionComponentType,
   type DetailItem,
   type DetailProperty,
   type ExplorerContext,
   type ExplorerNode,
   type NodeProvider,
-  type SdkMessage,
-  type SdkMessageFilter,
-  type SdkMessageProcessingStep,
   type SolutionComponent,
   Logger,
 } from "core-dataverse";
+import {
+  StepStateCode,
+  StepMode,
+  StepStage,
+  type SdkMessage,
+  type SdkMessageFilter,
+  type SdkMessageProcessingStep,
+} from "../types";
 import { type IRegistrationService } from "../interfaces/IRegistrationService";
 
 function stageToLabel(stage: number): string {

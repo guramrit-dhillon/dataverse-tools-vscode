@@ -2,20 +2,22 @@ import * as vscode from "vscode";
 import {
   type DataverseEnvironment,
   type PluginType,
-  type SdkMessage,
-  type SdkMessageFilter,
-  type SdkMessageProcessingStep,
   type WizardPage,
   type QuickPickWizardItem,
   runWizard,
   Logger,
+} from "core-dataverse";
+import {
+  type SdkMessage,
+  type SdkMessageFilter,
+  type SdkMessageProcessingStep,
   StepMode,
   StepStage,
   StepInvocationSource,
   StepSupportedDeployment,
   StepStateCode,
   StepStatusCode,
-} from "core-dataverse";
+} from "../types";
 import { type IRegistrationService } from "../interfaces/IRegistrationService";
 
 // ── Wizard state ──────────────────────────────────────────────────────────────

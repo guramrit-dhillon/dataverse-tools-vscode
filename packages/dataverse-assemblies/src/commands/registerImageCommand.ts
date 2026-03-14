@@ -1,4 +1,5 @@
-import { type DataverseAccountApi, type DataverseEnvironment, type SdkMessageProcessingStep } from "core-dataverse";
+import { type DataverseAccountApi, type DataverseEnvironment } from "core-dataverse";
+import type { SdkMessageProcessingStep } from "../types";
 import { type IRegistrationService } from "../interfaces/IRegistrationService";
 import { imageWizard } from "./imageQuickInput";
 

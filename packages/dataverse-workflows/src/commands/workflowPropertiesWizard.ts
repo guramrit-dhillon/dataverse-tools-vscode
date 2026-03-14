@@ -1,13 +1,11 @@
 import * as vscode from "vscode";
 import {
   type DataverseEnvironment,
-  type WorkflowProcess,
   type WizardPage,
-  WorkflowCategory,
-  WorkflowStateCode,
   runWizard,
   Logger,
 } from "core-dataverse";
+import { WorkflowCategory, WorkflowStateCode, type WorkflowProcess } from "../types/dataverse";
 import { type IWorkflowService } from "../interfaces/IWorkflowService";
 
 // ── Wizard state ──────────────────────────────────────────────────────────────

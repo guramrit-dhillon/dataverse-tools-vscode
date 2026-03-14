@@ -1,4 +1,5 @@
-import type { DataverseEnvironment, WorkflowProcess } from "core-dataverse";
+import type { DataverseEnvironment } from "core-dataverse";
+import type { WorkflowProcess } from "../types/dataverse";
 
 export interface IWorkflowService {
   listWorkflows(env: DataverseEnvironment, solutionId?: string, includeAllComponents?: boolean, componentScope?: "all" | "unmanaged"): Promise<WorkflowProcess[]>;

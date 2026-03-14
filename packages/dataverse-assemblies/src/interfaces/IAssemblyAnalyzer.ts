@@ -1,4 +1,4 @@
-import { type AssemblyAnalysisResult, AnalyzerError } from "core-dataverse";
+import { type AssemblyAnalysisResult, type AnalyzerError } from "../types";
 
 /**
  * Invokes the external .NET CLI analyzer tool and returns structured metadata.

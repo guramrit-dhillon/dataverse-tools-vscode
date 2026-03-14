@@ -1,12 +1,9 @@
 import {
   DataverseWebApiClient,
   SolutionComponentType,
-  WorkflowCategory,
-  WorkflowStateCode,
-  WorkflowType,
   type DataverseEnvironment,
-  type WorkflowProcess,
 } from "core-dataverse";
+import { WorkflowCategory, WorkflowStateCode, WorkflowType, type WorkflowProcess } from "../types/dataverse";
 import type { IWorkflowService } from "../interfaces/IWorkflowService";
 
 export class WorkflowService implements IWorkflowService {

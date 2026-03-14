@@ -1,7 +1,5 @@
 import {
   SolutionComponentType,
-  WorkflowCategory,
-  WorkflowStateCode,
   Logger,
   type DetailItem,
   type DetailProperty,
@@ -9,8 +7,8 @@ import {
   type ExplorerNode,
   type NodeProvider,
   type SolutionComponent,
-  type WorkflowProcess,
 } from "core-dataverse";
+import { WorkflowCategory, WorkflowStateCode, type WorkflowProcess } from "../types/dataverse";
 import type { IWorkflowService } from "../interfaces/IWorkflowService";
 
 const CATEGORY_LABEL: Record<number, string> = {

@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
-import type { DataverseEnvironment, WorkflowProcess } from "core-dataverse";
+import type { DataverseEnvironment } from "core-dataverse";
+import type { WorkflowProcess } from "../types/dataverse";
 import type { IWorkflowService } from "../interfaces/IWorkflowService";
 
 export async function activateWorkflowCommand(

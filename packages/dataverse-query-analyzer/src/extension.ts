@@ -1,12 +1,12 @@
 import * as vscode from "vscode";
 import {
   Logger,
-  Commands,
   ExtensionIds,
   type DataverseAccountApi,
   type DataverseEnvironment,
   registerCommand,
 } from "core-dataverse";
+import { Commands } from "./constants";
 import { ServiceContainer } from "./container/ServiceContainer";
 import { QueryPanel } from "./webviews/QueryPanel";
 

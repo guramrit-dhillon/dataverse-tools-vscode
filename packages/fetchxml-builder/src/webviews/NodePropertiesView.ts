@@ -1,5 +1,6 @@
 import type * as vscode from "vscode";
-import { View, Views, DataverseWebApiClient, type ODataCollection } from "core-dataverse";
+import { View, DataverseWebApiClient, type ODataCollection } from "core-dataverse";
+import { Views } from "../constants";
 import { type FetchNode, DEFAULT_ATTRS, createFetchNode, findNode } from "../model/FetchXmlNode";
 import { type FetchXmlTreeProvider } from "../providers/FetchXmlTreeProvider";
 

@@ -1,12 +1,11 @@
 import * as vscode from "vscode";
 import {
-  type SdkMessageProcessingStep,
   type ExplorerNode,
   type PluginAssembly,
   type PluginType,
   Logger,
-  type DeploymentResult,
 } from "core-dataverse";
+import type { SdkMessageProcessingStep, DeploymentResult } from "../types";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 

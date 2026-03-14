@@ -1,18 +1,18 @@
 import * as vscode from "vscode";
 import {
   Logger,
-  Commands,
+  Commands as CoreCommands,
   ExtensionIds,
   type DataverseAccountApi,
   type DataverseEnvironment,
   type ExplorerNode,
   type PluginAssembly,
   type PluginType,
-  type SdkMessageProcessingStep,
-  type SdkMessageProcessingStepImage,
   type TraceLogTarget,
   registerCommand,
 } from "core-dataverse";
+import { Commands } from "./constants";
+import type { SdkMessageProcessingStep, SdkMessageProcessingStepImage } from "./types";
 import { ServiceContainer } from "./container/ServiceContainer";
 import { downloadAssemblyCommand } from "./commands/downloadAssemblyCommand";
 import { deployAssemblyCommand } from "./commands/deployAssemblyCommand";
@@ -241,14 +241,14 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       }
     }
     const envId = getEnv()?.id;
-    return vscode.commands.executeCommand(Commands.TraceLog, target, envId);
+    return vscode.commands.executeCommand(CoreCommands.TraceLog, target, envId);
   }) as (...args: unknown[]) => unknown);
 
   // ── Managed filter toggle ──────────────────────────────────────────────────
   registerCommand(context, Commands.ShowManaged, () =>
-    vscode.commands.executeCommand(Commands.ExplorerShowAll));
+    vscode.commands.executeCommand(CoreCommands.ExplorerShowAll));
   registerCommand(context, Commands.HideManaged, () =>
-    vscode.commands.executeCommand(Commands.ExplorerFilterUnmanaged));
+    vscode.commands.executeCommand(CoreCommands.ExplorerFilterUnmanaged));
 
   // ── Build task watcher ─────────────────────────────────────────────────────
   const taskWatcher = vscode.tasks.onDidEndTaskProcess(async (e) => {

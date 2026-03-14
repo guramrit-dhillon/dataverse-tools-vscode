@@ -2,13 +2,15 @@ import {
   type DataverseEnvironment,
   type PluginAssembly,
   type PluginType,
-  type SdkMessageProcessingStep,
-  type SdkMessageProcessingStepImage,
-  type SdkMessage,
-  type SdkMessageFilter,
-  type DeploymentResult,
-  type AssemblyAnalysisResult,
 } from "core-dataverse";
+import type {
+  SdkMessageProcessingStep,
+  SdkMessageProcessingStepImage,
+  SdkMessage,
+  SdkMessageFilter,
+  DeploymentResult,
+  AssemblyAnalysisResult,
+} from "../types";
 
 /**
  * Plugin registration operations against the Dataverse Web API.

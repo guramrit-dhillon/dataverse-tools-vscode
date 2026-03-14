@@ -1,13 +1,14 @@
 import * as vscode from "vscode";
 import {
   Logger,
-  Commands,
+  Commands as CoreCommands,
   ExtensionIds,
   type DataverseAccountApi,
   type TraceLogTarget,
-  type TraceLogFilter,
   registerCommand,
 } from "core-dataverse";
+import { Commands } from "./constants";
+import type { TraceLogFilter } from "./types/dataverse";
 import { TraceLogService } from "./services/TraceLogService";
 import { TraceLogPanel } from "./webviews/TraceLogPanel";
 
@@ -41,7 +42,7 @@ export function activate(context: vscode.ExtensionContext): void {
   // Sole owner of Commands.TraceLog ("dataverse-tools.traceLog").
   // dataverse-assemblies passes a TraceLogTarget + optional environmentId
   // so both sides share a strongly-typed contract with no duck typing.
-  registerCommand(context, Commands.TraceLog, (async (target?: unknown, environmentId?: string) => {
+  registerCommand(context, CoreCommands.TraceLog, (async (target?: unknown, environmentId?: string) => {
     // Resolve environment: tree item → passed ID → single-env auto-select → pickEnvironment()
     const envItem = target as { environment?: { id: string } } | undefined;
     let env = envItem?.environment?.id

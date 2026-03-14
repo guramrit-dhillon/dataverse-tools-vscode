@@ -2,10 +2,8 @@ import {
   DataverseWebApiClient,
   type DataverseEnvironment,
   type ODataCollection,
-  type PluginTraceLog,
-  type TraceLogFilter,
-  type TraceLogSuggestions,
 } from "core-dataverse";
+import type { PluginTraceLog, TraceLogFilter, TraceLogSuggestions } from "../types/dataverse";
 
 export class TraceLogService {
   constructor(

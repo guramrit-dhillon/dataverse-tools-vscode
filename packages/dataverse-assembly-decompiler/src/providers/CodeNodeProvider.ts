@@ -5,9 +5,9 @@ import {
   type DataverseEnvironment,
   type PluginAssembly,
   DataverseWebApiClient,
-  Commands,
   Logger,
 } from "core-dataverse";
+import { Commands } from "../constants";
 import { type DecompilerService, type LoadAssemblyResult } from "../services/DecompilerService";
 import { type DecompilerFileSystemProvider, DECOMPILED_SCHEME } from "./DecompilerFileSystemProvider";
 

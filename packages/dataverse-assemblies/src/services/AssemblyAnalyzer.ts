@@ -3,7 +3,7 @@ import * as path from "path";
 import * as fs from "fs/promises";
 import { type IAssemblyAnalyzer } from "../interfaces/IAssemblyAnalyzer";
 import { Logger } from "core-dataverse";
-import type { AssemblyAnalysisResult, AnalyzerError } from "core-dataverse";
+import type { AssemblyAnalysisResult, AnalyzerError } from "../types";
 import analyzer from "dataverse-assembly-analyzer";
 
 /**

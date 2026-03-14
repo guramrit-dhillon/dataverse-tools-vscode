@@ -1,6 +1,5 @@
 import {
   SolutionComponentType,
-  StepStateCode,
   type DetailItem,
   type DetailProperty,
   type ExplorerContext,
@@ -8,13 +7,16 @@ import {
   type NodeProvider,
   type PluginAssembly,
   type PluginType,
-  type SdkMessageProcessingStep,
-  type SdkMessageProcessingStepImage,
   PluginAssemblyIsolationMode,
-  StepMode,
-  StepStage,
   Logger,
 } from "core-dataverse";
+import {
+  StepStateCode,
+  StepMode,
+  StepStage,
+  type SdkMessageProcessingStep,
+  type SdkMessageProcessingStepImage,
+} from "../types";
 import { type IRegistrationService } from "../interfaces/IRegistrationService";
 
 const GUID_RE =

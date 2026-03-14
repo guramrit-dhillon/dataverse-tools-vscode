@@ -1,11 +1,11 @@
 import * as vscode from "vscode";
 import {
   Logger,
-  Commands,
   ExtensionIds,
   type DataverseAccountApi,
   registerCommand,
 } from "core-dataverse";
+import { Commands } from "./constants";
 import { DecompilerService } from "./services/DecompilerService";
 import {
   DecompilerFileSystemProvider,

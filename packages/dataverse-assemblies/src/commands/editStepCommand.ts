@@ -1,4 +1,5 @@
-import { type DataverseAccountApi, type DataverseEnvironment, type PluginType, type SdkMessageProcessingStep } from "core-dataverse";
+import { type DataverseAccountApi, type DataverseEnvironment, type PluginType } from "core-dataverse";
+import type { SdkMessageProcessingStep } from "../types";
 import { type IRegistrationService } from "../interfaces/IRegistrationService";
 import { stepWizard } from "./stepWizard";
 

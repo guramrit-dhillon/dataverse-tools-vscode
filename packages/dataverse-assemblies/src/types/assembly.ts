@@ -70,15 +70,6 @@ export interface ImageHint {
 
 // ─── Analyzer invocation ────────────────────────────────────────────────────
 
-export interface AnalyzerOptions {
-  assemblyPath: string;
-  /**
-   * Absolute path to the analyzer binary.
-   * Resolved by AssemblyAnalyzer from settings or bundled location.
-   */
-  analyzerBinPath: string;
-}
-
 export interface AnalyzerError {
   code: "NOT_FOUND" | "PARSE_FAILED" | "PROCESS_ERROR" | "TIMEOUT";
   message: string;

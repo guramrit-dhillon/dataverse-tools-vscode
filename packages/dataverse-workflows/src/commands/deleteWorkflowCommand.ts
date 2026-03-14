@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
-import { WorkflowStateCode, type DataverseEnvironment, type WorkflowProcess } from "core-dataverse";
+import type { DataverseEnvironment } from "core-dataverse";
+import { WorkflowStateCode, type WorkflowProcess } from "../types/dataverse";
 import type { IWorkflowService } from "../interfaces/IWorkflowService";
 
 export async function deleteWorkflowCommand(

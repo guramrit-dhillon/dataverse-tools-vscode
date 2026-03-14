@@ -1,4 +1,5 @@
-import { type DataverseAccountApi, type DataverseEnvironment, type SdkMessageProcessingStep, Logger } from "core-dataverse";
+import { type DataverseAccountApi, type DataverseEnvironment, Logger } from "core-dataverse";
+import type { SdkMessageProcessingStep } from "../types";
 import * as vscode from "vscode";
 import { type IRegistrationService } from "../interfaces/IRegistrationService";
 

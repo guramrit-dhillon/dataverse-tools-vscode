@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
-import type { DataverseEnvironment, WorkflowProcess } from "core-dataverse";
+import type { DataverseEnvironment } from "core-dataverse";
+import type { WorkflowProcess } from "../types/dataverse";
 import type { IWorkflowService } from "../interfaces/IWorkflowService";
 
 const GUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
