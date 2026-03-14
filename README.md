@@ -1,10 +1,13 @@
 # Dataverse Tools for VS Code
 
+[![CI](https://github.com/guramrit-dhillon/dataverse-tools-vscode/actions/workflows/ci.yml/badge.svg)](https://github.com/guramrit-dhillon/dataverse-tools-vscode/actions/workflows/ci.yml)
+[![Release](https://github.com/guramrit-dhillon/dataverse-tools-vscode/actions/workflows/release.yml/badge.svg)](https://github.com/guramrit-dhillon/dataverse-tools-vscode/actions/workflows/release.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Deploy plugins, register steps, query data, debug trace logs, browse metadata, manage workflows, edit web resources, and decompile assemblies — without leaving VS Code.
 
 A modern replacement for the XrmToolBox Plugin Registration Tool, built entirely inside VS Code.
 
-> **Status:** Preview (`0.1.0-preview`)
 > **Requires:** VS Code 1.96+
 > **License:** MIT
 
@@ -26,7 +29,7 @@ Dataverse Tools puts the whole workflow in one place:
 
 ## Extensions
 
-Ten extensions share a common foundation. Install them all at once with the [Dataverse Tools](https://marketplace.visualstudio.com/items?itemName=gdhillon.dataverse-tools) extension pack, or pick the ones you need.
+Ten extensions share a common foundation. Install them all at once with the [Dataverse Tools](https://marketplace.visualstudio.com/items?itemName=gdhillon.dataverse-tools-pack) extension pack, or pick the ones you need.
 
 | Extension | What it does |
 |---|---|
@@ -43,24 +46,32 @@ Ten extensions share a common foundation. Install them all at once with the [Dat
 
 ### Architecture
 
-```
-                    ┌─────────────────────────────────────────────┐
-                    │          Environments (auth + tree)          │
-                    └──────────────────┬──────────────────────────┘
-                                       │
-          ┌────────────┬───────────┬───┴───┬───────────┬──────────┬──────────┐
-          ▼            ▼           ▼       ▼           ▼          ▼          ▼
-    Assemblies    Metadata    FetchXML  Query      Trace     Decompiler   Audit
-                              Builder  Analyzer   Viewer                 Viewer
-          │                                                       │
-          ▼                                                       ▼
-   Plugin Analyzer                                       Assembly Decompiler
-     (.NET 8)                                               (.NET 8 / ILSpy)
-          │                                                       │
-          └──────────────────┬────────────────────────────────────┘
-                             ▼
-                      Assembly Backend
-                    (shared .NET host)
+```mermaid
+graph TD
+    ENV[Environments<br><small>auth + explorer framework</small>]
+    CORE[core-dataverse<br><small>shared types, services, constants</small>]
+
+    ASM[Assemblies]
+    META[Metadata]
+    FXB[FetchXML Builder]
+    QA[Query Analyzer]
+    TV[Trace Viewer]
+    DEC[Decompiler]
+    AUD[Audit Viewer]
+    WF[Workflows]
+    WR[Web Resources]
+
+    ANALYZER[Plugin Analyzer<br><small>.NET 8</small>]
+    DECOMPILER[Assembly Decompiler<br><small>.NET 8 / ILSpy</small>]
+    BACKEND[Assembly Backend<br><small>shared .NET host</small>]
+
+    ENV --> ASM & META & FXB & QA & TV & DEC & AUD & WF & WR
+    CORE -.-> ENV & ASM & META & FXB & QA & TV & DEC & AUD & WF & WR
+
+    ASM --> ANALYZER
+    DEC --> DECOMPILER
+    ANALYZER --> BACKEND
+    DECOMPILER --> BACKEND
 ```
 
 All extensions depend on **Environments** for authentication and the explorer framework. **core-dataverse** provides shared types, services, and constants consumed by every package.
@@ -172,7 +183,7 @@ Four language model tools exposed for Copilot Chat: list environments, get envir
 - **.NET 8 runtime** (only needed if using the Assemblies or Decompiler extensions)
 
 ### Installation
-Install from the VS Code Marketplace (search for "Dataverse Tools") or from `.vsix` files on the [Releases](../../releases) page.
+Install from the VS Code Marketplace (search for "Dataverse Tools") or from `.vsix` files on the [Releases](https://github.com/guramrit-dhillon/dataverse-tools-vscode/releases) page.
 
 ### Quick Start
 1. Open a workspace containing a `.csproj` file (triggers automatic activation)
@@ -225,8 +236,8 @@ scripts/
 ### Building from source
 
 ```bash
-git clone https://github.com/guramrit-dhillon/plugin-registration-tool.git
-cd plugin-registration-tool
+git clone https://github.com/guramrit-dhillon/dataverse-tools-vscode.git
+cd dataverse-tools-vscode
 npm install
 npm run build          # build all packages (skips .NET if dotnet SDK is missing)
 ```
