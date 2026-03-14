@@ -6,7 +6,7 @@
   },
   "license": "MIT",
   "displayName": "Dataverse Tools",
-  "description": "Complete toolkit for Dynamics 365 / Power Platform plugin development — deploy, register, trace, decompile, and query Dataverse from VS Code.",
+  "description": "Complete toolkit for Dynamics 365 / Power Platform plugin development — deploy, register, trace, decompile, audit, and query Dataverse from VS Code.",
   "version": "0.5.0",
   "publisher": "gdhillon",
   "engines": {
@@ -25,11 +25,15 @@
   "icon": "resources/icon.png",
   "extensionPack": [
     "gdhillon.dataverse-environments",
+    "gdhillon.dataverse-assemblies",
+    "gdhillon.dataverse-metadata",
     "gdhillon.dataverse-plugin-trace-viewer",
     "gdhillon.fetchxml-builder",
     "gdhillon.dataverse-query-analyzer",
     "gdhillon.dataverse-workflows",
-    "gdhillon.dataverse-web-resources"
+    "gdhillon.dataverse-web-resources",
+    "gdhillon.dataverse-assembly-decompiler",
+    "gdhillon.dataverse-audit-viewer"
   ],
   "scripts": {
     "build": "echo 'No build step for extension pack'",

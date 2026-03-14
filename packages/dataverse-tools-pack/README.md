@@ -2,7 +2,7 @@
 
 Everything you need to develop for Dynamics 365 / Power Platform — in one install.
 
-This extension pack includes the complete Dataverse Tools suite. Install it once to get all the tools: connect to your environments, deploy plugins, browse metadata, query data, debug trace logs, manage workflows, edit web resources, and decompile assemblies — all without leaving VS Code.
+This extension pack includes the complete Dataverse Tools suite. Install it once to get all the tools: connect to your environments, deploy plugins, browse metadata, query data, debug trace logs, manage workflows, edit web resources, decompile assemblies, and view audit history — all without leaving VS Code.
 
 ---
 
@@ -19,6 +19,7 @@ This extension pack includes the complete Dataverse Tools suite. Install it once
 | **Dataverse Tools: Web Resources** | Open, edit, and publish web resources with Ctrl+S |
 | **Dataverse Tools: Metadata** | Browse entities, attributes, and SDK messages in the explorer |
 | **Dataverse Tools: Decompiler** | Read decompiled C# source from any deployed assembly |
+| **Dataverse Tools: Audit Viewer** | View and analyze audit history for Dataverse records |
 
 ---
 
