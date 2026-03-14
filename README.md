@@ -26,7 +26,7 @@ Dataverse Tools puts the whole workflow in one place:
 
 ## Extensions
 
-Nine extensions share a common foundation. Install them all at once with the [Dataverse Tools](https://marketplace.visualstudio.com/items?itemName=gdhillon.dataverse-tools) extension pack, or pick the ones you need.
+Ten extensions share a common foundation. Install them all at once with the [Dataverse Tools](https://marketplace.visualstudio.com/items?itemName=gdhillon.dataverse-tools) extension pack, or pick the ones you need.
 
 | Extension | What it does |
 |---|---|
@@ -39,6 +39,7 @@ Nine extensions share a common foundation. Install them all at once with the [Da
 | **Workflows** | Browse, activate, deactivate, and trigger Dataverse process automation |
 | **Web Resources** | Edit and publish JS, CSS, and HTML resources with Ctrl+S |
 | **Decompiler** | Browse decompiled C# source from any deployed plugin assembly |
+| **Audit Viewer** | View and analyze audit history for Dataverse records |
 
 ### Architecture
 
@@ -47,10 +48,10 @@ Nine extensions share a common foundation. Install them all at once with the [Da
                     │          Environments (auth + tree)          │
                     └──────────────────┬──────────────────────────┘
                                        │
-          ┌────────────┬───────────┬───┴───┬───────────┬──────────┐
-          ▼            ▼           ▼       ▼           ▼          ▼
-    Assemblies    Metadata    FetchXML  Query      Trace       Decompiler
-                              Builder  Analyzer   Viewer
+          ┌────────────┬───────────┬───┴───┬───────────┬──────────┬──────────┐
+          ▼            ▼           ▼       ▼           ▼          ▼          ▼
+    Assemblies    Metadata    FetchXML  Query      Trace     Decompiler   Audit
+                              Builder  Analyzer   Viewer                 Viewer
           │                                                       │
           ▼                                                       ▼
    Plugin Analyzer                                       Assembly Decompiler
@@ -145,6 +146,10 @@ Browse classic workflows, actions, business rules, business process flows, and m
 
 Open any JavaScript, CSS, or HTML web resource as a proper editor tab with syntax highlighting. Ctrl+S writes the change back to Dataverse. A prompt then offers to publish immediately, or save it for a batch publish later. The upload button in the editor title bar saves and publishes in one step.
 
+### Audit Viewer — Trace record changes
+
+Pick an entity, enter a record ID, and see the full audit trail — every field change with old and new values, who made the change, and when. Open from the explorer tree by right-clicking an entity, or from an environment context menu. Supports multiple panels for different environments.
+
 ### Decompiler — Read deployed assembly code
 
 <!-- SCREENSHOT: Decompiler showing the namespace → type tree on the left
@@ -208,6 +213,7 @@ packages/
 ├── dataverse-assembly-decompiler/ Assembly code browser
 ├── dataverse-workflows/         Workflow and process automation browser
 ├── dataverse-web-resources/     Web resource editor + Ctrl+S publish
+├── dataverse-audit-viewer/      Audit history viewer for Dataverse records
 ├── dataverse-tools-pack/        Extension pack (installs all of the above)
 ├── assembly-backend/            Shared .NET host (stdio/exec JSON-RPC)
 ├── dataverse-assembly-analyzer/ .NET Plugin Analyzer CLI
