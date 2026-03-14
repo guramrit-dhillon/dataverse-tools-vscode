@@ -7,7 +7,7 @@
   "license": "MIT",
   "displayName": "Dataverse Tools: Audit Viewer",
   "description": "View and analyze audit history for Dataverse records in VS Code",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "publisher": "gdhillon",
   "engines": {
     "vscode": "^1.96.0"
@@ -34,7 +34,7 @@
     "commands": [
       {
         "command": "dataverse-tools.auditViewer.open",
-        "title": "View Audit History\u2026",
+        "title": "View Audit History…",
         "category": "Dataverse Tools: Audit Viewer",
         "icon": "$(history)"
       },

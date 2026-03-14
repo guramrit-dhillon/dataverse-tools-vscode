@@ -1,5 +1,18 @@
 # dataverse-assembly-decompiler
 
+## 0.8.0
+
+### Minor Changes
+
+- [`e18402c`](https://github.com/guramrit-dhillon/dataverse-tools-vscode/commit/e18402c7b89d8422f181990d167d69ffb0438688) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - fix(metadata): sort entities by display name instead of logical name
+  - fix(trace-viewer): make badge text selectable
+  - chore: update package-lock.json for audit-viewer workspace
+  - refactor(core-dataverse): move extension-specific types and constants to owning extensions
+  - docs: add audit viewer to root README
+  - fix(tools-pack): include all extensions in extension pack and release workflow
+  - docs: update extension READMEs with complete suite listing and new features
+  - feat(audit-viewer): add audit history viewer extension
+
 ## 0.7.0
 
 ### Minor Changes
