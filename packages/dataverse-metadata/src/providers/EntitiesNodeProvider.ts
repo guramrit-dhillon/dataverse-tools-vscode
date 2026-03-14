@@ -32,7 +32,7 @@ export class EntitiesNodeProvider implements NodeProvider {
     );
 
     return components
-      .sort((a, b) => a.name.localeCompare(b.name))
+      .sort((a, b) => (a.displayName || a.name).localeCompare(b.displayName || b.name))
       .map((c) => this.toNode(c));
   }
 
