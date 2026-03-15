@@ -1,5 +1,13 @@
 # dataverse-environments
 
+## 0.8.2
+
+### Patch Changes
+
+- [`f8dcfd1`](https://github.com/guramrit-dhillon/dataverse-tools-vscode/commit/f8dcfd1ba380c99846a4bca9f90544417a2f7ea3) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - docs: replace relative links with absolute GitHub URLs for marketplace compatibility
+  - docs: remove .csproj requirement from getting started steps
+  - fix(activation): remove redundant activationEvents from non-assembly extensions
+
 ## 0.8.1
 
 ### Patch Changes

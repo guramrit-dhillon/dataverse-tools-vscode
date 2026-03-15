@@ -7,7 +7,7 @@
   "license": "MIT",
   "displayName": "Dataverse Tools",
   "description": "Complete Dataverse development toolkit for VS Code — manage plugins, browse metadata, query data, edit web resources, manage workflows, and more",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "publisher": "gdhillon",
   "homepage": "https://github.com/guramrit-dhillon/dataverse-tools-vscode#readme",
   "bugs": {
