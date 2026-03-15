@@ -32,9 +32,7 @@
     "color": "#1e1e2e",
     "theme": "dark"
   },
-  "activationEvents": [
-    "workspaceContains:**/*.csproj"
-  ],
+  "activationEvents": [],
   "main": "./out/extension.js",
   "icon": "resources/icon.png",
   "contributes": {

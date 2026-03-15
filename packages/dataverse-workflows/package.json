@@ -37,10 +37,7 @@
   "extensionDependencies": [
     "gdhillon.dataverse-environments"
   ],
-  "activationEvents": [
-    "workspaceContains:**/*.csproj",
-    "onView:dataverse-tools.explorer"
-  ],
+  "activationEvents": [],
   "main": "./out/extension.js",
   "icon": "resources/icon.png",
   "contributes": {
