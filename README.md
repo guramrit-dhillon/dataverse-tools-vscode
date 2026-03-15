@@ -259,7 +259,7 @@ Have a bug to report, a feature to request, or an idea for a new extension? Open
 - **Feature requests** — describe the problem you're trying to solve, not just the solution you want
 - **Questions & discussion** — use [GitHub Discussions](https://github.com/guramrit-dhillon/dataverse-tools-vscode/discussions) for general questions, tips, and conversation
 
-See [EXTENSION-STATUS.md](docs/EXTENSION-STATUS.md) for a full list of planned and proposed extensions.
+See [EXTENSION-STATUS.md](https://github.com/guramrit-dhillon/dataverse-tools-vscode/blob/main/docs/EXTENSION-STATUS.md) for a full list of planned and proposed extensions.
 
 ---
 
@@ -273,4 +273,4 @@ The decompiler extension is powered by [ILSpy](https://github.com/icsharpcode/IL
 
 ## License
 
-[MIT](LICENSE) — Copyright (c) 2026 guramrit-dhillon
+[MIT](https://github.com/guramrit-dhillon/dataverse-tools-vscode/blob/main/LICENSE) — Copyright (c) 2026 guramrit-dhillon

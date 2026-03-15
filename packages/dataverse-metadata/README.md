@@ -20,7 +20,7 @@ When you're writing a plugin, building a query, or configuring a step, you need 
 - **Copy logical name** — copy entity or attribute names to clipboard
 - **Global option sets** — browse global option sets and their values
 
-See [docs/feature-status.md](docs/feature-status.md) for the full roadmap.
+See [docs/feature-status.md](https://github.com/guramrit-dhillon/dataverse-tools-vscode/blob/main/packages/dataverse-metadata/docs/feature-status.md) for the full roadmap.
 
 ---
 
