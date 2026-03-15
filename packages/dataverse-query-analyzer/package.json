@@ -28,7 +28,7 @@
     "tds",
     "crm",
     "query analyzer",
-    "intellisense"
+    "autocomplete"
   ],
   "galleryBanner": {
     "color": "#1e1e2e",
