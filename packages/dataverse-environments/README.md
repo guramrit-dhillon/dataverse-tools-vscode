@@ -21,9 +21,8 @@ No more re-entering credentials or juggling separate connection tools.
 ## Getting Started
 
 1. Install this extension — it's required by every other Dataverse Tools extension
-2. Open any workspace in VS Code (the extension activates automatically when a `.csproj` file is present)
-3. Click the **Dataverse Tools** icon in the Activity Bar to open the explorer
-4. Click **Add Environment** and follow the wizard
+2. Click the **Dataverse Tools** icon in the Activity Bar — the extension activates automatically
+3. Click **Add Environment** and follow the wizard
 5. Sign in — the extension handles token refresh automatically from here on
 
 ---

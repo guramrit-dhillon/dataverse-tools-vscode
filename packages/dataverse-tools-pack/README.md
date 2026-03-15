@@ -26,7 +26,7 @@ This extension pack includes the complete Dataverse Tools suite. Install it once
 ## Getting Started
 
 1. Install this extension pack — all included extensions are installed automatically
-2. Open a plugin project in VS Code (a folder containing a `.csproj` file)
+2. Open any workspace in VS Code
 3. Click the **Dataverse Tools** icon in the Activity Bar
 4. Click **Add Environment** — the wizard finds all your orgs automatically
 5. Sign in and start working
