@@ -9,6 +9,10 @@
   "description": "View and analyze audit history for Dataverse records in VS Code",
   "version": "0.7.0",
   "publisher": "gdhillon",
+  "homepage": "https://github.com/guramrit-dhillon/dataverse-tools-vscode#readme",
+  "bugs": {
+    "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode/issues"
+  },
   "engines": {
     "vscode": "^1.96.0"
   },
@@ -19,9 +23,16 @@
     "dataverse",
     "power platform",
     "dynamics 365",
+    "crm",
     "audit",
-    "crm"
+    "audit history",
+    "history",
+    "change tracking"
   ],
+  "galleryBanner": {
+    "color": "#1e1e2e",
+    "theme": "dark"
+  },
   "extensionDependencies": [
     "gdhillon.dataverse-environments"
   ],

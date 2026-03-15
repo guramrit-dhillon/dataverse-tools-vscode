@@ -9,11 +9,16 @@
   "description": "SQL query editor for Dataverse with intellisense, results display, and query analysis via the TDS endpoint",
   "version": "0.8.0",
   "publisher": "gdhillon",
+  "homepage": "https://github.com/guramrit-dhillon/dataverse-tools-vscode#readme",
+  "bugs": {
+    "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode/issues"
+  },
   "engines": {
     "vscode": "^1.96.0"
   },
   "categories": [
-    "Other"
+    "Other",
+    "Programming Languages"
   ],
   "keywords": [
     "dataverse",
@@ -22,8 +27,14 @@
     "power platform",
     "dynamics 365",
     "tds",
-    "crm"
+    "crm",
+    "query analyzer",
+    "intellisense"
   ],
+  "galleryBanner": {
+    "color": "#1e1e2e",
+    "theme": "dark"
+  },
   "extensionDependencies": [
     "gdhillon.dataverse-environments"
   ],
