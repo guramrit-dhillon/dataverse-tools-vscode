@@ -1,10 +1,14 @@
 {
   "name": "dataverse-workflows",
   "displayName": "Dataverse Tools: Workflows",
-  "description": "Browse and manage Dataverse workflow processes in VS Code",
+  "description": "Browse, activate, deactivate, and manage Dataverse workflows, custom actions, and business process flows from VS Code",
   "version": "0.8.0",
   "publisher": "gdhillon",
   "license": "MIT",
+  "homepage": "https://github.com/guramrit-dhillon/dataverse-tools-vscode#readme",
+  "bugs": {
+    "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode.git"
@@ -19,9 +23,17 @@
     "dataverse",
     "power platform",
     "dynamics 365",
+    "crm",
     "workflow",
-    "crm"
+    "process",
+    "custom action",
+    "business process",
+    "automation"
   ],
+  "galleryBanner": {
+    "color": "#1e1e2e",
+    "theme": "dark"
+  },
   "extensionDependencies": [
     "gdhillon.dataverse-environments"
   ],

@@ -6,9 +6,13 @@
   },
   "license": "MIT",
   "displayName": "Dataverse Tools: Environments",
-  "description": "Manages Dataverse authentication and connections",
+  "description": "Manage Dataverse environments and authenticate — the shared foundation and explorer tree framework powering all Dataverse Tools extensions",
   "version": "0.8.0",
   "publisher": "gdhillon",
+  "homepage": "https://github.com/guramrit-dhillon/dataverse-tools-vscode#readme",
+  "bugs": {
+    "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode/issues"
+  },
   "engines": {
     "vscode": "^1.96.0"
   },
@@ -19,9 +23,15 @@
     "dataverse",
     "power platform",
     "dynamics 365",
-    "plugin",
-    "crm"
+    "crm",
+    "authentication",
+    "environment",
+    "connection"
   ],
+  "galleryBanner": {
+    "color": "#1e1e2e",
+    "theme": "dark"
+  },
   "activationEvents": [
     "workspaceContains:**/*.csproj"
   ],

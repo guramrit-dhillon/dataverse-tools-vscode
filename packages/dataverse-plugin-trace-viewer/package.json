@@ -6,9 +6,13 @@
   },
   "license": "MIT",
   "displayName": "Dataverse Tools: Trace Viewer",
-  "description": "View and analyze trace logs for Dataverse plugins in VS Code",
+  "description": "View and analyze Dataverse plugin execution trace logs — filter, search, and inspect exceptions from VS Code",
   "version": "0.8.0",
   "publisher": "gdhillon",
+  "homepage": "https://github.com/guramrit-dhillon/dataverse-tools-vscode#readme",
+  "bugs": {
+    "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode/issues"
+  },
   "engines": {
     "vscode": "^1.96.0"
   },
@@ -20,8 +24,16 @@
     "power platform",
     "dynamics 365",
     "plugin",
-    "crm"
+    "crm",
+    "trace",
+    "trace log",
+    "logging",
+    "debug"
   ],
+  "galleryBanner": {
+    "color": "#1e1e2e",
+    "theme": "dark"
+  },
   "extensionDependencies": [
     "gdhillon.dataverse-environments"
   ],

@@ -6,9 +6,13 @@
   },
   "license": "MIT",
   "displayName": "Dataverse Tools",
-  "description": "Complete toolkit for Dynamics 365 / Power Platform plugin development — deploy, register, trace, decompile, audit, and query Dataverse from VS Code.",
+  "description": "Complete Dataverse development toolkit for VS Code — manage plugins, browse metadata, query data, edit web resources, manage workflows, and more",
   "version": "0.6.0",
   "publisher": "gdhillon",
+  "homepage": "https://github.com/guramrit-dhillon/dataverse-tools-vscode#readme",
+  "bugs": {
+    "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode/issues"
+  },
   "engines": {
     "vscode": "^1.96.0"
   },
@@ -19,9 +23,20 @@
     "dataverse",
     "power platform",
     "dynamics 365",
+    "crm",
     "plugin",
-    "crm"
+    "metadata",
+    "workflow",
+    "fetchxml",
+    "sql",
+    "web resources",
+    "audit",
+    "assembly"
   ],
+  "galleryBanner": {
+    "color": "#1e1e2e",
+    "theme": "dark"
+  },
   "icon": "resources/icon.png",
   "extensionPack": [
     "gdhillon.dataverse-environments",

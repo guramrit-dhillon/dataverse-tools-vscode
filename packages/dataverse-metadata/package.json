@@ -6,9 +6,13 @@
   },
   "license": "MIT",
   "displayName": "Dataverse Tools: Metadata",
-  "description": "Contributes metadata providers (entities, etc.) to the Dataverse Explorer",
+  "description": "Browse Dataverse entity metadata — entities, attributes, relationships, and option sets — from VS Code",
   "version": "0.8.0",
   "publisher": "gdhillon",
+  "homepage": "https://github.com/guramrit-dhillon/dataverse-tools-vscode#readme",
+  "bugs": {
+    "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode/issues"
+  },
   "engines": {
     "vscode": "^1.96.0"
   },
@@ -19,9 +23,16 @@
     "dataverse",
     "power platform",
     "dynamics 365",
-    "plugin",
-    "crm"
+    "crm",
+    "metadata",
+    "entity",
+    "schema",
+    "attributes"
   ],
+  "galleryBanner": {
+    "color": "#1e1e2e",
+    "theme": "dark"
+  },
   "extensionDependencies": [
     "gdhillon.dataverse-environments"
   ],

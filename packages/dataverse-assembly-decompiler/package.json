@@ -6,23 +6,36 @@
   },
   "license": "MIT",
   "displayName": "Dataverse Tools: Decompiler",
-  "description": "Browse and decompile C# source from Dataverse plugin assemblies",
+  "description": "Browse and decompile Dataverse plugin assemblies to C# source using ILSpy — directly from the explorer tree",
   "version": "0.8.0",
   "publisher": "gdhillon",
+  "homepage": "https://github.com/guramrit-dhillon/dataverse-tools-vscode#readme",
+  "bugs": {
+    "url": "https://github.com/guramrit-dhillon/dataverse-tools-vscode/issues"
+  },
   "engines": {
     "vscode": "^1.96.0"
   },
   "categories": [
-    "Other"
+    "Other",
+    "Programming Languages"
   ],
   "keywords": [
     "dataverse",
     "power platform",
     "dynamics 365",
     "plugin",
+    "crm",
     "decompile",
-    "ilspy"
+    "decompiler",
+    "ilspy",
+    "c#",
+    "csharp"
   ],
+  "galleryBanner": {
+    "color": "#1e1e2e",
+    "theme": "dark"
+  },
   "extensionDependencies": [
     "gdhillon.dataverse-environments"
   ],
