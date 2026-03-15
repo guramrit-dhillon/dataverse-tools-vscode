@@ -1,5 +1,17 @@
 # dataverse-metadata
 
+## 0.8.1
+
+### Patch Changes
+
+- [`33cac24`](https://github.com/guramrit-dhillon/dataverse-tools-vscode/commit/33cac2449fd2ce60c18dfc2d08633b63ba3dc6cc) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - docs: rewrite root README for broader Dataverse Tools scope
+  - docs(metadata): revise README to match current implementation
+  - docs: update acknowledgements in extension READMEs
+  - fix(docs): correct links, badges, and architecture diagram in root README
+  - docs: add feedback & community section to all READMEs
+  - docs: add extension status roadmap
+  - docs: add feature status tracking to all extensions
+
 ## 0.8.0
 
 ### Minor Changes

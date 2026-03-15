@@ -7,7 +7,7 @@
   "license": "MIT",
   "displayName": "Dataverse Tools: Decompiler",
   "description": "Browse and decompile Dataverse plugin assemblies to C# source using ILSpy — directly from the explorer tree",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "publisher": "gdhillon",
   "homepage": "https://github.com/guramrit-dhillon/dataverse-tools-vscode#readme",
   "bugs": {

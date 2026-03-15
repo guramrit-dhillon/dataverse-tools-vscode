@@ -7,7 +7,7 @@
   "license": "MIT",
   "displayName": "Dataverse Tools: Query Analyzer",
   "description": "SQL query editor for Dataverse with intellisense, results display, and query analysis via the TDS endpoint",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "publisher": "gdhillon",
   "homepage": "https://github.com/guramrit-dhillon/dataverse-tools-vscode#readme",
   "bugs": {

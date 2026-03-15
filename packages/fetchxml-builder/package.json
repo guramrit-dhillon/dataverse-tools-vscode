@@ -7,7 +7,7 @@
   "license": "MIT",
   "displayName": "Dataverse Tools: FetchXML Builder",
   "description": "Visual FetchXML query builder for Dataverse — inspect entities, build queries, execute and view results",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "publisher": "gdhillon",
   "homepage": "https://github.com/guramrit-dhillon/dataverse-tools-vscode#readme",
   "bugs": {
