@@ -11,9 +11,15 @@ textarea {
     flex-shrink: 0;
 }
 
-/* env-bar override: add bottom margin in filter panel context */
-.filter-panel .env-bar {
+/* env bar row — right-aligned, matching audit viewer pattern */
+.env-header-row {
+    display: flex;
+    justify-content: flex-end;
     margin-bottom: 8px;
+}
+
+.env-header-row .env-bar {
+    margin-bottom: 0;
 }
 
 .filter-grid {

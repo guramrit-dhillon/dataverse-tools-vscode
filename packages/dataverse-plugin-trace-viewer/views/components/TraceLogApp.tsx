@@ -274,7 +274,9 @@ export function TraceLogApp(): React.ReactElement {
       {/* ── Filter panel ── */}
       <div className="filter-panel">
         {envName && (
-          <EnvironmentBar envName={envName} onChangeEnv={handleChangeEnv} />
+          <div className="env-header-row">
+            <EnvironmentBar envName={envName} onChangeEnv={handleChangeEnv} />
+          </div>
         )}
         <div className="filter-grid">
           <FilterField label="Plugin">
