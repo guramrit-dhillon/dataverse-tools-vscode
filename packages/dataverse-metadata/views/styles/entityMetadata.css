@@ -1,0 +1,51 @@
+.entity-metadata-app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ── Breadcrumb header ── */
+.entity-breadcrumb {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 12px 4px;
+  flex-shrink: 0;
+}
+
+.entity-breadcrumb-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--vscode-foreground);
+}
+
+.entity-breadcrumb-env {
+  font-size: 11px;
+  color: var(--vscode-descriptionForeground);
+}
+
+/* ── Content area ── */
+.entity-metadata-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.entity-metadata-content .results-viewer {
+  flex: 1;
+}
+
+/* ── Progress bar ── */
+.em-progress-bar {
+  height: 2px;
+  background: var(--vscode-progressBar-background);
+  animation: em-progress 1.5s infinite linear;
+  flex-shrink: 0;
+}
+
+@keyframes em-progress {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100vw); }
+}
