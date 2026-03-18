@@ -57,6 +57,12 @@
         "title": "View Audit History",
         "category": "Dataverse Tools: Audit Viewer",
         "icon": "$(history)"
+      },
+      {
+        "command": "dataverse-tools.auditViewer.manageEntityAuditing",
+        "title": "Manage Entity Auditing…",
+        "category": "Dataverse Tools: Audit Viewer",
+        "icon": "$(checklist)"
       }
     ],
     "menus": {

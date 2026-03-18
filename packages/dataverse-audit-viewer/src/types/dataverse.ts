@@ -42,6 +42,26 @@ export interface AuditFilter {
 export interface OrgAuditStatus {
   orgId: string;
   isEnabled: boolean;
+  isUserAccessAuditEnabled: boolean;
+}
+
+export interface EntityWithAuditStatus {
+  metadataId: string;
+  logicalName: string;
+  displayName: string;
+  isAuditEnabled: boolean;
+}
+
+export interface AttributeWithAuditStatus {
+  metadataId: string;
+  logicalName: string;
+  displayName: string;
+  attributeType: string;
+  /** The concrete OData type (e.g. Microsoft.Dynamics.CRM.StringAttributeMetadata) — required for PATCH. */
+  odataType: string;
+  isAuditEnabled: boolean;
+  /** False for system-managed attributes that cannot have their audit setting changed. */
+  canBeChanged: boolean;
 }
 
 export interface EntityAuditStatus {

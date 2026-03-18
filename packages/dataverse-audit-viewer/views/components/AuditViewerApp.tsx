@@ -37,6 +37,8 @@ interface AuditStatusState {
   orgId: string | null;
   orgAuditEnabled: boolean | null;
   orgAuditLoading: boolean;
+  userAccessAuditEnabled: boolean | null;
+  userAccessAuditLoading: boolean;
   entityMetadataId: string | null;
   entityAuditEnabled: boolean | null;
   entityAuditLoading: boolean;
@@ -67,6 +69,8 @@ const initialAuditStatus: AuditStatusState = {
   orgId: null,
   orgAuditEnabled: null,
   orgAuditLoading: false,
+  userAccessAuditEnabled: null,
+  userAccessAuditLoading: false,
   entityMetadataId: null,
   entityAuditEnabled: null,
   entityAuditLoading: false,
@@ -111,6 +115,9 @@ type Action =
   | { type: "clear" }
   | { type: "changeEnvironment"; meta: { toExtension: true } }
   | { type: "changeEnvironment:response"; payload: { envName: string } }
+  | { type: "manageEntityAuditing"; meta: { toExtension: true } }
+  | { type: "manageEntityAuditing:response"; payload: { enabled: number; disabled: number } | null }
+  | { type: "manageEntityAuditing:error"; payload: string }
   // Org audit status
   | { type: "getOrgAuditStatus"; meta: { toExtension: true } }
   | { type: "getOrgAuditStatus:response"; payload: { orgId: string; isEnabled: boolean } }
@@ -118,6 +125,10 @@ type Action =
   | { type: "setOrgAuditStatus"; payload: { orgId: string; isEnabled: boolean }; meta: { toExtension: true } }
   | { type: "setOrgAuditStatus:response"; payload: { isEnabled: boolean } }
   | { type: "setOrgAuditStatus:error"; payload: string }
+  // User access audit status
+  | { type: "setUserAccessAuditStatus"; payload: { orgId: string; isEnabled: boolean }; meta: { toExtension: true } }
+  | { type: "setUserAccessAuditStatus:response"; payload: { isEnabled: boolean } }
+  | { type: "setUserAccessAuditStatus:error"; payload: string }
   // Entity audit status
   | { type: "getEntityAuditStatus"; payload: { entityLogicalName: string }; meta: { toExtension: true } }
   | { type: "getEntityAuditStatus:response"; payload: { metadataId: string; isEnabled: boolean } }
@@ -207,6 +218,13 @@ function reducer(state: State, action: Action): State {
           entityAuditEntity: null,
         },
       };
+    case "manageEntityAuditing":
+      return state;
+    case "manageEntityAuditing:response":
+      // Reset entity list so audit-status changes are reflected next time the picker opens
+      return { ...state, entities: [], entitiesLoaded: false, filteredEntities: [] };
+    case "manageEntityAuditing:error":
+      return state;
     case "changeEnvironment:response":
       return action.payload?.envName
         ? {
@@ -227,6 +245,7 @@ function reducer(state: State, action: Action): State {
           ...state.auditStatus,
           orgId: action.payload.orgId,
           orgAuditEnabled: action.payload.isEnabled,
+          userAccessAuditEnabled: (action.payload as any).isUserAccessAuditEnabled ?? state.auditStatus.userAccessAuditEnabled,
           orgAuditLoading: false,
         },
       };
@@ -241,6 +260,16 @@ function reducer(state: State, action: Action): State {
       };
     case "setOrgAuditStatus:error":
       return { ...state, auditStatus: { ...state.auditStatus, orgAuditLoading: false } };
+    // User access audit status
+    case "setUserAccessAuditStatus":
+      return { ...state, auditStatus: { ...state.auditStatus, userAccessAuditLoading: true } };
+    case "setUserAccessAuditStatus:response":
+      return {
+        ...state,
+        auditStatus: { ...state.auditStatus, userAccessAuditEnabled: action.payload.isEnabled, userAccessAuditLoading: false },
+      };
+    case "setUserAccessAuditStatus:error":
+      return { ...state, auditStatus: { ...state.auditStatus, userAccessAuditLoading: false } };
     // Entity audit status
     case "getEntityAuditStatus":
       return {
@@ -412,6 +441,15 @@ export function AuditViewerApp(): React.ReactElement {
     });
   };
 
+  const handleToggleUserAccessAudit = (): void => {
+    if (auditStatus.orgId === null || auditStatus.userAccessAuditEnabled === null || auditStatus.userAccessAuditLoading) { return; }
+    dispatch({
+      type: "setUserAccessAuditStatus",
+      payload: { orgId: auditStatus.orgId, isEnabled: !auditStatus.userAccessAuditEnabled },
+      meta: { toExtension: true },
+    });
+  };
+
   const handleToggleEntityAudit = (): void => {
     if (!auditStatus.entityMetadataId || auditStatus.entityAuditEnabled === null || auditStatus.entityAuditLoading) { return; }
     dispatch({
@@ -446,6 +484,12 @@ export function AuditViewerApp(): React.ReactElement {
               enabled={auditStatus.orgAuditEnabled}
               loading={auditStatus.orgAuditLoading}
               onToggle={handleToggleOrgAudit}
+            />
+            <AuditStatusInline
+              label="User Access"
+              enabled={auditStatus.userAccessAuditEnabled}
+              loading={auditStatus.userAccessAuditLoading}
+              onToggle={handleToggleUserAccessAudit}
             />
             <div className="env-audit-separator" />
             <EnvironmentBar envName={envName} onChangeEnv={handleChangeEnv} />
@@ -502,6 +546,14 @@ export function AuditViewerApp(): React.ReactElement {
           </button>
           <button className="secondary" onClick={handleClear} disabled={loading}>
             Clear
+          </button>
+          <button
+            className="secondary"
+            onClick={() => dispatch({ type: "manageEntityAuditing", meta: { toExtension: true } })}
+            title="Manage entity auditing"
+            disabled={loading}
+          >
+            <Codicon name="checklist" /> Manage Auditing
           </button>
           {entityLogicalName && (
             <AuditStatusInline

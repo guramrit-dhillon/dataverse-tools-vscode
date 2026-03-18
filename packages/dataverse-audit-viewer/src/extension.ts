@@ -67,6 +67,24 @@ export function activate(context: vscode.ExtensionContext): void {
   // ── Change environment on active panel ──
   registerCommand(context, Commands.AuditViewerChangeEnvironment, () => AuditPanel.changeEnvironment());
 
+  // ── Manage entity auditing — opens the audit panel then triggers the QuickPick ──
+  registerCommand(context, Commands.AuditViewerManageEntityAuditing, (async (item?: unknown) => {
+    const envItem = item as { environment?: { id: string } } | undefined;
+    let env = envItem?.environment?.id
+      ? api.getEnvironments().find((e) => e.id === envItem.environment!.id)
+      : api.explorer.getContext()?.environment;
+    if (!env) {
+      const all = api.getEnvironments();
+      if (all.length === 1) { env = all[0]; }
+    }
+    if (!env) {
+      const result = await api.pickEnvironment();
+      if (!result) { return; }
+      env = result.environment;
+    }
+    AuditPanel.render(context.extensionUri, env, api, auditSvc);
+  }) as (...args: unknown[]) => unknown);
+
   Logger.info("Dataverse Tools: Audit Viewer extension activated.");
 }
 

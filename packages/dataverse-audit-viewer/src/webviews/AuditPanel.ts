@@ -2,11 +2,13 @@ import * as vscode from "vscode";
 import {
   type DataverseAccountApi,
   type DataverseEnvironment,
+  type WizardPage,
+  type QuickPickWizardItem,
+  runWizard,
   Logger,
   Panel,
 } from "core-dataverse";
-import type { AuditFilter } from "../types/dataverse";
-import type { OrgAuditStatus, EntityAuditStatus } from "../types/dataverse";
+import type { AuditFilter, OrgAuditStatus, EntityAuditStatus, EntityWithAuditStatus, AttributeWithAuditStatus } from "../types/dataverse";
 import type { AuditService } from "../services/AuditService";
 
 /** Options sent to the webview on init / re-activate. */
@@ -55,8 +57,10 @@ export class AuditPanel extends Panel {
       changeEnvironment: this.handleChangeEnvironment.bind(this),
       getOrgAuditStatus: this.handleGetOrgAuditStatus.bind(this),
       setOrgAuditStatus: this.handleSetOrgAuditStatus.bind(this),
+      setUserAccessAuditStatus: this.handleSetUserAccessAuditStatus.bind(this),
       getEntityAuditStatus: this.handleGetEntityAuditStatus.bind(this),
       setEntityAuditStatus: this.handleSetEntityAuditStatus.bind(this),
+      manageEntityAuditing: this.handleManageEntityAuditing.bind(this),
     });
   }
 
@@ -143,6 +147,16 @@ export class AuditPanel extends Panel {
     }
   }
 
+  private async handleSetUserAccessAuditStatus(payload: { orgId: string; isEnabled: boolean }): Promise<{ isEnabled: boolean }> {
+    try {
+      await this.auditSvc.setUserAccessAuditStatus(this.env, payload.orgId, payload.isEnabled);
+      return { isEnabled: payload.isEnabled };
+    } catch (err) {
+      Logger.error("Failed to set user access audit status", err);
+      throw new Error(err instanceof Error ? err.message : String(err));
+    }
+  }
+
   private async handleGetEntityAuditStatus(payload: { entityLogicalName: string }): Promise<EntityAuditStatus> {
     try {
       return await this.auditSvc.getEntityAuditStatus(this.env, payload.entityLogicalName);
@@ -185,6 +199,243 @@ export class AuditPanel extends Panel {
     this.setTitle(`Audit History (${newEnv.name})`);
 
     return { envName: newEnv.name };
+  }
+
+  private async handleManageEntityAuditing(): Promise<{ enabled: number; disabled: number } | null> {
+    const entities = await vscode.window.withProgress(
+      { location: vscode.ProgressLocation.Notification, title: "Loading entities…", cancellable: false },
+      () => this.auditSvc.listAllEntitiesWithAuditStatus(this.env),
+    );
+
+    // Attribute cache scoped to this wizard session (keyed by entity logical name)
+    const attrCache = new Map<string, AttributeWithAuditStatus[]>();
+
+    const initiallyEnabledSet = new Set(
+      entities.filter((e) => e.isAuditEnabled).map((e) => e.logicalName),
+    );
+
+    interface ManageAuditState {
+      entities: EntityWithAuditStatus[];
+      /** Entity selected for column drilling. */
+      selectedEntityForColumns: EntityWithAuditStatus | null;
+      /** Saved entity-page checkbox selections — preserved when drilling into columns. */
+      entityPageSelections: string[] | null;
+      /** Column changes accumulated per entity (not yet saved). Applied on entity-page confirm. */
+      pendingColumnChanges: Record<string, Array<{ attribute: AttributeWithAuditStatus; isEnabled: boolean }>>;
+      entityEnabled: number;
+      entityDisabled: number;
+    }
+
+    const columnsButton = { iconPath: "list-flat", tooltip: "Manage column auditing" };
+
+    const pages: WizardPage<ManageAuditState>[] = [
+      {
+        id: "entityPage",
+        type: "quickpick",
+        title: "Manage Entity Auditing",
+        render: (state): import("core-dataverse").QuickPickConfig => {
+          const enabledEntities = state.entities.filter((e) => e.isAuditEnabled);
+          const disabledEntities = state.entities.filter((e) => !e.isAuditEnabled);
+
+          const makeEntityItem = (e: EntityWithAuditStatus): QuickPickWizardItem => {
+            const pending = state.pendingColumnChanges[e.logicalName];
+            return {
+              label: e.displayName,
+              description: pending?.length
+                ? `${e.logicalName} · ${pending.length} column change(s) pending`
+                : e.logicalName,
+              action: e.logicalName,
+              data: e,
+              buttons: [columnsButton],
+            };
+          };
+
+          const items: QuickPickWizardItem[] = [
+            { label: "Auditing Enabled", action: "__sep_enabled", kind: -1 },
+            ...enabledEntities.map(makeEntityItem),
+            { label: "Auditing Disabled", action: "__sep_disabled", kind: -1 },
+            ...disabledEntities.map(makeEntityItem),
+          ];
+
+          // Restore selections saved before drilling, otherwise default to currently enabled
+          const selectedActions = state.entityPageSelections
+            ?? entities.filter((e) => e.isAuditEnabled).map((e) => e.logicalName);
+
+          return {
+            placeholder: "Check to enable/disable · $(list-flat) to manage columns · Enter to save all",
+            canPickMany: true,
+            selectedActions,
+            items,
+          };
+        },
+        onSelect: () => ({ next: undefined }),
+        onItemButton: (_btn, _idx, _action, item, state, currentSelectedItems) => ({
+          next: "columnPage",
+          update: {
+            selectedEntityForColumns: item.data as EntityWithAuditStatus,
+            // Save the user's current checkbox state so it survives the round-trip
+            entityPageSelections: currentSelectedItems
+              .filter((i) => i.action !== "__sep_enabled" && i.action !== "__sep_disabled")
+              .map((i) => i.action),
+          },
+        }),
+        onMultiSelect: async (selectedItems, state, ui) => {
+          const selectedLogicalNames = new Set(
+            selectedItems
+              .filter((i) => i.action !== "__sep_enabled" && i.action !== "__sep_disabled")
+              .map((i) => i.action),
+          );
+
+          const toEnable = state.entities.filter(
+            (e) => !initiallyEnabledSet.has(e.logicalName) && selectedLogicalNames.has(e.logicalName),
+          );
+          const toDisable = state.entities.filter(
+            (e) => initiallyEnabledSet.has(e.logicalName) && !selectedLogicalNames.has(e.logicalName),
+          );
+          const columnChangeEntries = Object.entries(state.pendingColumnChanges).filter(([, c]) => c.length > 0);
+
+          if (toEnable.length === 0 && toDisable.length === 0 && columnChangeEntries.length === 0) {
+            return { next: undefined };
+          }
+
+          ui.setBusy("Saving changes…");
+
+          const errors: string[] = [];
+
+          for (const e of toEnable) {
+            try {
+              await this.auditSvc.setEntityAuditStatus(this.env, e.metadataId, e.logicalName, true);
+            } catch (err) {
+              errors.push(`Enable ${e.displayName}: ${err instanceof Error ? err.message : String(err)}`);
+            }
+          }
+          for (const e of toDisable) {
+            try {
+              await this.auditSvc.setEntityAuditStatus(this.env, e.metadataId, e.logicalName, false);
+            } catch (err) {
+              errors.push(`Disable ${e.displayName}: ${err instanceof Error ? err.message : String(err)}`);
+            }
+          }
+          for (const [entityLogicalName, changes] of columnChangeEntries) {
+            const entity = state.entities.find((e) => e.logicalName === entityLogicalName);
+            if (!entity) { continue; }
+            const { errors: colErrors } = await this.auditSvc.setAttributesAuditStatus(
+              this.env, entity.metadataId, entityLogicalName, changes,
+            );
+            errors.push(...colErrors.map((e) => `Columns (${entityLogicalName}): ${e}`));
+          }
+
+          if (errors.length > 0) {
+            vscode.window.showErrorMessage(`Some changes failed:\n${errors.join("\n")}`);
+          } else {
+            const entityCount = toEnable.length + toDisable.length;
+            const colBatches = columnChangeEntries.length;
+            const parts: string[] = [];
+            if (entityCount > 0) { parts.push(`${entityCount} entity change(s)`); }
+            if (colBatches > 0) { parts.push(`column changes for ${colBatches} entity/entities`); }
+            vscode.window.showInformationMessage(`Auditing updated: ${parts.join(", ")}.`);
+          }
+
+          return {
+            next: undefined,
+            update: { entityEnabled: toEnable.length, entityDisabled: toDisable.length },
+          };
+        },
+      },
+      {
+        id: "columnPage",
+        type: "quickpick",
+        title: "Column Auditing",
+        ephemeral: true,
+        loading: { placeholder: "Loading columns…" },
+        render: async (state): Promise<import("core-dataverse").QuickPickConfig> => {
+          const entity = state.selectedEntityForColumns!;
+
+          let attributes = attrCache.get(entity.logicalName);
+          if (!attributes) {
+            attributes = await this.auditSvc.listAttributesWithAuditStatus(this.env, entity.logicalName);
+            attrCache.set(entity.logicalName, attributes);
+          }
+
+          const enabledAttrs = attributes.filter((a) => a.isAuditEnabled);
+          const disabledAttrs = attributes.filter((a) => !a.isAuditEnabled);
+
+          // Reflect previously saved pending selections for this entity
+          const pending = state.pendingColumnChanges[entity.logicalName] ?? [];
+          const pendingMap = new Map(pending.map((c) => [c.attribute.logicalName, c.isEnabled]));
+
+          const makeAttrItem = (a: AttributeWithAuditStatus, defaultEnabled: boolean): QuickPickWizardItem => ({
+            label: a.displayName,
+            description: `${a.logicalName} · ${a.attributeType}`,
+            action: a.logicalName,
+            data: a,
+          });
+
+          const items: QuickPickWizardItem[] = [
+            { label: "Auditing Enabled", action: "__sep_enabled", kind: -1 },
+            ...enabledAttrs.map((a) => makeAttrItem(a, true)),
+            { label: "Auditing Disabled", action: "__sep_disabled", kind: -1 },
+            ...disabledAttrs.map((a) => makeAttrItem(a, false)),
+          ];
+
+          // Build selectedActions: start from currently-enabled, apply pending overrides
+          const selectedSet = new Set(enabledAttrs.map((a) => a.logicalName));
+          for (const [logicalName, isEnabled] of pendingMap) {
+            if (isEnabled) { selectedSet.add(logicalName); } else { selectedSet.delete(logicalName); }
+          }
+
+          return {
+            placeholder: `${entity.displayName} — check to enable, uncheck to disable · Enter to stage · Esc to go back`,
+            canPickMany: true,
+            selectedActions: [...selectedSet],
+            items,
+          };
+        },
+        onSelect: () => ({ next: "entityPage" }),
+        onMultiSelect: (selectedItems, state) => {
+          const entity = state.selectedEntityForColumns!;
+          const attributes = attrCache.get(entity.logicalName) ?? [];
+          const originallyEnabledSet = new Set(attributes.filter((a) => a.isAuditEnabled).map((a) => a.logicalName));
+          const selectedLogicalNames = new Set(
+            selectedItems
+              .filter((i) => i.action !== "__sep_enabled" && i.action !== "__sep_disabled")
+              .map((i) => i.action),
+          );
+
+          const changes = attributes
+            .filter((a) => selectedLogicalNames.has(a.logicalName) !== originallyEnabledSet.has(a.logicalName))
+            .map((a) => ({ attribute: a, isEnabled: selectedLogicalNames.has(a.logicalName) }));
+
+          return {
+            next: "entityPage",
+            pop: true,
+            update: {
+              entityPageSelections: null, // clear saved selections — entity page will re-default on next render
+              pendingColumnChanges: {
+                ...state.pendingColumnChanges,
+                [entity.logicalName]: changes,
+              },
+            },
+          };
+        },
+      },
+    ];
+
+    const result = await runWizard<ManageAuditState>({
+      title: `Manage Auditing — ${this.env.name}`,
+      pages,
+      startPage: "entityPage",
+      initialState: {
+        entities,
+        selectedEntityForColumns: null,
+        entityPageSelections: null,
+        pendingColumnChanges: {},
+        entityEnabled: 0,
+        entityDisabled: 0,
+      },
+    });
+
+    return result ? { enabled: result.entityEnabled, disabled: result.entityDisabled } : null;
   }
 
   protected override dispose(): void {

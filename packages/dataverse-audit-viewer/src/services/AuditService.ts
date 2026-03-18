@@ -3,7 +3,7 @@ import {
   type DataverseEnvironment,
   type ODataCollection,
 } from "core-dataverse";
-import type { AuditChangeDetail, AuditAttributeChange, AuditFilter, OrgAuditStatus, EntityAuditStatus } from "../types/dataverse";
+import type { AuditChangeDetail, AuditAttributeChange, AuditFilter, OrgAuditStatus, EntityAuditStatus, EntityWithAuditStatus, AttributeWithAuditStatus } from "../types/dataverse";
 
 interface EntityMetadata {
   LogicalName: string;
@@ -115,16 +115,54 @@ export class AuditService {
 
   /** Returns the organization's audit enablement status and its record ID. */
   async getOrgAuditStatus(env: DataverseEnvironment): Promise<OrgAuditStatus> {
-    const data = await this.client(env).get<ODataCollection<{ organizationid: string; isauditenabled: boolean }>>(
-      "organizations?$select=organizationid,isauditenabled"
+    const data = await this.client(env).get<ODataCollection<{ organizationid: string; isauditenabled: boolean; isuseraccessauditenabled: boolean }>>(
+      "organizations?$select=organizationid,isauditenabled,isuseraccessauditenabled"
     );
     const org = data.value[0];
-    return { orgId: org.organizationid, isEnabled: org.isauditenabled };
+    return { orgId: org.organizationid, isEnabled: org.isauditenabled, isUserAccessAuditEnabled: org.isuseraccessauditenabled };
   }
 
   /** Enables or disables auditing at the organization level. */
   async setOrgAuditStatus(env: DataverseEnvironment, orgId: string, isEnabled: boolean): Promise<void> {
     await this.client(env).patch(`organizations(${orgId})`, { isauditenabled: isEnabled });
+  }
+
+  /** Enables or disables user access auditing at the organization level. */
+  async setUserAccessAuditStatus(env: DataverseEnvironment, orgId: string, isEnabled: boolean): Promise<void> {
+    await this.client(env).patch(`organizations(${orgId})`, { isuseraccessauditenabled: isEnabled });
+  }
+
+  /**
+   * Returns all entities with their audit enablement status.
+   * Sorted by display name; includes both enabled and disabled entities.
+   *
+   * NOTE: EntityDefinitions does NOT support $orderby — we sort client-side.
+   */
+  async listAllEntitiesWithAuditStatus(env: DataverseEnvironment): Promise<EntityWithAuditStatus[]> {
+    const data = await this.client(env).get<ODataCollection<{
+      MetadataId: string;
+      LogicalName: string;
+      DisplayName: { UserLocalizedLabel?: { Label: string } };
+      EntitySetName: string;
+      IsAuditEnabled: { Value: boolean };
+    }>>(
+      "EntityDefinitions?$select=MetadataId,LogicalName,DisplayName,EntitySetName,IsAuditEnabled"
+    );
+
+    // Prime the entity-set-name cache while we have the data
+    const cache = getOrCreateCache(env.id);
+    for (const e of data.value) {
+      cache.set(e.LogicalName, e.EntitySetName);
+    }
+
+    return data.value
+      .map((e) => ({
+        metadataId: e.MetadataId,
+        logicalName: e.LogicalName,
+        displayName: e.DisplayName?.UserLocalizedLabel?.Label ?? e.LogicalName,
+        isAuditEnabled: e.IsAuditEnabled.Value,
+      }))
+      .sort((a, b) => a.displayName.localeCompare(b.displayName));
   }
 
   /** Returns the audit enablement status for a specific entity. */
@@ -157,6 +195,76 @@ export class AuditService {
     await this.client(env).post("PublishXml", {
       ParameterXml: `<importexportxml><entities><entity>${entityLogicalName}</entity></entities></importexportxml>`,
     });
+  }
+
+  /**
+   * Returns all attributes for an entity with their audit enablement status.
+   * Excludes Virtual attributes and attributes whose audit setting cannot be changed.
+   * Sorted by display name.
+   */
+  async listAttributesWithAuditStatus(
+    env: DataverseEnvironment,
+    entityLogicalName: string,
+  ): Promise<AttributeWithAuditStatus[]> {
+    const data = await this.client(env).get<ODataCollection<RawAttributeMetadata>>(
+      `EntityDefinitions(LogicalName='${entityLogicalName}')/Attributes` +
+      `?$select=MetadataId,LogicalName,DisplayName,AttributeType,IsAuditEnabled` +
+      `&$filter=AttributeType ne 'Virtual' and AttributeType ne 'EntityName'`
+    );
+
+    return data.value
+      .map((a) => ({
+        metadataId: a.MetadataId,
+        logicalName: a.LogicalName,
+        displayName: a.DisplayName?.UserLocalizedLabel?.Label ?? a.LogicalName,
+        attributeType: a.AttributeType,
+        odataType: a["@odata.type"] ?? "Microsoft.Dynamics.CRM.AttributeMetadata",
+        isAuditEnabled: a.IsAuditEnabled.Value,
+        canBeChanged: a.IsAuditEnabled.CanBeChanged,
+      }))
+      .filter((a) => a.canBeChanged)
+      .sort((a, b) => a.displayName.localeCompare(b.displayName));
+  }
+
+  /**
+   * Applies audit status changes to a batch of attributes for one entity,
+   * then publishes once at the end.
+   */
+  async setAttributesAuditStatus(
+    env: DataverseEnvironment,
+    entityMetadataId: string,
+    entityLogicalName: string,
+    changes: Array<{ attribute: AttributeWithAuditStatus; isEnabled: boolean }>,
+  ): Promise<{ errors: string[] }> {
+    const errors: string[] = [];
+
+    for (const { attribute, isEnabled } of changes) {
+      try {
+        await this.client(env).patch(
+          `EntityDefinitions(${entityMetadataId})/Attributes(${attribute.metadataId})`,
+          {
+            "@odata.type": attribute.odataType,
+            IsAuditEnabled: { Value: isEnabled, CanBeChanged: true, ManagedPropertyLogicalName: "canmodifyauditsettings" },
+          },
+          { "MSCRM.MergeLabels": "true" },
+        );
+      } catch (err) {
+        errors.push(`${attribute.displayName}: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    }
+
+    // Publish once for the whole entity
+    if (errors.length < changes.length) {
+      try {
+        await this.client(env).post("PublishXml", {
+          ParameterXml: `<importexportxml><entities><entity>${entityLogicalName}</entity></entities></importexportxml>`,
+        });
+      } catch (err) {
+        errors.push(`Publish: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    }
+
+    return { errors };
   }
 
   // ── Internals ─────────────────────────────────────────────────────────────
@@ -233,7 +341,17 @@ export class AuditService {
   }
 }
 
-// ── Raw API types ─────────────────────────────────────────────────────────
+// ── Raw API types ──────────────────────────────────────────────────────────
+
+interface RawAttributeMetadata {
+  "@odata.type": string;
+  MetadataId: string;
+  LogicalName: string;
+  DisplayName: { UserLocalizedLabel?: { Label: string } };
+  AttributeType: string;
+  IsAuditEnabled: { Value: boolean; CanBeChanged: boolean };
+}
+
 
 interface RawAuditRecord {
   auditid: string;
