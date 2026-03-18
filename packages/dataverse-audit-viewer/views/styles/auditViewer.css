@@ -7,7 +7,7 @@
     flex-shrink: 0;
 }
 
-.filter-panel .env-bar {
+.filter-panel > .env-bar {
     margin-bottom: 8px;
 }
 
@@ -29,6 +29,82 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
+}
+
+/* ── Env bar + org audit on same row ──────────────────────────────────── */
+.env-audit-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.env-audit-row .env-bar {
+    margin-bottom: 0;
+}
+
+.env-audit-separator {
+    width: 1px;
+    height: 16px;
+    background: var(--vscode-panel-border);
+    flex-shrink: 0;
+}
+
+/* ── Inline audit status (used in env row and filter-actions row) ─────── */
+.audit-inline {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--vscode-descriptionForeground);
+    white-space: nowrap;
+}
+
+.audit-inline-label {
+    opacity: 0.85;
+}
+
+.audit-inline-checking {
+    opacity: 0.6;
+    font-style: italic;
+}
+
+.audit-inline-unknown {
+    opacity: 0.35;
+}
+
+.audit-dot {
+    font-size: 8px;
+}
+
+.audit-dot.dot-on {
+    color: var(--vscode-testing-iconPassed, #3fb950);
+}
+
+.audit-dot.dot-off {
+    color: var(--vscode-testing-iconFailed, #f85149);
+}
+
+.audit-inline-value {
+    color: var(--vscode-foreground);
+}
+
+.audit-inline-btn {
+    padding: 0;
+    height: auto;
+    font-size: 11px;
+    background: none;
+    border: none;
+    color: var(--vscode-textLink-foreground);
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.audit-inline-btn:hover {
+    color: var(--vscode-textLink-activeForeground);
+    text-decoration: underline;
 }
 
 /* ── Input overrides ──────────────────────────────────────────────────── */

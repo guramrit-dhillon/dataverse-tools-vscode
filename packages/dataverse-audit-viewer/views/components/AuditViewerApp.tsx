@@ -33,6 +33,16 @@ interface AuditChange {
   newValue: string | null;
 }
 
+interface AuditStatusState {
+  orgId: string | null;
+  orgAuditEnabled: boolean | null;
+  orgAuditLoading: boolean;
+  entityMetadataId: string | null;
+  entityAuditEnabled: boolean | null;
+  entityAuditLoading: boolean;
+  entityAuditEntity: string | null; // which entity the status was loaded for
+}
+
 interface State {
   envName: string;
   entityLogicalName: string;
@@ -50,7 +60,18 @@ interface State {
   detailLoading: boolean;
   error: string | null;
   durationMs: number | null;
+  auditStatus: AuditStatusState;
 }
+
+const initialAuditStatus: AuditStatusState = {
+  orgId: null,
+  orgAuditEnabled: null,
+  orgAuditLoading: false,
+  entityMetadataId: null,
+  entityAuditEnabled: null,
+  entityAuditLoading: false,
+  entityAuditEntity: null,
+};
 
 const initialState: State = {
   envName: "",
@@ -69,6 +90,7 @@ const initialState: State = {
   detailLoading: false,
   error: null,
   durationMs: null,
+  auditStatus: initialAuditStatus,
 };
 
 type Action =
@@ -79,7 +101,7 @@ type Action =
   | { type: "entitySearch:response"; payload: EntityOption[] }
   | { type: "entitySearch:error"; payload: string }
   | { type: "filterEntities"; payload: string }
-  | { type: "retrieve"; payload: { entityLogicalName: string; recordId: string; maxCount: number }; meta: { toExtension: true } }
+  | { type: "retrieve"; payload: { entityLogicalName?: string; recordId?: string; maxCount: number }; meta: { toExtension: true } }
   | { type: "retrieve:response"; payload: AuditRow[] }
   | { type: "retrieve:error"; payload: string }
   | { type: "setSelected"; payload: AuditRow | null }
@@ -88,7 +110,21 @@ type Action =
   | { type: "getDetails:error"; payload: string }
   | { type: "clear" }
   | { type: "changeEnvironment"; meta: { toExtension: true } }
-  | { type: "changeEnvironment:response"; payload: { envName: string } };
+  | { type: "changeEnvironment:response"; payload: { envName: string } }
+  // Org audit status
+  | { type: "getOrgAuditStatus"; meta: { toExtension: true } }
+  | { type: "getOrgAuditStatus:response"; payload: { orgId: string; isEnabled: boolean } }
+  | { type: "getOrgAuditStatus:error"; payload: string }
+  | { type: "setOrgAuditStatus"; payload: { orgId: string; isEnabled: boolean }; meta: { toExtension: true } }
+  | { type: "setOrgAuditStatus:response"; payload: { isEnabled: boolean } }
+  | { type: "setOrgAuditStatus:error"; payload: string }
+  // Entity audit status
+  | { type: "getEntityAuditStatus"; payload: { entityLogicalName: string }; meta: { toExtension: true } }
+  | { type: "getEntityAuditStatus:response"; payload: { metadataId: string; isEnabled: boolean } }
+  | { type: "getEntityAuditStatus:error"; payload: string }
+  | { type: "setEntityAuditStatus"; payload: { metadataId: string; entityLogicalName: string; isEnabled: boolean }; meta: { toExtension: true } }
+  | { type: "setEntityAuditStatus:response"; payload: { isEnabled: boolean } }
+  | { type: "setEntityAuditStatus:error"; payload: string };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -119,6 +155,7 @@ function reducer(state: State, action: Action): State {
         ...state,
         envName: envName ?? state.envName,
         entityLogicalName: entityLogicalName ?? state.entityLogicalName,
+        auditStatus: initialAuditStatus,
       };
     }
     case "setFilter":
@@ -162,13 +199,116 @@ function reducer(state: State, action: Action): State {
         recordId: "",
         maxCount: 50,
         durationMs: null,
+        auditStatus: {
+          ...state.auditStatus,
+          entityMetadataId: null,
+          entityAuditEnabled: null,
+          entityAuditLoading: false,
+          entityAuditEntity: null,
+        },
       };
     case "changeEnvironment:response":
       return action.payload?.envName
-        ? { ...state, envName: action.payload.envName, entities: [], entitiesLoaded: false }
+        ? {
+          ...state,
+          envName: action.payload.envName,
+          entities: [],
+          entitiesLoaded: false,
+          auditStatus: initialAuditStatus,
+        }
         : state;
+    // Org audit status
+    case "getOrgAuditStatus":
+      return { ...state, auditStatus: { ...state.auditStatus, orgAuditLoading: true } };
+    case "getOrgAuditStatus:response":
+      return {
+        ...state,
+        auditStatus: {
+          ...state.auditStatus,
+          orgId: action.payload.orgId,
+          orgAuditEnabled: action.payload.isEnabled,
+          orgAuditLoading: false,
+        },
+      };
+    case "getOrgAuditStatus:error":
+      return { ...state, auditStatus: { ...state.auditStatus, orgAuditLoading: false } };
+    case "setOrgAuditStatus":
+      return { ...state, auditStatus: { ...state.auditStatus, orgAuditLoading: true } };
+    case "setOrgAuditStatus:response":
+      return {
+        ...state,
+        auditStatus: { ...state.auditStatus, orgAuditEnabled: action.payload.isEnabled, orgAuditLoading: false },
+      };
+    case "setOrgAuditStatus:error":
+      return { ...state, auditStatus: { ...state.auditStatus, orgAuditLoading: false } };
+    // Entity audit status
+    case "getEntityAuditStatus":
+      return {
+        ...state,
+        auditStatus: {
+          ...state.auditStatus,
+          entityAuditLoading: true,
+          entityAuditEnabled: null,
+          entityMetadataId: null,
+          entityAuditEntity: action.payload.entityLogicalName,
+        },
+      };
+    case "getEntityAuditStatus:response":
+      return {
+        ...state,
+        auditStatus: {
+          ...state.auditStatus,
+          entityMetadataId: action.payload.metadataId,
+          entityAuditEnabled: action.payload.isEnabled,
+          entityAuditLoading: false,
+        },
+      };
+    case "getEntityAuditStatus:error":
+      return { ...state, auditStatus: { ...state.auditStatus, entityAuditLoading: false } };
+    case "setEntityAuditStatus":
+      return { ...state, auditStatus: { ...state.auditStatus, entityAuditLoading: true } };
+    case "setEntityAuditStatus:response":
+      return {
+        ...state,
+        auditStatus: { ...state.auditStatus, entityAuditEnabled: action.payload.isEnabled, entityAuditLoading: false },
+      };
+    case "setEntityAuditStatus:error":
+      return { ...state, auditStatus: { ...state.auditStatus, entityAuditLoading: false } };
   }
   return state;
+}
+
+// ── AuditStatusInline component ───────────────────────────────────────────────
+
+interface AuditStatusInlineProps {
+  label: string;
+  enabled: boolean | null;
+  loading: boolean;
+  onToggle: () => void;
+}
+
+function AuditStatusInline({ label, enabled, loading, onToggle }: AuditStatusInlineProps): React.ReactElement {
+  return (
+    <div className="audit-inline">
+      <span className="audit-inline-label">{label}</span>
+      {loading ? (
+        <>
+          <Codicon name="loading~spin" />
+          <span className="audit-inline-checking">Checking…</span>
+        </>
+      ) : enabled === null ? (
+        <span className="audit-inline-unknown">—</span>
+      ) : (
+        <>
+          <Codicon name="circle-filled" className={`audit-dot ${enabled ? "dot-on" : "dot-off"}`} />
+          <span className="audit-inline-value">{enabled ? "on" : "off"}</span>
+          <button className="audit-inline-btn" onClick={onToggle}>
+            {enabled ? "Disable" : "Enable"}
+          </button>
+        </>
+      )}
+    </div>
+  );
 }
 
 // ── Root component ────────────────────────────────────────────────────────────
@@ -180,15 +320,15 @@ export function AuditViewerApp(): React.ReactElement {
     filteredEntities, entitiesLoaded,
     auditRecords, loading, retrieved, error, selected,
     detailChanges, detailLoading, durationMs,
+    auditStatus,
   } = state;
   const adapter = useAuditAdapter();
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const retrieve = useCallback(() => {
-    if (!entityLogicalName || !recordId) { return; }
     dispatch({
       type: "retrieve",
-      payload: { entityLogicalName, recordId, maxCount },
+      payload: { entityLogicalName: entityLogicalName || undefined, recordId: recordId || undefined, maxCount },
       meta: { toExtension: true },
     });
   }, [entityLogicalName, recordId, maxCount]);
@@ -196,6 +336,33 @@ export function AuditViewerApp(): React.ReactElement {
   useEffect(() => {
     dispatch({ type: "ready", meta: { toExtension: true } });
   }, []);
+
+  // Load org audit status on ready
+  useEffect(() => {
+    dispatch({ type: "getOrgAuditStatus", meta: { toExtension: true } });
+  }, []);
+
+  // When environment changes, reload org audit status
+  useEffect(() => {
+    if (envName) {
+      dispatch({ type: "getOrgAuditStatus", meta: { toExtension: true } });
+    }
+  }, [envName]);
+
+  // When entity changes, load entity audit status
+  useEffect(() => {
+    if (entityLogicalName && entityLogicalName !== auditStatus.entityAuditEntity) {
+      dispatch({
+        type: "getEntityAuditStatus",
+        payload: { entityLogicalName },
+        meta: { toExtension: true },
+      });
+    }
+    if (!entityLogicalName) {
+      // Clear entity status when entity is cleared
+      dispatch({ type: "setFilter", payload: {} });
+    }
+  }, [entityLogicalName]);
 
   // When a row is selected, fetch its details from the extension
   useEffect(() => {
@@ -236,7 +403,27 @@ export function AuditViewerApp(): React.ReactElement {
     });
   };
 
-  const canRetrieve = entityLogicalName.length > 0 && recordId.length > 0;
+  const handleToggleOrgAudit = (): void => {
+    if (auditStatus.orgId === null || auditStatus.orgAuditEnabled === null || auditStatus.orgAuditLoading) { return; }
+    dispatch({
+      type: "setOrgAuditStatus",
+      payload: { orgId: auditStatus.orgId, isEnabled: !auditStatus.orgAuditEnabled },
+      meta: { toExtension: true },
+    });
+  };
+
+  const handleToggleEntityAudit = (): void => {
+    if (!auditStatus.entityMetadataId || auditStatus.entityAuditEnabled === null || auditStatus.entityAuditLoading) { return; }
+    dispatch({
+      type: "setEntityAuditStatus",
+      payload: {
+        metadataId: auditStatus.entityMetadataId,
+        entityLogicalName,
+        isEnabled: !auditStatus.entityAuditEnabled,
+      },
+      meta: { toExtension: true },
+    });
+  };
 
   const rowCount = retrieved && !loading ? auditRecords.length : null;
   const statusMessages: string[] = [];
@@ -245,15 +432,24 @@ export function AuditViewerApp(): React.ReactElement {
   }
 
   const emptyMessage = !retrieved && !loading
-    ? "Select an entity, enter a record ID, and click Retrieve"
-    : "No audit records found for this record";
+    ? "Set filters and click Retrieve, or click Retrieve to load all recent audit records"
+    : "No audit records found";
 
   return (
     <div className="app" onKeyDown={handleKeyDown}>
       {/* ── Filter panel ── */}
       <div className="filter-panel">
         {envName && (
-          <EnvironmentBar envName={envName} onChangeEnv={handleChangeEnv} />
+          <div className="env-audit-row">
+            <AuditStatusInline
+              label="Auditing"
+              enabled={auditStatus.orgAuditEnabled}
+              loading={auditStatus.orgAuditLoading}
+              onToggle={handleToggleOrgAudit}
+            />
+            <div className="env-audit-separator" />
+            <EnvironmentBar envName={envName} onChangeEnv={handleChangeEnv} />
+          </div>
         )}
         <div className="filter-grid">
           <FilterField label="Entity">
@@ -271,7 +467,7 @@ export function AuditViewerApp(): React.ReactElement {
                 type: "setFilter",
                 payload: { entityLogicalName: opt?.key ?? "" },
               })}
-              placeholder="Search auditable entities\u2026"
+              placeholder="Search entities…"
               clearOnBlur={false}
               debounceMs={0}
             />
@@ -281,7 +477,7 @@ export function AuditViewerApp(): React.ReactElement {
               type="text"
               className="record-id-input"
               value={recordId}
-              placeholder="Enter record GUID"
+              placeholder="Enter record GUID (optional)"
               onChange={(e) => dispatch({ type: "setFilter", payload: { recordId: e.target.value.trim() } })}
             />
           </FilterField>
@@ -300,13 +496,21 @@ export function AuditViewerApp(): React.ReactElement {
           </FilterField>
         </div>
         <div className="filter-actions">
-          <button className="primary" onClick={retrieve} disabled={loading || !canRetrieve}>
+          <button className="primary" onClick={retrieve} disabled={loading}>
             <Codicon name={loading ? "loading~spin" : "search"} />
             {loading ? " Loading\u2026" : " Retrieve"}
           </button>
           <button className="secondary" onClick={handleClear} disabled={loading}>
             Clear
           </button>
+          {entityLogicalName && (
+            <AuditStatusInline
+              label="Entity auditing"
+              enabled={auditStatus.entityAuditEnabled}
+              loading={auditStatus.entityAuditLoading}
+              onToggle={handleToggleEntityAudit}
+            />
+          )}
         </div>
       </div>
 

@@ -70,7 +70,7 @@ export function AuditDiffView({ record, changes, detailLoading, onClose, onCopy,
       {detailLoading && (
         <div className="diff-loading">
           <Codicon name="loading~spin" />
-          <span>Loading change details\u2026</span>
+          <span>Loading change details…</span>
         </div>
       )}
 
