@@ -7,7 +7,7 @@
   "license": "MIT",
   "displayName": "Dataverse Tools: Assemblies",
   "description": "Deploy, register, and manage Dataverse plugin assemblies, step registrations, and images from VS Code",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "publisher": "gdhillon",
   "homepage": "https://github.com/guramrit-dhillon/dataverse-tools-vscode#readme",
   "bugs": {

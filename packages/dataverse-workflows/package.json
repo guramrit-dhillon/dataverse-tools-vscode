@@ -2,7 +2,7 @@
   "name": "dataverse-workflows",
   "displayName": "Dataverse Tools: Workflows",
   "description": "Browse, activate, deactivate, and manage Dataverse workflows, custom actions, and business process flows from VS Code",
-  "version": "0.8.2",
+  "version": "0.9.0",
   "publisher": "gdhillon",
   "license": "MIT",
   "homepage": "https://github.com/guramrit-dhillon/dataverse-tools-vscode#readme",

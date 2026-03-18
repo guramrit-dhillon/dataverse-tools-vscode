@@ -1,5 +1,14 @@
 # dataverse-query-analyzer
 
+## 0.9.0
+
+### Minor Changes
+
+- [`42fad4d`](https://github.com/guramrit-dhillon/dataverse-tools-vscode/commit/42fad4d3317ae201b50ff29bedb237570aac047f) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - feat(trace-viewer): right-align environment bar for consistency
+  - feat(audit-viewer): inline audit status indicators and toggles
+  - feat(audit-viewer): add org and entity audit enablement management
+  - fix(shared-views): handle ~spin modifier in Codicon component
+
 ## 0.8.2
 
 ### Patch Changes
