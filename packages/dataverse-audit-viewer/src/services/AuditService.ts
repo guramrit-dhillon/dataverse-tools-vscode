@@ -3,7 +3,7 @@ import {
   type DataverseEnvironment,
   type ODataCollection,
 } from "core-dataverse";
-import type { AuditChangeDetail, AuditAttributeChange, AuditFilter } from "../types/dataverse";
+import type { AuditChangeDetail, AuditAttributeChange, AuditFilter, OrgAuditStatus, EntityAuditStatus } from "../types/dataverse";
 
 interface EntityMetadata {
   LogicalName: string;
@@ -66,7 +66,9 @@ export class AuditService {
     const maxCount = Math.min(filter.maxCount ?? 50, 500);
 
     const clauses: string[] = [];
-    clauses.push(`_objectid_value eq '${filter.recordId}'`);
+    if (filter.recordId) {
+      clauses.push(`_objectid_value eq '${filter.recordId}'`);
+    }
     if (filter.entityLogicalName) {
       clauses.push(`objecttypecode eq '${filter.entityLogicalName}'`);
     }
@@ -109,6 +111,52 @@ export class AuditService {
     if (!detail) { return []; }
 
     return this.parseAttributeAuditDetail(detail);
+  }
+
+  /** Returns the organization's audit enablement status and its record ID. */
+  async getOrgAuditStatus(env: DataverseEnvironment): Promise<OrgAuditStatus> {
+    const data = await this.client(env).get<ODataCollection<{ organizationid: string; isauditenabled: boolean }>>(
+      "organizations?$select=organizationid,isauditenabled"
+    );
+    const org = data.value[0];
+    return { orgId: org.organizationid, isEnabled: org.isauditenabled };
+  }
+
+  /** Enables or disables auditing at the organization level. */
+  async setOrgAuditStatus(env: DataverseEnvironment, orgId: string, isEnabled: boolean): Promise<void> {
+    await this.client(env).patch(`organizations(${orgId})`, { isauditenabled: isEnabled });
+  }
+
+  /** Returns the audit enablement status for a specific entity. */
+  async getEntityAuditStatus(env: DataverseEnvironment, entityLogicalName: string): Promise<EntityAuditStatus> {
+    const data = await this.client(env).get<{ MetadataId: string; IsAuditEnabled: { Value: boolean } }>(
+      `EntityDefinitions(LogicalName='${entityLogicalName}')?$select=MetadataId,IsAuditEnabled`
+    );
+    return { metadataId: data.MetadataId, isEnabled: data.IsAuditEnabled.Value };
+  }
+
+  /**
+   * Enables or disables auditing for a specific entity, then publishes the change.
+   * Uses MSCRM.MergeLabels to avoid resetting display name labels.
+   */
+  async setEntityAuditStatus(
+    env: DataverseEnvironment,
+    metadataId: string,
+    entityLogicalName: string,
+    isEnabled: boolean,
+  ): Promise<void> {
+    await this.client(env).patch(
+      `EntityDefinitions(${metadataId})`,
+      {
+        "@odata.type": "Microsoft.Dynamics.CRM.EntityMetadata",
+        IsAuditEnabled: { Value: isEnabled, CanBeChanged: true, ManagedPropertyLogicalName: "canmodifyauditsettings" },
+      },
+      { "MSCRM.MergeLabels": "true" },
+    );
+    // Publish the metadata change
+    await this.client(env).post("PublishXml", {
+      ParameterXml: `<importexportxml><entities><entity>${entityLogicalName}</entity></entities></importexportxml>`,
+    });
   }
 
   // ── Internals ─────────────────────────────────────────────────────────────

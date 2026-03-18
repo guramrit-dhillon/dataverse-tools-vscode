@@ -91,8 +91,8 @@ export class DataverseWebApiClient {
     return this.request(() => this.fetchJson<T>(this.resolveUrl(path), { method: "POST", headers: hdrs, body: JSON.stringify(body) }));
   }
 
-  async patch<T = unknown>(path: string, body: unknown): Promise<T> {
-    const hdrs = await this.headers();
+  async patch<T = unknown>(path: string, body: unknown, extraHeaders?: Record<string, string>): Promise<T> {
+    const hdrs = await this.headers(extraHeaders);
     return this.request(() => this.fetchJson<T>(this.resolveUrl(path), { method: "PATCH", headers: hdrs, body: JSON.stringify(body) }));
   }
 

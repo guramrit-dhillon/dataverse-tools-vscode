@@ -34,7 +34,17 @@ export interface AuditAttributeChange {
 }
 
 export interface AuditFilter {
-  entityLogicalName: string;
-  recordId: string;
+  entityLogicalName?: string;
+  recordId?: string;
   maxCount?: number;
+}
+
+export interface OrgAuditStatus {
+  orgId: string;
+  isEnabled: boolean;
+}
+
+export interface EntityAuditStatus {
+  metadataId: string;
+  isEnabled: boolean;
 }

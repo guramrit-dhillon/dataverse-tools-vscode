@@ -6,6 +6,7 @@ import {
   Panel,
 } from "core-dataverse";
 import type { AuditFilter } from "../types/dataverse";
+import type { OrgAuditStatus, EntityAuditStatus } from "../types/dataverse";
 import type { AuditService } from "../services/AuditService";
 
 /** Options sent to the webview on init / re-activate. */
@@ -52,6 +53,10 @@ export class AuditPanel extends Panel {
       getDetails: this.handleGetDetails.bind(this),
       entitySearch: this.handleEntitySearch.bind(this),
       changeEnvironment: this.handleChangeEnvironment.bind(this),
+      getOrgAuditStatus: this.handleGetOrgAuditStatus.bind(this),
+      setOrgAuditStatus: this.handleSetOrgAuditStatus.bind(this),
+      getEntityAuditStatus: this.handleGetEntityAuditStatus.bind(this),
+      setEntityAuditStatus: this.handleSetEntityAuditStatus.bind(this),
     });
   }
 
@@ -115,6 +120,44 @@ export class AuditPanel extends Panel {
       return await this.auditSvc.listAuditableEntities(this.env);
     } catch (err) {
       Logger.warn("Failed to load auditable entities", err instanceof Error ? { message: err.message } : {});
+      throw new Error(err instanceof Error ? err.message : String(err));
+    }
+  }
+
+  private async handleGetOrgAuditStatus(): Promise<OrgAuditStatus> {
+    try {
+      return await this.auditSvc.getOrgAuditStatus(this.env);
+    } catch (err) {
+      Logger.warn("Failed to get org audit status", err instanceof Error ? { message: err.message } : {});
+      throw new Error(err instanceof Error ? err.message : String(err));
+    }
+  }
+
+  private async handleSetOrgAuditStatus(payload: { orgId: string; isEnabled: boolean }): Promise<{ isEnabled: boolean }> {
+    try {
+      await this.auditSvc.setOrgAuditStatus(this.env, payload.orgId, payload.isEnabled);
+      return { isEnabled: payload.isEnabled };
+    } catch (err) {
+      Logger.error("Failed to set org audit status", err);
+      throw new Error(err instanceof Error ? err.message : String(err));
+    }
+  }
+
+  private async handleGetEntityAuditStatus(payload: { entityLogicalName: string }): Promise<EntityAuditStatus> {
+    try {
+      return await this.auditSvc.getEntityAuditStatus(this.env, payload.entityLogicalName);
+    } catch (err) {
+      Logger.warn("Failed to get entity audit status", err instanceof Error ? { message: err.message } : {});
+      throw new Error(err instanceof Error ? err.message : String(err));
+    }
+  }
+
+  private async handleSetEntityAuditStatus(payload: { metadataId: string; entityLogicalName: string; isEnabled: boolean }): Promise<{ isEnabled: boolean }> {
+    try {
+      await this.auditSvc.setEntityAuditStatus(this.env, payload.metadataId, payload.entityLogicalName, payload.isEnabled);
+      return { isEnabled: payload.isEnabled };
+    } catch (err) {
+      Logger.error("Failed to set entity audit status", err);
       throw new Error(err instanceof Error ? err.message : String(err));
     }
   }
