@@ -36,8 +36,32 @@
   "extensionDependencies": [
     "gdhillon.dataverse-environments"
   ],
-  "activationEvents": [],
+  "activationEvents": ["onStartupFinished"],
   "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "dataverse-tools.metadata.openAttributes",
+        "title": "Open Attributes",
+        "category": "Dataverse Tools: Metadata"
+      },
+      {
+        "command": "dataverse-tools.metadata.openRelationships",
+        "title": "Open Relationships",
+        "category": "Dataverse Tools: Metadata"
+      },
+      {
+        "command": "dataverse-tools.metadata.openForms",
+        "title": "Open Forms",
+        "category": "Dataverse Tools: Metadata"
+      },
+      {
+        "command": "dataverse-tools.metadata.openViews",
+        "title": "Open Views",
+        "category": "Dataverse Tools: Metadata"
+      }
+    ]
+  },
   "icon": "resources/icon.png",
   "scripts": {
     "build": "node ../../scripts/build-extension.js --production",
@@ -46,7 +70,8 @@
     "package:prerelease": "vsce package --pre-release --out ../../dataverse-metadata.vsix"
   },
   "dependencies": {
-    "core-dataverse": "0.2.1"
+    "core-dataverse": "0.2.1",
+    "shared-views": "0.2.1"
   },
   "devDependencies": {
     "@types/node": "^25.2.3",
