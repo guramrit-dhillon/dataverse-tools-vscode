@@ -11,6 +11,13 @@ export interface StepResult<S> {
 
 // ── QuickPick page ──────────────────────────────────────────────────────────
 
+/** A button shown on the right side of a QuickPick item row (appears on hover). */
+export interface WizardItemButton {
+  /** ThemeIcon id (e.g. `"list-flat"`) or a `{ light, dark }` icon path object. */
+  iconPath: string | { id: string; color?: { id: string } } | { light: string; dark: string };
+  tooltip?: string;
+}
+
 export interface QuickPickWizardItem {
   label: string;
   description?: string;
@@ -22,6 +29,8 @@ export interface QuickPickWizardItem {
   alwaysShow?: boolean;
   /** Arbitrary payload the consumer can attach and read back in `onSelect`. */
   data?: unknown;
+  /** Buttons shown on the right side of this item row (appears on hover). */
+  buttons?: WizardItemButton[];
 }
 
 export interface QuickPickConfig {
@@ -61,6 +70,12 @@ export interface QuickPickPageDef<S> {
   onSelect: (action: string, item: QuickPickWizardItem, state: S, ui: QuickPickControl) => StepResult<S> | Promise<StepResult<S>>;
   /** Called when the user confirms a multi-select page (only used when `canPickMany` is true). */
   onMultiSelect?: (items: QuickPickWizardItem[], state: S, ui: QuickPickControl) => StepResult<S> | Promise<StepResult<S>>;
+  /**
+   * Called when a per-item button is clicked. Return a StepResult to navigate (e.g. to a detail page).
+   * `currentSelectedItems` contains the items currently checked in the QuickPick at the moment
+   * the button was clicked — useful for saving the user's partial selection into state before navigating.
+   */
+  onItemButton?: (button: WizardItemButton, buttonIndex: number, action: string, item: QuickPickWizardItem, state: S, currentSelectedItems: QuickPickWizardItem[]) => StepResult<S> | Promise<StepResult<S>>;
 }
 
 // ── Input page ──────────────────────────────────────────────────────────────

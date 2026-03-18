@@ -90,6 +90,10 @@ function showQuickPickPage<S>(
         detail: item.detail,
         kind: item.kind as vscode.QuickPickItemKind | undefined,
         alwaysShow: item.alwaysShow,
+        buttons: item.buttons?.map((b): vscode.QuickInputButton => ({
+          iconPath: typeof b.iconPath === "string" ? new vscode.ThemeIcon(b.iconPath) : b.iconPath as vscode.ThemeIcon,
+          tooltip: b.tooltip,
+        })),
         _wizardAction: item.action,
         _wizardItem: item,
       }));
@@ -164,6 +168,26 @@ function showQuickPickPage<S>(
         finish({ outcome: "back" });
       }
     });
+
+    if (page.onItemButton) {
+      const onItemButton = page.onItemButton;
+      qp.onDidTriggerItemButton(({ item, button }) => {
+        const tagged = item as TaggedItem;
+        if (!tagged._wizardItem || !tagged._wizardAction) { return; }
+        const buttons = tagged._wizardItem.buttons ?? [];
+        const buttonIndex = buttons.findIndex((b) => {
+          const resolvedIcon = typeof b.iconPath === "string" ? new vscode.ThemeIcon(b.iconPath) : b.iconPath as vscode.ThemeIcon;
+          return (button.iconPath as vscode.ThemeIcon)?.id === resolvedIcon.id;
+        });
+        const resolvedButtonIndex = Math.max(buttonIndex, 0);
+        const currentSelectedItems = (qp.selectedItems as TaggedItem[])
+          .filter((i) => i._wizardItem)
+          .map((i) => i._wizardItem!);
+        Promise.resolve(onItemButton(buttons[resolvedButtonIndex], resolvedButtonIndex, tagged._wizardAction, tagged._wizardItem, state, currentSelectedItems))
+          .then((stepResult) => { finish({ outcome: "complete", stepResult }); })
+          .catch(fail);
+      });
+    }
 
     qp.onDidHide(() => {
       finish(canGoBack ? { outcome: "back" } : { outcome: "cancel" });
