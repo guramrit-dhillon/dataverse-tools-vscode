@@ -97,7 +97,8 @@ type Action =
   | { type: "retrieveViews"; meta: { toExtension: true } }
   | { type: "retrieveViews:response"; payload: EntityView[] }
   | { type: "retrieveViews:error"; payload: string }
-  | { type: "openViewDesigner"; payload: { savedqueryid: string; entityLogicalName: string; entityDisplayName?: string }; meta: { toExtension: true } };
+  | { type: "openViewDesigner"; payload: { savedqueryid: string; entityLogicalName: string; entityDisplayName?: string }; meta: { toExtension: true } }
+  | { type: "openFormViewer"; payload: { formid: string; entityLogicalName: string; entityDisplayName?: string }; meta: { toExtension: true } };
 
 // ── Row processors ────────────────────────────────────────────────────────────
 
@@ -208,7 +209,7 @@ const REL_COLS: TableColumnDefinition<RelationshipRow>[] = [
 ];
 
 const FORM_COLS: TableColumnDefinition<FormRow>[] = [
-  { key: "name", label: "Name" },
+  { key: "name", label: "Name", isLink: true },
   { key: "formType", label: "Type" },
   { key: "managed", label: "Managed" },
 ];
@@ -315,6 +316,13 @@ export function EntityMetadataApp(): React.ReactElement {
             emptyMessage={state.forms.loading ? "Loading\u2026" : "No forms found"}
             error={state.forms.error}
             loading={state.forms.loading}
+            onCellClick={(_col, row) => {
+              dispatch({
+                type: "openFormViewer",
+                payload: { formid: row.formid, entityLogicalName, entityDisplayName },
+                meta: { toExtension: true },
+              });
+            }}
           />
         )}
         {activeTab === "views" && (
