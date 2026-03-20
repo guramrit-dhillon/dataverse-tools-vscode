@@ -86,28 +86,11 @@
   color: var(--vscode-errorForeground);
 }
 
-.vd-columns-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-}
-
-.vd-columns-table th {
-  text-align: left;
-  padding: 4px 10px;
-  border-bottom: 1px solid var(--vscode-panel-border);
-  color: var(--vscode-descriptionForeground);
-  font-weight: 500;
-}
-
-.vd-columns-table td {
-  padding: 4px 10px;
-  border-bottom: 1px solid var(--vscode-panel-border, rgba(255,255,255,0.05));
-  font-family: var(--vscode-editor-font-family, monospace);
-}
-
 .vd-fetchxml-wrap {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .vd-copy-btn {
@@ -121,22 +104,27 @@
   padding: 3px 8px;
   font-size: 11px;
   cursor: pointer;
+  z-index: 1;
 }
 
 .vd-copy-btn:hover {
   background: var(--vscode-button-secondaryHoverBackground);
 }
 
-.vd-fetchxml-pre {
+.vd-fetchxml-textarea {
+  flex: 1;
+  min-height: 300px;
+  width: 100%;
+  box-sizing: border-box;
   background: var(--vscode-editor-background);
   color: var(--vscode-editor-foreground);
   font-family: var(--vscode-editor-font-family, monospace);
   font-size: 12px;
   padding: 12px;
-  margin: 0;
-  overflow: auto;
-  white-space: pre;
-  border-radius: 3px;
   border: 1px solid var(--vscode-panel-border);
-  max-height: 600px;
+  border-radius: 3px;
+  resize: vertical;
+  white-space: pre;
+  tab-size: 2;
+  line-height: 1.5;
 }

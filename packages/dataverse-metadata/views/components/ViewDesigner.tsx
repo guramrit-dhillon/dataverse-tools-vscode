@@ -1,8 +1,9 @@
 import * as React from "react";
 import { useCallback, useEffect, useMemo } from "react";
-import { useReducer, TabBar } from "shared-views";
+import { useReducer, TabBar, DataTable } from "shared-views";
+import type { TableColumnDefinition } from "shared-views";
 import type { EntityView } from "../../src/types/metadata";
-import { parseLayoutColumns } from "../utils/parseLayoutColumns";
+import { parseLayoutColumns, type LayoutColumn } from "../utils/parseLayoutColumns";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -69,6 +70,36 @@ const TABS = [
   { id: "columns", label: "Columns" },
   { id: "fetchxml", label: "FetchXML" },
 ] as const;
+
+const LAYOUT_COLS: TableColumnDefinition<LayoutColumn>[] = [
+  { key: "name", label: "Logical Name" },
+  { key: "width", label: "Width", type: "number" },
+];
+
+function formatXml(xml: string): string {
+  const INDENT = "  ";
+  try {
+    const normalized = xml.replace(/>\s+</g, "><").trim();
+    const tokens = normalized.match(/<[^>]+>|[^<]+/g) ?? [];
+    let level = 0;
+    const lines: string[] = [];
+    for (const token of tokens) {
+      if (!token.trim()) { continue; }
+      if (token.startsWith("</")) {
+        level = Math.max(0, level - 1);
+        lines.push(INDENT.repeat(level) + token);
+      } else if (token.startsWith("<") && !token.startsWith("<?") && !token.endsWith("/>")) {
+        lines.push(INDENT.repeat(level) + token);
+        level++;
+      } else {
+        lines.push(INDENT.repeat(level) + token);
+      }
+    }
+    return lines.join("\n");
+  } catch {
+    return xml;
+  }
+}
 
 // ── Initial state ─────────────────────────────────────────────────────────────
 
@@ -284,27 +315,14 @@ export function ViewDesigner(): React.ReactElement {
 
   const columns = currentView ? parseLayoutColumns(currentView.layoutxml) : [];
 
-  const columnsContent =
-    columns.length > 0 ? (
-      <table className="vd-columns-table">
-        <thead>
-          <tr>
-            <th>Logical Name</th>
-            <th>Width</th>
-          </tr>
-        </thead>
-        <tbody>
-          {columns.map((col) => (
-            <tr key={col.name}>
-              <td>{col.name}</td>
-              <td>{col.width}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    ) : (
-      <div className="vd-empty">No column data available</div>
-    );
+  const columnsContent = (
+    <DataTable<LayoutColumn>
+      columns={LAYOUT_COLS}
+      rows={columns}
+      keyFormatter={(col) => col.name}
+      emptyMessage="No column data available"
+    />
+  );
 
   // ── FetchXML tab content ─────────────────────────────────────────────────
 
@@ -314,7 +332,12 @@ export function ViewDesigner(): React.ReactElement {
       <button className="vd-copy-btn" onClick={handleCopy} type="button">
         {copyLabel}
       </button>
-      <pre className="vd-fetchxml-pre">{fetchxml}</pre>
+      <textarea
+        className="vd-fetchxml-textarea"
+        readOnly
+        value={formatXml(fetchxml)}
+        spellCheck={false}
+      />
     </div>
   ) : (
     <div className="vd-empty">No FetchXML available</div>
