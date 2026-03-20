@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { type DataverseEnvironment, Logger, Panel } from "core-dataverse";
 import type { IMetadataService } from "../interfaces/IMetadataService";
 import { ViewDesignerPanel } from "./ViewDesignerPanel";
+import { FormViewerPanel } from "./FormViewerPanel";
 
 export type EntityTab = "attributes" | "relationships" | "forms" | "views";
 
@@ -51,6 +52,16 @@ export class EntityPanel extends Panel {
           entityLogicalName,
           entityDisplayName,
           savedqueryid
+        );
+      },
+      openFormViewer: ({ formid, entityLogicalName, entityDisplayName }: { formid: string; entityLogicalName: string; entityDisplayName?: string }) => {
+        FormViewerPanel.render(
+          this.extensionUri,
+          this.env,
+          this.metadataSvc,
+          entityLogicalName,
+          entityDisplayName,
+          formid,
         );
       },
     });
