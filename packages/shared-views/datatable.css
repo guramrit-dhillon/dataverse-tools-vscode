@@ -108,3 +108,7 @@
 .cell-link:hover {
   color: var(--vscode-textLink-activeForeground, #4daafc);
 }
+.cell-link:focus-visible {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: -1px;
+}

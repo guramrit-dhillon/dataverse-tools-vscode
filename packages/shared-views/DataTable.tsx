@@ -13,6 +13,7 @@ export interface TableColumnDefinition<T = any> {
   width?: number;
   headerClassName?: string;
   cellClassName?: string | ((value: any, row: T) => string);
+  /** Renders the cell as an inline link button. Only has effect when `TableProps.onCellClick` is also provided. */
   isLink?: boolean;
 }
 
@@ -210,7 +211,11 @@ export default function DataTable<T>(props: TableProps<T>) {
                         type="button"
                         className="cell-link"
                         onClick={(e) => { e.stopPropagation(); onCellClick(col, row); }}
-                        onKeyDown={(e) => e.stopPropagation()}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.stopPropagation();
+                          }
+                        }}
                       >
                         {value}
                       </button>
