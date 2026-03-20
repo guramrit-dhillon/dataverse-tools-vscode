@@ -83,4 +83,6 @@ export interface EntityView {
   isdefault: boolean;
   ismanaged: boolean;
   description?: string;
+  fetchxml?: string;    // populated by getViewDetails only
+  layoutxml?: string;   // populated by getViewDetails only
 }

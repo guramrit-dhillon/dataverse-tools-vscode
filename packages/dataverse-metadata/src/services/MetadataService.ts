@@ -72,4 +72,10 @@ export class MetadataService implements IMetadataService {
     );
     return res.value;
   }
+
+  async getViewDetails(env: DataverseEnvironment, savedqueryid: string): Promise<EntityView> {
+    return this.client(env).get<EntityView>(
+      `savedqueries(${savedqueryid})?$select=savedqueryid,name,querytype,isdefault,ismanaged,fetchxml,layoutxml`
+    );
+  }
 }

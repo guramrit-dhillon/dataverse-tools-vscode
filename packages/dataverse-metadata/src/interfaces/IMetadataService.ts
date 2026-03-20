@@ -12,4 +12,5 @@ export interface IMetadataService {
   listRelationships(env: DataverseEnvironment, entityLogicalName: string): Promise<EntityRelationships>;
   listForms(env: DataverseEnvironment, entityLogicalName: string): Promise<EntityForm[]>;
   listViews(env: DataverseEnvironment, entityLogicalName: string): Promise<EntityView[]>;
+  getViewDetails(env: DataverseEnvironment, savedqueryid: string): Promise<EntityView>;
 }
