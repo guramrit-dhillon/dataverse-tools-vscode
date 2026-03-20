@@ -50,6 +50,7 @@ export interface ResultsViewerProps<T = Record<string, unknown>> {
   // ── DataTable passthrough ──
   keyFormatter?: (row: T) => string;
   onRowClick?: (row: T) => void;
+  onCellClick?: (col: TableColumnDefinition<T>, row: T) => void;
   selectedKeys?: string[];
   onSelectionChange?: (keys: string[], rows: T[]) => void;
   rowClassName?: string | ((row: T) => string);
@@ -111,6 +112,7 @@ export default function ResultsViewer<T = Record<string, unknown>>({
   enableCopy = true,
   keyFormatter = (row) => JSON.stringify(row),
   onRowClick,
+  onCellClick,
   selectedKeys,
   onSelectionChange,
   rowClassName,
@@ -360,6 +362,7 @@ export default function ResultsViewer<T = Record<string, unknown>>({
                 rows={filteredRows}
                 keyFormatter={keyFormatter}
                 onRowClick={onRowClick}
+                onCellClick={onCellClick}
                 selectedKeys={selectedKeys}
                 onSelectionChange={onSelectionChange}
                 rowClassName={rowClassName}
