@@ -7,7 +7,7 @@
   "license": "MIT",
   "displayName": "Dataverse Tools: Trace Viewer",
   "description": "View and analyze Dataverse plugin execution trace logs — filter, search, and inspect exceptions from VS Code",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "publisher": "gdhillon",
   "homepage": "https://github.com/guramrit-dhillon/dataverse-tools-vscode#readme",
   "bugs": {

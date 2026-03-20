@@ -1,5 +1,12 @@
 # dataverse-audit-viewer
 
+## 0.9.0
+
+### Minor Changes
+
+- [`40f4967`](https://github.com/guramrit-dhillon/dataverse-tools-vscode/commit/40f49679d0c05e34c61dbd54450fc0c9104cc49f) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - feat(audit): user access audit status and entity/column audit management
+  - feat(wizard): add per-item button support to QuickPick pages
+
 ## 0.8.0
 
 ### Minor Changes
