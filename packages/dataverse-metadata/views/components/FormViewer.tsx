@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo } from "react";
 import { useReducer, TabBar, DataTable } from "shared-views";
 import type { TableColumnDefinition } from "shared-views";
 import type { EntityForm, EntityFormDetails } from "../../src/types/metadata";
-import { parseFormStructure, type FormLibrary, type FormEvent } from "../utils/parseFormStructure";
+import { parseFormStructure, type FormField, type FormLibrary, type FormEvent } from "../utils/parseFormStructure";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -104,6 +104,7 @@ function reducer(state: State, action: Action): State {
       if (p.tag === "ready" || p.tag === "switching") {
         return { ...state, phase: { tag: "ready", forms: p.forms, current }, inFlightId: null };
       }
+      // Also set pendingCurrent so that a late-arriving formInit can promote to "ready"
       return { ...state, phase: { tag: "no-list", current }, pendingCurrent: current, inFlightId: null };
     }
 

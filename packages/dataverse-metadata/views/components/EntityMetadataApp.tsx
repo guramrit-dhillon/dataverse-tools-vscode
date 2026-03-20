@@ -103,8 +103,9 @@ type Action =
 // ── Row processors ────────────────────────────────────────────────────────────
 
 const FORM_TYPE_LABELS: Record<number, string> = {
-  2: "Main", 5: "Mobile Express", 6: "Quick View", 7: "Quick Create",
-  8: "Dashboard", 11: "Dialog", 12: "Power BI Dashboard",
+  2: "Main", 5: "Mobile Express", 6: "Quick View Form", 7: "Quick Create",
+  8: "Dialog", 9: "Task Flow Form", 11: "Card", 12: "Main - Interactive",
+  100: "Other",
 };
 
 const VIEW_TYPE_LABELS: Record<number, string> = {
