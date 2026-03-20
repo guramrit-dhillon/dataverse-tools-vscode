@@ -47,7 +47,9 @@ export interface FormStructure {
   events: FormEvent[];
 }
 
-const EMPTY: FormStructure = { tabs: [], libraries: [], events: [] };
+function emptyStructure(): FormStructure {
+  return { tabs: [], libraries: [], events: [] };
+}
 
 function isPcfControl(control: Record<string, unknown>): boolean {
   const classId = control['ClassId'] as string | undefined;
@@ -57,13 +59,13 @@ function isPcfControl(control: Record<string, unknown>): boolean {
 }
 
 export function parseFormStructure(formjson: string | null | undefined): FormStructure {
-  if (!formjson) { return EMPTY; }
+  if (!formjson) { return emptyStructure(); }
 
   let raw: Record<string, unknown>;
   try {
     raw = JSON.parse(formjson) as Record<string, unknown>;
   } catch {
-    return EMPTY;
+    return emptyStructure();
   }
 
   // ── Tabs ────────────────────────────────────────────────────────────────

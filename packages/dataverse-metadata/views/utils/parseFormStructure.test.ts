@@ -35,6 +35,10 @@ describe('parseFormStructure', () => {
     expect(parseFormStructure(null)).toEqual({ tabs: [], libraries: [], events: [] });
   });
 
+  it('returns empty structure for undefined', () => {
+    expect(parseFormStructure(undefined)).toEqual({ tabs: [], libraries: [], events: [] });
+  });
+
   it('returns empty structure for invalid JSON', () => {
     expect(parseFormStructure('not-json')).toEqual({ tabs: [], libraries: [], events: [] });
   });
@@ -95,6 +99,18 @@ describe('parseFormStructure', () => {
     const json = JSON.stringify({
       Tabs: [{ Name: "t1", Label: "T", Columns: [{ Sections: [{ Name: "s1", Label: "S", Rows: [{ Cells: [
         { Label: "Rating", Control: { Id: "new_rating", DataFieldName: "new_rating", ClassId: PCF_CLASS_ID } }
+      ]}]}]}] }],
+      FormLibraries: { Libraries: [] },
+      EventHandlers: []
+    });
+    const result = parseFormStructure(json);
+    expect(result.tabs[0].sections[0].fields[0].isPcf).toBe(true);
+  });
+
+  it('marks controls with ComponentType as PCF', () => {
+    const json = JSON.stringify({
+      Tabs: [{ Name: "t1", Label: "T", Columns: [{ Sections: [{ Name: "s1", Label: "S", Rows: [{ Cells: [
+        { Label: "Custom", Control: { Id: "new_custom", DataFieldName: "new_custom", ComponentType: 5 } }
       ]}]}]}] }],
       FormLibraries: { Libraries: [] },
       EventHandlers: []
