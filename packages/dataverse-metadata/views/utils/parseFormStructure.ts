@@ -1,19 +1,23 @@
 /**
- * Parses a Dataverse `formjson` string (from the `systemforms` entity) into a
+ * Parses a Dataverse `formxml` string (from the `systemforms` entity) into a
  * typed structure tree.
  *
- * WEBVIEW-SIDE ONLY — uses JSON.parse (safe in browser and Node/Vitest).
+ * WEBVIEW-SIDE ONLY — uses DOMParser (available in browser and happy-dom/Vitest).
  *
- * The real formjson uses .NET JSON serialization with `$values` wrappers on all
- * arrays: `{ "$type": "...", "$values": [...] }`. Plain arrays are also accepted
- * for test fixtures.
+ * formxml is a standard XML document; it is more complete than formjson and is
+ * the canonical representation used by the platform.
  */
 
 const PCF_CLASS_IDS = new Set([
   '{F9A8A302-114E-466A-B582-6771B2AE0D92}',
-  // lowercase variant
   '{f9a8a302-114e-466a-b582-6771b2ae0d92}',
 ]);
+
+const EVENT_NAME_MAP: Record<string, string> = {
+  onload:  'OnLoad',
+  onsave:  'OnSave',
+  onchange: 'OnChange',
+};
 
 export interface FormField {
   logicalName: string;
@@ -22,11 +26,15 @@ export interface FormField {
 }
 
 export interface FormSection {
+  /** Raw technical name from formxml (e.g. "header", "footer", "section_info"). */
+  name: string;
   label: string;
   fields: FormField[];
 }
 
 export interface FormTab {
+  /** Raw technical name from formxml (e.g. "tab_general"). */
+  name: string;
   label: string;
   sections: FormSection[];
 }
@@ -53,126 +61,125 @@ function emptyStructure(): FormStructure {
   return { tabs: [], libraries: [], events: [] };
 }
 
+// ── DOM helpers ─────────────────────────────────────────────────────────────
+
+/** Direct children of `el` whose tag matches `tagName` (case-insensitive). */
+function children(el: Element, tagName: string): Element[] {
+  const tag = tagName.toLowerCase();
+  return Array.from(el.children).filter((c) => c.tagName.toLowerCase() === tag);
+}
+
+/** First direct child of `el` whose tag matches `tagName`. */
+function child(el: Element, tagName: string): Element | null {
+  return children(el, tagName)[0] ?? null;
+}
+
 /**
- * Extracts an array from either a plain JS array or a .NET-serialized
- * `{ "$values": [...] }` wrapper object.
+ * Reads the display label from a `<labels>` direct child of `el`.
+ * Prefers languagecode 1033 (English), falls back to the first label.
+ * Returns null if no labels element or no label children.
  */
-function getValues<T>(obj: unknown): T[] {
-  if (Array.isArray(obj)) { return obj as T[]; }
-  const wrapped = obj as Record<string, unknown> | null | undefined;
-  if (wrapped && Array.isArray(wrapped['$values'])) { return wrapped['$values'] as T[]; }
-  return [];
+function getLabel(el: Element): string | null {
+  const labelsEl = child(el, 'labels');
+  if (!labelsEl) { return null; }
+  const all = children(labelsEl, 'label');
+  const en = all.find((l) => l.getAttribute('languagecode') === '1033');
+  const chosen = en ?? all[0];
+  return chosen?.getAttribute('description') ?? null;
 }
 
-function isPcfControl(control: Record<string, unknown>): boolean {
-  const classId = (control['ClassId'] as string | undefined) ?? '';
-  if (PCF_CLASS_IDS.has(classId)) { return true; }
-  return control['ComponentType'] !== undefined;
+function isPcfControl(control: Element): boolean {
+  const classId = control.getAttribute('classid') ?? '';
+  return PCF_CLASS_IDS.has(classId);
 }
 
-function parseEventHandler(ev: Record<string, unknown>, fieldOverride?: string): FormEvent {
-  return {
-    event: (ev['EventName'] as string | undefined) ?? '',
-    field: (ev['ControlId'] as string | undefined) ?? fieldOverride ?? null,
-    functionName: (ev['FunctionName'] as string | undefined) ?? '',
-    libraryName: (ev['LibraryName'] as string | undefined) ?? '',
-  };
-}
+// ── Main parser ──────────────────────────────────────────────────────────────
 
-export function parseFormStructure(formjson: string | null | undefined): FormStructure {
-  if (!formjson) { return emptyStructure(); }
+export function parseFormStructure(formxml: string | null | undefined): FormStructure {
+  if (!formxml) { return emptyStructure(); }
 
-  let raw: Record<string, unknown>;
+  let doc: Document;
   try {
-    raw = JSON.parse(formjson) as Record<string, unknown>;
+    doc = new DOMParser().parseFromString(formxml, 'text/xml');
   } catch {
     return emptyStructure();
   }
 
-  const events: FormEvent[] = [];
+  // DOMParser returns a document with a <parsererror> root on invalid XML.
+  if (doc.querySelector('parsererror')) { return emptyStructure(); }
 
-  // ── Form-level event handlers (OnLoad, OnSave) ───────────────────────────
-  for (const ev of getValues<Record<string, unknown>>(raw['EventHandlers'])) {
-    events.push(parseEventHandler(ev));
+  const root = doc.documentElement; // <form>
+
+  // ── Events ───────────────────────────────────────────────────────────────
+  const events: FormEvent[] = [];
+  const eventsEl = child(root, 'events');
+  if (eventsEl) {
+    for (const eventEl of children(eventsEl, 'event')) {
+      const rawName = eventEl.getAttribute('name') ?? '';
+      const eventName = EVENT_NAME_MAP[rawName.toLowerCase()] ?? rawName;
+      const field = eventEl.getAttribute('attribute') ?? null;
+      const handlersEl = child(eventEl, 'Handlers') ?? child(eventEl, 'handlers');
+      if (handlersEl) {
+        for (const handler of children(handlersEl, 'Handler')) {
+          events.push({
+            event: eventName,
+            field,
+            functionName: handler.getAttribute('functionName') ?? '',
+            libraryName:  handler.getAttribute('libraryName')  ?? '',
+          });
+        }
+      }
+    }
   }
 
   // ── Tabs ─────────────────────────────────────────────────────────────────
-  const tabs: FormTab[] = getValues<Record<string, unknown>>(raw['Tabs']).map((tab) => {
-    const tabLabel = (tab['Label'] as string | undefined) ?? (tab['Name'] as string | undefined) ?? '';
-
-    // Tab-level event handlers
-    for (const ev of getValues<Record<string, unknown>>(tab['EventHandlers'])) {
-      events.push(parseEventHandler(ev));
-    }
+  const tabsEl = child(root, 'tabs');
+  const tabs: FormTab[] = (tabsEl ? children(tabsEl, 'tab') : []).map((tabEl) => {
+    const tabName  = tabEl.getAttribute('name') ?? '';
+    const tabLabel = getLabel(tabEl) ?? tabName;
 
     const sections: FormSection[] = [];
-    for (const col of getValues<Record<string, unknown>>(tab['Columns'])) {
-      for (const sec of getValues<Record<string, unknown>>(col['Sections'])) {
-        const secLabel = (sec['Label'] as string | undefined) ?? (sec['Name'] as string | undefined) ?? '';
-        const fields: FormField[] = [];
+    const columnsEl = child(tabEl, 'columns');
+    if (columnsEl) {
+      for (const colEl of children(columnsEl, 'column')) {
+        const sectionsEl = child(colEl, 'sections');
+        if (!sectionsEl) { continue; }
+        for (const secEl of children(sectionsEl, 'section')) {
+          const secName  = secEl.getAttribute('name') ?? '';
+          const secLabel = getLabel(secEl) ?? secName;
+          const fields: FormField[] = [];
 
-        for (const row of getValues<Record<string, unknown>>(sec['Rows'])) {
-          for (const cell of getValues<Record<string, unknown>>(row['Cells'])) {
-            const control = cell['Control'] as Record<string, unknown> | undefined;
-            if (!control) { continue; }
+          const rowsEl = child(secEl, 'rows');
+          if (rowsEl) {
+            for (const rowEl of children(rowsEl, 'row')) {
+              for (const cellEl of children(rowEl, 'cell')) {
+                const control = child(cellEl, 'control');
+                if (!control) { continue; }
 
-            const logicalName = (control['DataFieldName'] as string | undefined)
-              ?? (control['Id'] as string | undefined);
-            if (!logicalName) { continue; }
+                const logicalName = control.getAttribute('datafieldname') || control.getAttribute('id');
+                if (!logicalName) { continue; }
 
-            // Labels are often null in formjson — fall back through the chain
-            const label = (cell['Label'] as string | undefined)
-              ?? (control['Label'] as string | undefined)
-              ?? logicalName;
-
-            // Control-level event handlers (OnChange etc.)
-            for (const ev of getValues<Record<string, unknown>>(control['EventHandlers'])) {
-              events.push(parseEventHandler(ev, logicalName));
+                const label = getLabel(cellEl) ?? logicalName;
+                fields.push({ logicalName, label, isPcf: isPcfControl(control) });
+              }
             }
-
-            fields.push({ logicalName, label, isPcf: isPcfControl(control) });
           }
+
+          sections.push({ name: secName, label: secLabel, fields });
         }
-        sections.push({ label: secLabel, fields });
       }
     }
-    return { label: tabLabel, sections };
+
+    return { name: tabName, label: tabLabel, sections };
   });
 
   // ── Libraries ─────────────────────────────────────────────────────────────
-  // Real formjson: FormLibraries.$values is string[] (web resource names)
-  // Test fixtures: FormLibraries.Libraries is { Name, DisplayName }[]
-  const libraries: FormLibrary[] = [];
-  const rawLibsContainer = raw['FormLibraries'] as Record<string, unknown> | undefined;
-  if (rawLibsContainer) {
-    // Real format: { "$values": ["new_/js/contact.js", ...] }
-    const valuesList = getValues<unknown>(rawLibsContainer);
-    if (valuesList.length > 0) {
-      for (const item of valuesList) {
-        if (typeof item === 'string') {
-          libraries.push({ webResourceName: item, displayName: item });
-        } else if (item && typeof item === 'object') {
-          const lib = item as Record<string, unknown>;
-          libraries.push({
-            webResourceName: (lib['Name'] as string | undefined) ?? '',
-            displayName: (lib['DisplayName'] as string | undefined) ?? (lib['Name'] as string | undefined) ?? '',
-          });
-        }
-      }
-    } else {
-      // Test fixture format: { Libraries: [...] }
-      for (const item of getValues<Record<string, unknown>>(rawLibsContainer['Libraries'])) {
-        if (typeof item === 'string') {
-          libraries.push({ webResourceName: item, displayName: item });
-        } else {
-          libraries.push({
-            webResourceName: (item['Name'] as string | undefined) ?? '',
-            displayName: (item['DisplayName'] as string | undefined) ?? (item['Name'] as string | undefined) ?? '',
-          });
-        }
-      }
-    }
-  }
+  const formLibrariesEl = child(root, 'formLibraries');
+  const libraries: FormLibrary[] = (formLibrariesEl ? children(formLibrariesEl, 'Library') : []).map((lib) => {
+    const name        = lib.getAttribute('name') ?? '';
+    const displayName = lib.getAttribute('displayName') ?? name;
+    return { webResourceName: name, displayName };
+  });
 
   return { tabs, libraries, events };
 }

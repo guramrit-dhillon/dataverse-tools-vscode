@@ -2,33 +2,49 @@
 import { describe, it, expect } from 'vitest';
 import { parseFormStructure } from './parseFormStructure';
 
-const MINIMAL_FORM_JSON = JSON.stringify({
-  Tabs: [{
-    Name: "tab1",
-    Label: "General",
-    Columns: [{
-      Sections: [{
-        Name: "section1",
-        Label: "Contact Information",
-        Rows: [{
-          Cells: [
-            { Label: "First Name", Control: { Id: "firstname", DataFieldName: "firstname" } },
-            { Label: "Last Name",  Control: { Id: "lastname",  DataFieldName: "lastname" } },
-          ]
-        }]
-      }]
-    }]
-  }],
-  FormLibraries: {
-    Libraries: [
-      { Name: "new_/js/contact.js", DisplayName: "Contact Scripts" }
-    ]
-  },
-  EventHandlers: [
-    { EventName: "OnLoad", FunctionName: "Contact.onLoad", LibraryName: "new_/js/contact.js" },
-    { EventName: "OnChange", ControlId: "firstname", FunctionName: "Contact.onChange", LibraryName: "new_/js/contact.js" }
-  ]
-});
+// ── Minimal fixture ──────────────────────────────────────────────────────────
+
+const MINIMAL_FORM_XML = `<form>
+  <tabs>
+    <tab name="tab1">
+      <labels><label description="General" languagecode="1033" /></labels>
+      <columns><column><sections>
+        <section name="section1">
+          <labels><label description="Contact Information" languagecode="1033" /></labels>
+          <rows>
+            <row>
+              <cell>
+                <labels><label description="First Name" languagecode="1033" /></labels>
+                <control id="firstname" datafieldname="firstname" />
+              </cell>
+              <cell>
+                <labels><label description="Last Name" languagecode="1033" /></labels>
+                <control id="lastname" datafieldname="lastname" />
+              </cell>
+            </row>
+          </rows>
+        </section>
+      </sections></column></columns>
+    </tab>
+  </tabs>
+  <formLibraries>
+    <Library name="new_/js/contact.js" displayName="Contact Scripts" />
+  </formLibraries>
+  <events>
+    <event name="onload">
+      <Handlers>
+        <Handler functionName="Contact.onLoad" libraryName="new_/js/contact.js" />
+      </Handlers>
+    </event>
+    <event name="onchange" attribute="firstname">
+      <Handlers>
+        <Handler functionName="Contact.onChange" libraryName="new_/js/contact.js" />
+      </Handlers>
+    </event>
+  </events>
+</form>`;
+
+// ── Tests ────────────────────────────────────────────────────────────────────
 
 describe('parseFormStructure', () => {
   it('returns empty structure for null', () => {
@@ -39,140 +55,230 @@ describe('parseFormStructure', () => {
     expect(parseFormStructure(undefined)).toEqual({ tabs: [], libraries: [], events: [] });
   });
 
-  it('returns empty structure for invalid JSON', () => {
-    expect(parseFormStructure('not-json')).toEqual({ tabs: [], libraries: [], events: [] });
+  it('returns empty structure for invalid XML', () => {
+    expect(parseFormStructure('not-xml')).toEqual({ tabs: [], libraries: [], events: [] });
+  });
+
+  it('returns empty structure for malformed XML', () => {
+    expect(parseFormStructure('<form><unclosed>')).toEqual({ tabs: [], libraries: [], events: [] });
   });
 
   it('parses tabs and sections', () => {
-    const result = parseFormStructure(MINIMAL_FORM_JSON);
+    const result = parseFormStructure(MINIMAL_FORM_XML);
     expect(result.tabs).toHaveLength(1);
+    expect(result.tabs[0].name).toBe('tab1');
     expect(result.tabs[0].label).toBe('General');
     expect(result.tabs[0].sections).toHaveLength(1);
+    expect(result.tabs[0].sections[0].name).toBe('section1');
     expect(result.tabs[0].sections[0].label).toBe('Contact Information');
   });
 
   it('parses fields with logicalName and label', () => {
-    const result = parseFormStructure(MINIMAL_FORM_JSON);
+    const result = parseFormStructure(MINIMAL_FORM_XML);
     const fields = result.tabs[0].sections[0].fields;
     expect(fields).toHaveLength(2);
     expect(fields[0]).toEqual({ logicalName: 'firstname', label: 'First Name', isPcf: false });
     expect(fields[1]).toEqual({ logicalName: 'lastname',  label: 'Last Name',  isPcf: false });
   });
 
-  it('parses libraries', () => {
-    const result = parseFormStructure(MINIMAL_FORM_JSON);
+  it('parses libraries with displayName', () => {
+    const result = parseFormStructure(MINIMAL_FORM_XML);
     expect(result.libraries).toEqual([
-      { webResourceName: 'new_/js/contact.js', displayName: 'Contact Scripts' }
+      { webResourceName: 'new_/js/contact.js', displayName: 'Contact Scripts' },
     ]);
   });
 
-  it('parses event handlers — OnLoad has null field', () => {
-    const result = parseFormStructure(MINIMAL_FORM_JSON);
+  it('library without displayName falls back to name', () => {
+    const xml = `<form>
+      <tabs></tabs>
+      <formLibraries><Library name="new_/js/utils.js" /></formLibraries>
+      <events></events>
+    </form>`;
+    const result = parseFormStructure(xml);
+    expect(result.libraries[0]).toEqual({ webResourceName: 'new_/js/utils.js', displayName: 'new_/js/utils.js' });
+  });
+
+  it('parses OnLoad event — field is null', () => {
+    const result = parseFormStructure(MINIMAL_FORM_XML);
     expect(result.events[0]).toEqual({
-      event: 'OnLoad', field: null, functionName: 'Contact.onLoad', libraryName: 'new_/js/contact.js'
+      event: 'OnLoad', field: null, functionName: 'Contact.onLoad', libraryName: 'new_/js/contact.js',
     });
   });
 
-  it('parses event handlers — OnChange has field', () => {
-    const result = parseFormStructure(MINIMAL_FORM_JSON);
+  it('parses OnChange event — field is set', () => {
+    const result = parseFormStructure(MINIMAL_FORM_XML);
     expect(result.events[1]).toEqual({
-      event: 'OnChange', field: 'firstname', functionName: 'Contact.onChange', libraryName: 'new_/js/contact.js'
+      event: 'OnChange', field: 'firstname', functionName: 'Contact.onChange', libraryName: 'new_/js/contact.js',
     });
   });
 
-  it('skips cells without a Control', () => {
-    const json = JSON.stringify({
-      Tabs: [{ Name: "t1", Label: "T", Columns: [{ Sections: [{ Name: "s1", Label: "S", Rows: [{ Cells: [
-        { Label: "No control here" },
-        { Label: "Has control", Control: { Id: "name", DataFieldName: "name" } }
-      ]}]}]}] }],
-      FormLibraries: { Libraries: [] },
-      EventHandlers: []
-    });
-    const result = parseFormStructure(json);
+  it('normalises event names (onload → OnLoad, onsave → OnSave)', () => {
+    const xml = `<form>
+      <tabs></tabs>
+      <formLibraries></formLibraries>
+      <events>
+        <event name="onsave">
+          <Handlers><Handler functionName="Ns.onSave" libraryName="new_/js/lib.js" /></Handlers>
+        </event>
+      </events>
+    </form>`;
+    const result = parseFormStructure(xml);
+    expect(result.events[0].event).toBe('OnSave');
+  });
+
+  it('skips cells without a control element', () => {
+    const xml = `<form>
+      <tabs><tab name="t1">
+        <labels><label description="T" languagecode="1033" /></labels>
+        <columns><column><sections>
+          <section name="s1">
+            <labels><label description="S" languagecode="1033" /></labels>
+            <rows><row>
+              <cell>
+                <labels><label description="No control" languagecode="1033" /></labels>
+              </cell>
+              <cell>
+                <labels><label description="Has control" languagecode="1033" /></labels>
+                <control id="name" datafieldname="name" />
+              </cell>
+            </row></rows>
+          </section>
+        </sections></column></columns>
+      </tab></tabs>
+      <formLibraries></formLibraries>
+      <events></events>
+    </form>`;
+    const result = parseFormStructure(xml);
     expect(result.tabs[0].sections[0].fields).toHaveLength(1);
     expect(result.tabs[0].sections[0].fields[0].logicalName).toBe('name');
   });
 
-  it('marks PCF controls', () => {
-    const PCF_CLASS_ID = '{F9A8A302-114E-466A-B582-6771B2AE0D92}';
-    const json = JSON.stringify({
-      Tabs: [{ Name: "t1", Label: "T", Columns: [{ Sections: [{ Name: "s1", Label: "S", Rows: [{ Cells: [
-        { Label: "Rating", Control: { Id: "new_rating", DataFieldName: "new_rating", ClassId: PCF_CLASS_ID } }
-      ]}]}]}] }],
-      FormLibraries: { Libraries: [] },
-      EventHandlers: []
-    });
-    const result = parseFormStructure(json);
-    expect(result.tabs[0].sections[0].fields[0].isPcf).toBe(true);
+  it('falls back to control id when datafieldname is absent', () => {
+    const xml = `<form>
+      <tabs><tab name="t1">
+        <columns><column><sections>
+          <section name="s1">
+            <rows><row>
+              <cell><control id="myfield" /></cell>
+            </row></rows>
+          </section>
+        </sections></column></columns>
+      </tab></tabs>
+      <formLibraries></formLibraries><events></events>
+    </form>`;
+    const result = parseFormStructure(xml);
+    expect(result.tabs[0].sections[0].fields[0].logicalName).toBe('myfield');
   });
 
-  it('marks controls with ComponentType as PCF', () => {
-    const json = JSON.stringify({
-      Tabs: [{ Name: "t1", Label: "T", Columns: [{ Sections: [{ Name: "s1", Label: "S", Rows: [{ Cells: [
-        { Label: "Custom", Control: { Id: "new_custom", DataFieldName: "new_custom", ComponentType: 5 } }
-      ]}]}]}] }],
-      FormLibraries: { Libraries: [] },
-      EventHandlers: []
-    });
-    const result = parseFormStructure(json);
-    expect(result.tabs[0].sections[0].fields[0].isPcf).toBe(true);
-  });
-
-  it('handles real formjson with $values wrappers, null labels, and string libraries', () => {
-    const json = JSON.stringify({
-      Tabs: { $values: [{
-        Label: null,
-        Name: "tab_general",
-        Columns: { $values: [{
-          Sections: { $values: [{
-            Label: null,
-            Name: "section_info",
-            Rows: { $values: [{
-              Cells: { $values: [
-                {
-                  Label: null,
-                  Control: {
-                    Id: "indskr_name",
-                    DataFieldName: "indskr_name",
-                    Label: null,
-                    EventHandlers: { $values: [
-                      { EventName: "OnChange", FunctionName: "Ns.onNameChange", LibraryName: "new_/js/contact.js" }
-                    ] }
-                  }
-                }
-              ] }
-            }] }
-          }] }
-        }] },
-        EventHandlers: { $values: [] }
-      }] },
-      FormLibraries: { $values: ["new_/js/contact.js", "new_/js/utils.js"] },
-      EventHandlers: { $values: [
-        { EventName: "OnLoad", FunctionName: "Ns.onLoad", LibraryName: "new_/js/contact.js" }
-      ] }
-    });
-    const result = parseFormStructure(json);
-
-    // Structure: tab label falls back to Name
-    expect(result.tabs).toHaveLength(1);
-    expect(result.tabs[0].label).toBe('tab_general');
-    expect(result.tabs[0].sections[0].label).toBe('section_info');
-
-    // Field: label falls back to logical name when null
+  it('falls back to logicalName when cell has no labels', () => {
+    const xml = `<form>
+      <tabs><tab name="t1">
+        <columns><column><sections>
+          <section name="s1">
+            <rows><row>
+              <cell><control id="indskr_name" datafieldname="indskr_name" /></cell>
+            </row></rows>
+          </section>
+        </sections></column></columns>
+      </tab></tabs>
+      <formLibraries></formLibraries><events></events>
+    </form>`;
+    const result = parseFormStructure(xml);
     const field = result.tabs[0].sections[0].fields[0];
     expect(field.logicalName).toBe('indskr_name');
     expect(field.label).toBe('indskr_name');
+  });
 
-    // Libraries: string[] → webResourceName = displayName
-    expect(result.libraries).toEqual([
-      { webResourceName: 'new_/js/contact.js', displayName: 'new_/js/contact.js' },
-      { webResourceName: 'new_/js/utils.js',   displayName: 'new_/js/utils.js' },
-    ]);
+  it('falls back to tab name when tab has no labels', () => {
+    const xml = `<form>
+      <tabs><tab name="tab_general"><columns></columns></tab></tabs>
+      <formLibraries></formLibraries><events></events>
+    </form>`;
+    const result = parseFormStructure(xml);
+    expect(result.tabs[0].label).toBe('tab_general');
+  });
 
-    // Events: form-level OnLoad + control-level OnChange
-    expect(result.events).toHaveLength(2);
-    expect(result.events[0]).toEqual({ event: 'OnLoad', field: null, functionName: 'Ns.onLoad', libraryName: 'new_/js/contact.js' });
-    expect(result.events[1]).toEqual({ event: 'OnChange', field: 'indskr_name', functionName: 'Ns.onNameChange', libraryName: 'new_/js/contact.js' });
+  it('falls back to section name when section has no labels', () => {
+    const xml = `<form>
+      <tabs><tab name="t1">
+        <columns><column><sections>
+          <section name="header">
+            <rows></rows>
+          </section>
+        </sections></column></columns>
+      </tab></tabs>
+      <formLibraries></formLibraries><events></events>
+    </form>`;
+    const result = parseFormStructure(xml);
+    expect(result.tabs[0].sections[0].name).toBe('header');
+    expect(result.tabs[0].sections[0].label).toBe('header');
+  });
+
+  it('marks PCF controls via classid', () => {
+    const PCF_CLASS_ID = '{F9A8A302-114E-466A-B582-6771B2AE0D92}';
+    const xml = `<form>
+      <tabs><tab name="t1">
+        <columns><column><sections>
+          <section name="s1">
+            <rows><row>
+              <cell>
+                <labels><label description="Rating" languagecode="1033" /></labels>
+                <control id="new_rating" datafieldname="new_rating" classid="${PCF_CLASS_ID}" />
+              </cell>
+            </row></rows>
+          </section>
+        </sections></column></columns>
+      </tab></tabs>
+      <formLibraries></formLibraries><events></events>
+    </form>`;
+    const result = parseFormStructure(xml);
+    expect(result.tabs[0].sections[0].fields[0].isPcf).toBe(true);
+  });
+
+  it('non-PCF controls have isPcf false', () => {
+    const STANDARD_CLASS_ID = '{270BD3DB-D9AF-4782-9025-509E298DEC0A}';
+    const xml = `<form>
+      <tabs><tab name="t1">
+        <columns><column><sections>
+          <section name="s1">
+            <rows><row>
+              <cell>
+                <labels><label description="Name" languagecode="1033" /></labels>
+                <control id="name" datafieldname="name" classid="${STANDARD_CLASS_ID}" />
+              </cell>
+            </row></rows>
+          </section>
+        </sections></column></columns>
+      </tab></tabs>
+      <formLibraries></formLibraries><events></events>
+    </form>`;
+    const result = parseFormStructure(xml);
+    expect(result.tabs[0].sections[0].fields[0].isPcf).toBe(false);
+  });
+
+  it('parses multiple tabs and multiple sections per tab', () => {
+    const xml = `<form>
+      <tabs>
+        <tab name="tab_main">
+          <labels><label description="Main" languagecode="1033" /></labels>
+          <columns><column><sections>
+            <section name="s1"><labels><label description="Info" languagecode="1033" /></labels><rows></rows></section>
+            <section name="s2"><labels><label description="Details" languagecode="1033" /></labels><rows></rows></section>
+          </sections></column></columns>
+        </tab>
+        <tab name="tab_extra">
+          <labels><label description="Extra" languagecode="1033" /></labels>
+          <columns><column><sections>
+            <section name="s3"><labels><label description="Other" languagecode="1033" /></labels><rows></rows></section>
+          </sections></column></columns>
+        </tab>
+      </tabs>
+      <formLibraries></formLibraries><events></events>
+    </form>`;
+    const result = parseFormStructure(xml);
+    expect(result.tabs).toHaveLength(2);
+    expect(result.tabs[0].sections).toHaveLength(2);
+    expect(result.tabs[1].sections).toHaveLength(1);
+    expect(result.tabs[0].sections[1].label).toBe('Details');
   });
 });

@@ -32,51 +32,10 @@
   padding: 4px 0;
 }
 
-.fv-tab-group {
-  margin-bottom: 12px;
-}
-
-.fv-tab-label {
-  font-weight: 600;
-  font-size: 12px;
-  padding: 4px 0 2px;
-  color: var(--vscode-foreground);
-}
-
-.fv-section-group {
-  margin-left: 16px;
-  margin-bottom: 6px;
-}
-
-.fv-section-label {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--vscode-descriptionForeground);
-  padding: 2px 0;
-}
-
-.fv-fields {
-  margin-left: 16px;
-}
-
-.fv-field-row {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  padding: 1px 0;
-  line-height: 1.6;
-}
-
 .fv-field-logical {
   font-family: var(--vscode-editor-font-family, monospace);
   font-size: 11px;
   color: var(--vscode-foreground);
-}
-
-.fv-field-label {
-  color: var(--vscode-descriptionForeground);
-  font-size: 11px;
 }
 
 .fv-pcf-badge {
@@ -90,9 +49,40 @@
   flex-shrink: 0;
 }
 
+.fv-section-type-badge {
+  font-size: 9px;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--vscode-descriptionForeground) 15%, transparent);
+  color: var(--vscode-descriptionForeground);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+/* Meta row extras */
+.fv-meta-description {
+  color: var(--vscode-descriptionForeground);
+  font-size: 11px;
+  font-style: italic;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 300px;
+  flex-shrink: 1;
+}
+
 /* Libraries & Events tab */
 .fv-lib-events {
   padding: 4px 0;
+}
+
+.fv-label-empty {
+  color: var(--vscode-descriptionForeground);
+  font-style: italic;
+  font-weight: 400;
+  opacity: 0.6;
 }
 
 .fv-section-heading {

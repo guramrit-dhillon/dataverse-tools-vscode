@@ -1,13 +1,13 @@
 import * as React from "react";
 import { useCallback, useEffect, useMemo } from "react";
-import { useReducer, TabBar, DataTable } from "shared-views";
-import type { TableColumnDefinition } from "shared-views";
+import { useReducer, TabBar, DataTable, TreeView } from "shared-views";
+import type { TableColumnDefinition, TreeNode } from "shared-views";
 import type { EntityForm, EntityFormDetails } from "../../src/types/metadata";
 import { parseFormStructure, type FormField, type FormLibrary, type FormEvent } from "../utils/parseFormStructure";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-type Tab = "structure" | "libraries" | "formjson";
+type Tab = "structure" | "libraries" | "formxml";
 
 type Phase =
   | { tag: "loading" }
@@ -52,8 +52,37 @@ function formTypeGroupLabel(type: number): string {
 const TABS = [
   { id: "structure",  label: "Structure" },
   { id: "libraries",  label: "Libraries & Events" },
-  { id: "formjson",   label: "FormJSON" },
+  { id: "formxml",    label: "FormXML" },
 ] as const;
+
+// ── XML formatter ─────────────────────────────────────────────────────────────
+
+function serializeXmlNode(el: Element, depth: number): string {
+  const indent = "  ".repeat(depth);
+  const tag = el.tagName;
+  const attrStr = el.attributes.length > 0
+    ? " " + Array.from(el.attributes).map((a) => `${a.name}="${a.value.replace(/&/g, "&amp;").replace(/"/g, "&quot;")}"`).join(" ")
+    : "";
+  const childEls = Array.from(el.children);
+  if (childEls.length === 0) {
+    const text = el.textContent?.trim() ?? "";
+    return text
+      ? `${indent}<${tag}${attrStr}>${text}</${tag}>`
+      : `${indent}<${tag}${attrStr} />`;
+  }
+  const inner = childEls.map((c) => serializeXmlNode(c, depth + 1)).join("\n");
+  return `${indent}<${tag}${attrStr}>\n${inner}\n${indent}</${tag}>`;
+}
+
+function formatXml(xml: string): string {
+  try {
+    const doc = new DOMParser().parseFromString(xml, "text/xml");
+    if (doc.querySelector("parsererror")) { return xml; }
+    return serializeXmlNode(doc.documentElement, 0);
+  } catch {
+    return xml;
+  }
+}
 
 // Column definitions for sub-tables
 const LIBRARY_COLS: TableColumnDefinition<FormLibrary>[] = [
@@ -165,10 +194,9 @@ export function FormViewer(): React.ReactElement {
 
   const handleCopy = (): void => {
     if (phase.tag !== "ready" && phase.tag !== "no-list") { return; }
-    const json = phase.current.formjson;
-    if (!json) { return; }
-    const pretty = (() => { try { return JSON.stringify(JSON.parse(json), null, 2); } catch { return json; } })();
-    navigator.clipboard.writeText(pretty).then(() => {
+    const xml = phase.current.formxml;
+    if (!xml) { return; }
+    navigator.clipboard.writeText(formatXml(xml)).then(() => {
       dispatch({ type: "copyDone" });
       setTimeout(() => dispatch({ type: "copyReset" }), 1500);
     });
@@ -194,11 +222,35 @@ export function FormViewer(): React.ReactElement {
     return Array.from(groups.entries()).sort(([a], [b]) => a - b);
   }, [formsList]);
 
-  // Parse formjson for Structure tab
+  // Parse formxml for Structure tab
   const formStructure = useMemo(
-    () => parseFormStructure(currentForm?.formjson),
-    [currentForm?.formjson],
+    () => parseFormStructure(currentForm?.formxml),
+    [currentForm?.formxml],
   );
+
+  // ── Structure tree nodes (must be before early returns) ──────────────────
+  const structureNodes = useMemo((): TreeNode[] => {
+    return formStructure.tabs.map((tab, ti) => ({
+      id: `t${ti}`,
+      label: tab.label || <span className="fv-label-empty">(unnamed tab)</span>,
+      defaultExpanded: true,
+      children: tab.sections.map((sec, si) => {
+        const isSpecial = sec.name === "header" || sec.name === "footer";
+        return {
+          id: `t${ti}s${si}`,
+          label: sec.label || <span className="fv-label-empty">(unnamed section)</span>,
+          badges: isSpecial ? <span className="fv-section-type-badge">{sec.name}</span> : undefined,
+          defaultExpanded: true,
+          children: sec.fields.map((f: FormField, fi) => ({
+            id: `t${ti}s${si}f${fi}`,
+            label: <span className="fv-field-logical">{f.logicalName}</span>,
+            secondary: f.label !== f.logicalName ? f.label : undefined,
+            badges: f.isPcf ? <span className="fv-pcf-badge">PCF</span> : undefined,
+          })),
+        };
+      }),
+    }));
+  }, [formStructure.tabs]);
 
   if (phase.tag === "loading") {
     return <div className="form-viewer"><div className="fv-loading">Loading…</div></div>;
@@ -207,33 +259,10 @@ export function FormViewer(): React.ReactElement {
     return <div className="form-viewer"><div className="fv-error">{phase.message}</div></div>;
   }
 
-  // ── Structure tab ────────────────────────────────────────────────────────
-  const structureContent = formStructure.tabs.length === 0 ? (
+  const structureContent = structureNodes.length === 0 ? (
     <div className="fv-empty">No structure data available</div>
   ) : (
-    <div className="fv-structure">
-      {formStructure.tabs.map((tab, ti) => (
-        <div key={ti} className="fv-tab-group">
-          <div className="fv-tab-label">📂 {tab.label}</div>
-          {tab.sections.map((sec, si) => (
-            <div key={si} className="fv-section-group">
-              <div className="fv-section-label">📁 {sec.label}</div>
-              <div className="fv-fields">
-                {sec.fields.map((f, fi) => (
-                  <div key={fi} className="fv-field-row">
-                    <span className="fv-field-logical">{f.logicalName}</span>
-                    {f.label && f.label !== f.logicalName && (
-                      <span className="fv-field-label"> — {f.label}</span>
-                    )}
-                    {f.isPcf && <span className="fv-pcf-badge">PCF</span>}
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      ))}
-    </div>
+    <TreeView nodes={structureNodes} className="fv-structure" />
   );
 
   // ── Libraries & Events tab ───────────────────────────────────────────────
@@ -257,16 +286,16 @@ export function FormViewer(): React.ReactElement {
     </div>
   );
 
-  // ── FormJSON tab ─────────────────────────────────────────────────────────
-  const rawJson = currentForm?.formjson;
-  const prettyJson = rawJson ? (() => { try { return JSON.stringify(JSON.parse(rawJson), null, 2); } catch { return rawJson; } })() : null;
-  const formJsonContent = prettyJson ? (
+  // ── FormXML tab ───────────────────────────────────────────────────────────
+  const rawXml = currentForm?.formxml;
+  const prettyXml = rawXml ? formatXml(rawXml) : null;
+  const formXmlContent = prettyXml ? (
     <div className="vd-fetchxml-wrap">
       <button className="vd-copy-btn" onClick={handleCopy} type="button">{copyLabel}</button>
-      <textarea className="vd-fetchxml-textarea" readOnly value={prettyJson} spellCheck={false} />
+      <textarea className="vd-fetchxml-textarea" readOnly value={prettyXml} spellCheck={false} />
     </div>
   ) : (
-    <div className="fv-empty">No FormJSON available</div>
+    <div className="fv-empty">No FormXML available</div>
   );
 
   return (
@@ -299,6 +328,9 @@ export function FormViewer(): React.ReactElement {
         <div className="vd-meta-row">
           <span className="vd-meta-item">Type:<span>{formTypeGroupLabel(currentForm.type)}</span></span>
           {currentForm.ismanaged && <span className="vd-meta-item">Managed:<span>Yes</span></span>}
+          {currentForm.description && (
+            <span className="fv-meta-description" title={currentForm.description}>{currentForm.description}</span>
+          )}
         </div>
       )}
 
@@ -316,7 +348,7 @@ export function FormViewer(): React.ReactElement {
         )}
         {activeTab === "structure"  && structureContent}
         {activeTab === "libraries"  && libEventsContent}
-        {activeTab === "formjson"   && formJsonContent}
+        {activeTab === "formxml"    && formXmlContent}
       </div>
     </div>
   );
