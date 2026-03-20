@@ -1,6 +1,6 @@
 import { type IMetadataService } from "../interfaces/IMetadataService";
 import { SolutionComponentType, type DataverseEnvironment, type DataverseSolution, type SolutionComponent, DataverseWebApiClient } from "core-dataverse";
-import type { EntityAttribute, EntityRelationships, IntersectRelationship, LookupRelationship, EntityForm, EntityView } from "../types/metadata";
+import type { EntityAttribute, EntityRelationships, IntersectRelationship, LookupRelationship, EntityForm, EntityFormDetails, EntityView } from "../types/metadata";
 
 export class MetadataService implements IMetadataService {
   constructor(private readonly getToken: (env: DataverseEnvironment) => Promise<string>) {}
@@ -76,6 +76,12 @@ export class MetadataService implements IMetadataService {
   async getViewDetails(env: DataverseEnvironment, savedqueryid: string): Promise<EntityView> {
     return this.client(env).get<EntityView>(
       `savedqueries(${savedqueryid})?$select=savedqueryid,name,querytype,isdefault,ismanaged,description,fetchxml,layoutxml`
+    );
+  }
+
+  async getFormDetails(env: DataverseEnvironment, formid: string): Promise<EntityFormDetails> {
+    return this.client(env).get<EntityFormDetails>(
+      `systemforms(${formid})?$select=formid,name,type,ismanaged,description,formjson`
     );
   }
 }
