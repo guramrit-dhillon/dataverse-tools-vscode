@@ -81,7 +81,7 @@ export class MetadataService implements IMetadataService {
 
   async getFormDetails(env: DataverseEnvironment, formid: string): Promise<EntityFormDetails> {
     return this.client(env).get<EntityFormDetails>(
-      `systemforms(${formid})?$select=formid,name,type,ismanaged,description,formjson`
+      `systemforms(${formid})?$select=formid,name,type,ismanaged,description,formxml`
     );
   }
 }

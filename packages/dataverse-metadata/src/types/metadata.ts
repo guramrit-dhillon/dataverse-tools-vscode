@@ -71,10 +71,10 @@ export interface EntityForm {
 }
 
 /**
- * Extended form record including `formjson` — only populated by `getFormDetails`.
+ * Extended form record including `formxml` — only populated by `getFormDetails`.
  */
 export interface EntityFormDetails extends EntityForm {
-  formjson?: string;
+  formxml?: string;
 }
 
 /**
