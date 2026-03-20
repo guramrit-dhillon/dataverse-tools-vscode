@@ -79,7 +79,7 @@ export class ViewDesignerPanel extends Panel {
     } else {
       this.postMessage({
         type: "viewError",
-        payload: { message: detailResult.reason?.message ?? "Failed to load view" },
+        payload: { message: detailResult.reason instanceof Error ? detailResult.reason.message : "Failed to load view" },
       });
     }
   }
