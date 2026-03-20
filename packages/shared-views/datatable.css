@@ -79,6 +79,10 @@
   font-variant-numeric: tabular-nums;
 }
 
+.data-table thead th.col-number {
+  text-align: right;
+}
+
 .col-date {
   font-family: var(--vscode-editor-font-family, monospace);
   font-size: 11px;
