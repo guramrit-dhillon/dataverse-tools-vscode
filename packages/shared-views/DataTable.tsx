@@ -13,6 +13,7 @@ export interface TableColumnDefinition<T = any> {
   width?: number;
   headerClassName?: string;
   cellClassName?: string | ((value: any, row: T) => string);
+  isLink?: boolean;
 }
 
 export interface TableProps<T> {
@@ -27,6 +28,7 @@ export interface TableProps<T> {
   rowClassName?: string | ((row: T) => string);
   emptyMessage?: string;
   emptyCellClassName?: string;
+  onCellClick?: (col: TableColumnDefinition<T>, row: T) => void;
 }
 
 const columnTypeClass: Record<ColumnType, string> = {
@@ -44,7 +46,9 @@ export default function DataTable<T>(props: TableProps<T>) {
     onSelectionChange,
     keyFormatter,
     onRowClick,
-    rowClassName: rowClassNameProp } = props;
+    rowClassName: rowClassNameProp,
+    onCellClick,
+  } = props;
 
   const tableRef = useRef<HTMLTableElement>(null);
   const [colWidths, setColWidths] = useState<Record<string, number>>({});
@@ -201,7 +205,16 @@ export default function DataTable<T>(props: TableProps<T>) {
                     title={value}
                     className={getCellClassName(col, row) || undefined}
                   >
-                    {value}
+                    {col.isLink && onCellClick ? (
+                      <button
+                        type="button"
+                        className="cell-link"
+                        onClick={(e) => { e.stopPropagation(); onCellClick(col, row); }}
+                        onKeyDown={(e) => e.stopPropagation()}
+                      >
+                        {value}
+                      </button>
+                    ) : value}
                   </td>
                 );
               })}
