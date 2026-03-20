@@ -71,6 +71,13 @@ export interface EntityForm {
 }
 
 /**
+ * Extended form record including `formjson` — only populated by `getFormDetails`.
+ */
+export interface EntityFormDetails extends EntityForm {
+  formjson?: string;
+}
+
+/**
  * Saved query (view) record from the `savedqueries` OData entity.
  * Query type codes: 0=Public View, 1=Advanced Find, 2=Associated,
  * 4=Quick Find, 64=Lookup.
