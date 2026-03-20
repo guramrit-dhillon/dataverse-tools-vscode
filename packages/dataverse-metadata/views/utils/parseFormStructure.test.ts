@@ -118,4 +118,61 @@ describe('parseFormStructure', () => {
     const result = parseFormStructure(json);
     expect(result.tabs[0].sections[0].fields[0].isPcf).toBe(true);
   });
+
+  it('handles real formjson with $values wrappers, null labels, and string libraries', () => {
+    const json = JSON.stringify({
+      Tabs: { $values: [{
+        Label: null,
+        Name: "tab_general",
+        Columns: { $values: [{
+          Sections: { $values: [{
+            Label: null,
+            Name: "section_info",
+            Rows: { $values: [{
+              Cells: { $values: [
+                {
+                  Label: null,
+                  Control: {
+                    Id: "indskr_name",
+                    DataFieldName: "indskr_name",
+                    Label: null,
+                    EventHandlers: { $values: [
+                      { EventName: "OnChange", FunctionName: "Ns.onNameChange", LibraryName: "new_/js/contact.js" }
+                    ] }
+                  }
+                }
+              ] }
+            }] }
+          }] }
+        }] },
+        EventHandlers: { $values: [] }
+      }] },
+      FormLibraries: { $values: ["new_/js/contact.js", "new_/js/utils.js"] },
+      EventHandlers: { $values: [
+        { EventName: "OnLoad", FunctionName: "Ns.onLoad", LibraryName: "new_/js/contact.js" }
+      ] }
+    });
+    const result = parseFormStructure(json);
+
+    // Structure: tab label falls back to Name
+    expect(result.tabs).toHaveLength(1);
+    expect(result.tabs[0].label).toBe('tab_general');
+    expect(result.tabs[0].sections[0].label).toBe('section_info');
+
+    // Field: label falls back to logical name when null
+    const field = result.tabs[0].sections[0].fields[0];
+    expect(field.logicalName).toBe('indskr_name');
+    expect(field.label).toBe('indskr_name');
+
+    // Libraries: string[] → webResourceName = displayName
+    expect(result.libraries).toEqual([
+      { webResourceName: 'new_/js/contact.js', displayName: 'new_/js/contact.js' },
+      { webResourceName: 'new_/js/utils.js',   displayName: 'new_/js/utils.js' },
+    ]);
+
+    // Events: form-level OnLoad + control-level OnChange
+    expect(result.events).toHaveLength(2);
+    expect(result.events[0]).toEqual({ event: 'OnLoad', field: null, functionName: 'Ns.onLoad', libraryName: 'new_/js/contact.js' });
+    expect(result.events[1]).toEqual({ event: 'OnChange', field: 'indskr_name', functionName: 'Ns.onNameChange', libraryName: 'new_/js/contact.js' });
+  });
 });
