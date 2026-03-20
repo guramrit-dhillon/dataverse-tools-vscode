@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useReducer, TabBar } from "shared-views";
 import type { EntityView } from "../../src/types/metadata";
 import { parseLayoutColumns } from "../utils/parseLayoutColumns";
@@ -12,7 +12,7 @@ type Phase =
   | { tag: "loading" }
   | { tag: "ready"; views: EntityView[]; current: EntityView }
   | { tag: "switching"; views: EntityView[]; current: EntityView }
-  | { tag: "error"; views?: EntityView[]; message: string }
+  | { tag: "error"; views?: EntityView[]; current?: EntityView; message: string }
   | { tag: "no-list"; current: EntityView };
 
 interface State {
@@ -140,18 +140,11 @@ function reducer(state: State, action: Action): State {
 
     case "viewError": {
       const { message } = action.payload;
-      const p = state.phase;
-      const existingViews =
-        p.tag === "ready" || p.tag === "switching"
-          ? p.views
-          : p.tag === "error"
-          ? p.views
-          : undefined;
-      return {
-        ...state,
-        phase: { tag: "error", views: existingViews, message },
-        inFlightId: null,
-      };
+      const prev = state.phase;
+      const existingViews = (prev.tag === "ready" || prev.tag === "switching" || prev.tag === "error") ? prev.views : undefined;
+      const existingCurrent = (prev.tag === "ready" || prev.tag === "switching") ? prev.current
+        : prev.tag === "error" ? prev.current : undefined;
+      return { ...state, phase: { tag: "error", views: existingViews, current: existingCurrent, message }, inFlightId: null };
     }
 
     case "setView": {
@@ -175,15 +168,12 @@ function reducer(state: State, action: Action): State {
       const { savedqueryid } = action.payload;
       const p = state.phase;
       const newPhase: Phase =
-        p.tag === "ready" || p.tag === "switching"
+        (p.tag === "ready" || p.tag === "switching")
+          ? { tag: "switching", views: p.views, current: p.current }
+          : (p.tag === "error" && p.views && p.current)
           ? { tag: "switching", views: p.views, current: p.current }
           : p;
-      return {
-        ...state,
-        phase: newPhase,
-        inFlightId: savedqueryid,
-        pendingSwitchViewId: null,
-      };
+      return { ...state, phase: newPhase, inFlightId: savedqueryid, pendingSwitchViewId: null };
     }
 
     case "switchTab":
@@ -224,15 +214,11 @@ export function ViewDesigner(): React.ReactElement {
 
   // ── Dropdown change ──────────────────────────────────────────────────────
 
-  const handleViewChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
+  const handleViewChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>): void => {
     const savedqueryid = e.target.value;
     if (!savedqueryid) { return; }
-    dispatch({
-      type: "switchView",
-      payload: { savedqueryid },
-      meta: { toExtension: true },
-    });
-  };
+    dispatch({ type: "setView", payload: { savedqueryid } });
+  }, [dispatch]);
 
   // ── Copy FetchXML ────────────────────────────────────────────────────────
 
@@ -251,6 +237,8 @@ export function ViewDesigner(): React.ReactElement {
   const currentView =
     phase.tag === "ready" || phase.tag === "switching" || phase.tag === "no-list"
       ? phase.current
+      : phase.tag === "error" && phase.current
+      ? phase.current
       : null;
 
   const viewsList =
@@ -261,7 +249,7 @@ export function ViewDesigner(): React.ReactElement {
       : undefined;
 
   // Group views by querytype for optgroup
-  const groupedViews = React.useMemo(() => {
+  const groupedViews = useMemo(() => {
     if (!viewsList) { return []; }
     const groups = new Map<number, EntityView[]>();
     for (const v of viewsList) {
