@@ -96,7 +96,8 @@ type Action =
   | { type: "retrieveForms:error"; payload: string }
   | { type: "retrieveViews"; meta: { toExtension: true } }
   | { type: "retrieveViews:response"; payload: EntityView[] }
-  | { type: "retrieveViews:error"; payload: string };
+  | { type: "retrieveViews:error"; payload: string }
+  | { type: "openViewDesigner"; payload: { savedqueryid: string; entityLogicalName: string; entityDisplayName?: string }; meta: { toExtension: true } };
 
 // ── Row processors ────────────────────────────────────────────────────────────
 
@@ -213,7 +214,7 @@ const FORM_COLS: TableColumnDefinition<FormRow>[] = [
 ];
 
 const VIEW_COLS: TableColumnDefinition<ViewRow>[] = [
-  { key: "name", label: "Name" },
+  { key: "name", label: "Name", isLink: true },
   { key: "viewType", label: "Type" },
   { key: "isDefault", label: "Default" },
   { key: "managed", label: "Managed" },
@@ -326,6 +327,13 @@ export function EntityMetadataApp(): React.ReactElement {
             emptyMessage={state.views.loading ? "Loading\u2026" : "No views found"}
             error={state.views.error}
             loading={state.views.loading}
+            onCellClick={(_col, row) => {
+              dispatch({
+                type: "openViewDesigner",
+                payload: { savedqueryid: row.savedqueryid, entityLogicalName, entityDisplayName },
+                meta: { toExtension: true },
+              });
+            }}
           />
         )}
       </div>
