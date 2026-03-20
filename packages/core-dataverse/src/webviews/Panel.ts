@@ -80,6 +80,11 @@ export class Panel {
     return this.#panel.visible;
   }
 
+  /** Bring the panel to the foreground without sending init or triggering onReady. */
+  protected reveal(): void {
+    this.#panel.reveal();
+  }
+
   /** Update the panel's tab title without re-sending init or revealing. */
   protected setTitle(title: string): void {
     this.#panel.title = title;
