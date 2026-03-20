@@ -75,7 +75,7 @@ export class MetadataService implements IMetadataService {
 
   async getViewDetails(env: DataverseEnvironment, savedqueryid: string): Promise<EntityView> {
     return this.client(env).get<EntityView>(
-      `savedqueries(${savedqueryid})?$select=savedqueryid,name,querytype,isdefault,ismanaged,fetchxml,layoutxml`
+      `savedqueries(${savedqueryid})?$select=savedqueryid,name,querytype,isdefault,ismanaged,description,fetchxml,layoutxml`
     );
   }
 }
