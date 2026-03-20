@@ -23,3 +23,5 @@ export { default as ResultsViewer } from "./ResultsViewer";
 export type { ResultsViewerProps, ResultsViewerTab } from "./ResultsViewer";
 export { parseCsv } from "./parseCsv";
 export type { CsvParseResult } from "./parseCsv";
+export { TreeView } from "./TreeView";
+export type { TreeNode, TreeViewProps } from "./TreeView";
