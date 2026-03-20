@@ -1,0 +1,142 @@
+.view-designer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  font-size: 13px;
+}
+
+.vd-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px 6px;
+  border-bottom: 1px solid var(--vscode-panel-border);
+  flex-shrink: 0;
+}
+
+.vd-entity-label {
+  color: var(--vscode-descriptionForeground);
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.vd-view-select {
+  flex: 1;
+  background: var(--vscode-dropdown-background);
+  color: var(--vscode-dropdown-foreground);
+  border: 1px solid var(--vscode-dropdown-border);
+  border-radius: 2px;
+  padding: 3px 6px;
+  font-size: 12px;
+  font-family: inherit;
+  min-width: 0;
+}
+
+.vd-view-select:disabled {
+  opacity: 0.5;
+}
+
+.vd-no-list-note {
+  font-size: 11px;
+  color: var(--vscode-descriptionForeground);
+  white-space: nowrap;
+}
+
+.vd-meta-row {
+  display: flex;
+  gap: 16px;
+  padding: 4px 12px;
+  border-bottom: 1px solid var(--vscode-panel-border);
+  flex-shrink: 0;
+}
+
+.vd-meta-item {
+  font-size: 11px;
+  color: var(--vscode-descriptionForeground);
+}
+
+.vd-meta-item span {
+  color: var(--vscode-foreground);
+  margin-left: 4px;
+}
+
+.vd-content {
+  flex: 1;
+  overflow: auto;
+  padding: 12px;
+  position: relative;
+}
+
+.vd-content.switching {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.vd-loading, .vd-error, .vd-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--vscode-descriptionForeground);
+  font-size: 13px;
+}
+
+.vd-error {
+  color: var(--vscode-errorForeground);
+}
+
+.vd-columns-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.vd-columns-table th {
+  text-align: left;
+  padding: 4px 10px;
+  border-bottom: 1px solid var(--vscode-panel-border);
+  color: var(--vscode-descriptionForeground);
+  font-weight: 500;
+}
+
+.vd-columns-table td {
+  padding: 4px 10px;
+  border-bottom: 1px solid var(--vscode-panel-border, rgba(255,255,255,0.05));
+  font-family: var(--vscode-editor-font-family, monospace);
+}
+
+.vd-fetchxml-wrap {
+  position: relative;
+}
+
+.vd-copy-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+  border: none;
+  border-radius: 2px;
+  padding: 3px 8px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.vd-copy-btn:hover {
+  background: var(--vscode-button-secondaryHoverBackground);
+}
+
+.vd-fetchxml-pre {
+  background: var(--vscode-editor-background);
+  color: var(--vscode-editor-foreground);
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 12px;
+  padding: 12px;
+  margin: 0;
+  overflow: auto;
+  white-space: pre;
+  border-radius: 3px;
+  border: 1px solid var(--vscode-panel-border);
+  max-height: 600px;
+}
