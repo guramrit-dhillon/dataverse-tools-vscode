@@ -1,0 +1,74 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "packages", "packages", "{809F86A1-1C4C-B159-0CD4-DF9D33D876CE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dataverse-assembly-analyzer", "dataverse-assembly-analyzer", "{1CB4F209-E912-11F5-7315-5D3C3797DD81}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dotnet", "dotnet", "{560296CF-5E31-32B7-2B16-EBE48DAEA01B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginAnalyzer", "packages\dataverse-assembly-analyzer\dotnet\PluginAnalyzer.csproj", "{1E88C07E-7065-B5F1-8CC6-964FCFE71DFE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "assembly-backend", "assembly-backend", "{C7256A68-DA40-7B85-DE7A-3A0E527B0C91}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dotnet", "dotnet", "{29ABA65C-B6A9-F43D-19C8-4100BFDC670A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyBackend", "packages\assembly-backend\dotnet\AssemblyBackend.csproj", "{CD8506EF-4314-555A-A684-2B1BBE01C72D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "assembly-decompiler", "assembly-decompiler", "{7A23F570-5353-CDD0-7109-BC8E78C83D2C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dotnet", "dotnet", "{D7F55FD2-8474-7A06-900F-E23201E97B88}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyDecompiler", "packages\assembly-decompiler\dotnet\AssemblyDecompiler.csproj", "{F7074CE0-93A9-F895-D987-5700C63DFDFA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{EF84232F-F69F-9E95-64B0-6BA76C23C16E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fixtures", "fixtures", "{7A0F140C-0842-BCA4-9748-778AA4156522}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestAssembly", "packages\assembly-backend\tests\fixtures\TestAssembly.csproj", "{A7C85024-F70E-3E12-7838-C199AD68FCA4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1E88C07E-7065-B5F1-8CC6-964FCFE71DFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E88C07E-7065-B5F1-8CC6-964FCFE71DFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E88C07E-7065-B5F1-8CC6-964FCFE71DFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E88C07E-7065-B5F1-8CC6-964FCFE71DFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD8506EF-4314-555A-A684-2B1BBE01C72D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD8506EF-4314-555A-A684-2B1BBE01C72D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD8506EF-4314-555A-A684-2B1BBE01C72D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD8506EF-4314-555A-A684-2B1BBE01C72D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7074CE0-93A9-F895-D987-5700C63DFDFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7074CE0-93A9-F895-D987-5700C63DFDFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7074CE0-93A9-F895-D987-5700C63DFDFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7074CE0-93A9-F895-D987-5700C63DFDFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7C85024-F70E-3E12-7838-C199AD68FCA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7C85024-F70E-3E12-7838-C199AD68FCA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7C85024-F70E-3E12-7838-C199AD68FCA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7C85024-F70E-3E12-7838-C199AD68FCA4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1CB4F209-E912-11F5-7315-5D3C3797DD81} = {809F86A1-1C4C-B159-0CD4-DF9D33D876CE}
+		{560296CF-5E31-32B7-2B16-EBE48DAEA01B} = {1CB4F209-E912-11F5-7315-5D3C3797DD81}
+		{1E88C07E-7065-B5F1-8CC6-964FCFE71DFE} = {560296CF-5E31-32B7-2B16-EBE48DAEA01B}
+		{C7256A68-DA40-7B85-DE7A-3A0E527B0C91} = {809F86A1-1C4C-B159-0CD4-DF9D33D876CE}
+		{29ABA65C-B6A9-F43D-19C8-4100BFDC670A} = {C7256A68-DA40-7B85-DE7A-3A0E527B0C91}
+		{CD8506EF-4314-555A-A684-2B1BBE01C72D} = {29ABA65C-B6A9-F43D-19C8-4100BFDC670A}
+		{7A23F570-5353-CDD0-7109-BC8E78C83D2C} = {809F86A1-1C4C-B159-0CD4-DF9D33D876CE}
+		{D7F55FD2-8474-7A06-900F-E23201E97B88} = {7A23F570-5353-CDD0-7109-BC8E78C83D2C}
+		{F7074CE0-93A9-F895-D987-5700C63DFDFA} = {D7F55FD2-8474-7A06-900F-E23201E97B88}
+		{EF84232F-F69F-9E95-64B0-6BA76C23C16E} = {C7256A68-DA40-7B85-DE7A-3A0E527B0C91}
+		{7A0F140C-0842-BCA4-9748-778AA4156522} = {EF84232F-F69F-9E95-64B0-6BA76C23C16E}
+		{A7C85024-F70E-3E12-7838-C199AD68FCA4} = {7A0F140C-0842-BCA4-9748-778AA4156522}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9CF42889-9C72-4D8C-819B-0F8E16E49750}
+	EndGlobalSection
+EndGlobal
