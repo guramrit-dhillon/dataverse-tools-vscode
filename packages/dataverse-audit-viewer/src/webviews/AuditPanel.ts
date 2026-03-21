@@ -102,8 +102,10 @@ export class AuditPanel extends Panel {
   // ── Message handlers ───────────────────────────────────────────────────────
 
   private async handleRetrieve(filter: AuditFilter) {
+    const env = this.env;           // snapshot — prevents mid-flight env swap
+    const auditSvc = this.auditSvc;
     try {
-      return await this.auditSvc.getRecordAuditHistory(this.env, filter);
+      return await auditSvc.getRecordAuditHistory(env, filter);
     } catch (err) {
       Logger.error("Failed to retrieve audit history", err);
       throw new Error(err instanceof Error ? err.message : String(err));
@@ -111,8 +113,10 @@ export class AuditPanel extends Panel {
   }
 
   private async handleGetDetails(payload: { auditId: string }) {
+    const env = this.env;           // snapshot — prevents mid-flight env swap
+    const auditSvc = this.auditSvc;
     try {
-      return await this.auditSvc.getAuditDetails(this.env, payload.auditId);
+      return await auditSvc.getAuditDetails(env, payload.auditId);
     } catch (err) {
       Logger.warn("Failed to retrieve audit details", err instanceof Error ? { message: err.message } : {});
       throw new Error(err instanceof Error ? err.message : String(err));
@@ -120,8 +124,10 @@ export class AuditPanel extends Panel {
   }
 
   private async handleEntitySearch() {
+    const env = this.env;           // snapshot — prevents mid-flight env swap
+    const auditSvc = this.auditSvc;
     try {
-      return await this.auditSvc.listAuditableEntities(this.env);
+      return await auditSvc.listAuditableEntities(env);
     } catch (err) {
       Logger.warn("Failed to load auditable entities", err instanceof Error ? { message: err.message } : {});
       throw new Error(err instanceof Error ? err.message : String(err));
@@ -129,8 +135,10 @@ export class AuditPanel extends Panel {
   }
 
   private async handleGetOrgAuditStatus(): Promise<OrgAuditStatus> {
+    const env = this.env;           // snapshot — prevents mid-flight env swap
+    const auditSvc = this.auditSvc;
     try {
-      return await this.auditSvc.getOrgAuditStatus(this.env);
+      return await auditSvc.getOrgAuditStatus(env);
     } catch (err) {
       Logger.warn("Failed to get org audit status", err instanceof Error ? { message: err.message } : {});
       throw new Error(err instanceof Error ? err.message : String(err));
@@ -138,8 +146,10 @@ export class AuditPanel extends Panel {
   }
 
   private async handleSetOrgAuditStatus(payload: { orgId: string; isEnabled: boolean }): Promise<{ isEnabled: boolean }> {
+    const env = this.env;           // snapshot — prevents mid-flight env swap
+    const auditSvc = this.auditSvc;
     try {
-      await this.auditSvc.setOrgAuditStatus(this.env, payload.orgId, payload.isEnabled);
+      await auditSvc.setOrgAuditStatus(env, payload.orgId, payload.isEnabled);
       return { isEnabled: payload.isEnabled };
     } catch (err) {
       Logger.error("Failed to set org audit status", err);
@@ -148,8 +158,10 @@ export class AuditPanel extends Panel {
   }
 
   private async handleSetUserAccessAuditStatus(payload: { orgId: string; isEnabled: boolean }): Promise<{ isEnabled: boolean }> {
+    const env = this.env;           // snapshot — prevents mid-flight env swap
+    const auditSvc = this.auditSvc;
     try {
-      await this.auditSvc.setUserAccessAuditStatus(this.env, payload.orgId, payload.isEnabled);
+      await auditSvc.setUserAccessAuditStatus(env, payload.orgId, payload.isEnabled);
       return { isEnabled: payload.isEnabled };
     } catch (err) {
       Logger.error("Failed to set user access audit status", err);
@@ -158,8 +170,10 @@ export class AuditPanel extends Panel {
   }
 
   private async handleGetEntityAuditStatus(payload: { entityLogicalName: string }): Promise<EntityAuditStatus> {
+    const env = this.env;           // snapshot — prevents mid-flight env swap
+    const auditSvc = this.auditSvc;
     try {
-      return await this.auditSvc.getEntityAuditStatus(this.env, payload.entityLogicalName);
+      return await auditSvc.getEntityAuditStatus(env, payload.entityLogicalName);
     } catch (err) {
       Logger.warn("Failed to get entity audit status", err instanceof Error ? { message: err.message } : {});
       throw new Error(err instanceof Error ? err.message : String(err));
@@ -167,8 +181,10 @@ export class AuditPanel extends Panel {
   }
 
   private async handleSetEntityAuditStatus(payload: { metadataId: string; entityLogicalName: string; isEnabled: boolean }): Promise<{ isEnabled: boolean }> {
+    const env = this.env;           // snapshot — prevents mid-flight env swap
+    const auditSvc = this.auditSvc;
     try {
-      await this.auditSvc.setEntityAuditStatus(this.env, payload.metadataId, payload.entityLogicalName, payload.isEnabled);
+      await auditSvc.setEntityAuditStatus(env, payload.metadataId, payload.entityLogicalName, payload.isEnabled);
       return { isEnabled: payload.isEnabled };
     } catch (err) {
       Logger.error("Failed to set entity audit status", err);
@@ -202,9 +218,11 @@ export class AuditPanel extends Panel {
   }
 
   private async handleManageEntityAuditing(): Promise<{ enabled: number; disabled: number } | null> {
+    const env = this.env;           // snapshot — prevents mid-flight env swap
+    const auditSvc = this.auditSvc;
     const entities = await vscode.window.withProgress(
       { location: vscode.ProgressLocation.Notification, title: "Loading entities…", cancellable: false },
-      () => this.auditSvc.listAllEntitiesWithAuditStatus(this.env),
+      () => auditSvc.listAllEntitiesWithAuditStatus(env),
     );
 
     // Attribute cache scoped to this wizard session (keyed by entity logical name)
@@ -304,14 +322,14 @@ export class AuditPanel extends Panel {
 
           for (const e of toEnable) {
             try {
-              await this.auditSvc.setEntityAuditStatus(this.env, e.metadataId, e.logicalName, true);
+              await auditSvc.setEntityAuditStatus(env, e.metadataId, e.logicalName, true);
             } catch (err) {
               errors.push(`Enable ${e.displayName}: ${err instanceof Error ? err.message : String(err)}`);
             }
           }
           for (const e of toDisable) {
             try {
-              await this.auditSvc.setEntityAuditStatus(this.env, e.metadataId, e.logicalName, false);
+              await auditSvc.setEntityAuditStatus(env, e.metadataId, e.logicalName, false);
             } catch (err) {
               errors.push(`Disable ${e.displayName}: ${err instanceof Error ? err.message : String(err)}`);
             }
@@ -319,8 +337,8 @@ export class AuditPanel extends Panel {
           for (const [entityLogicalName, changes] of columnChangeEntries) {
             const entity = state.entities.find((e) => e.logicalName === entityLogicalName);
             if (!entity) { continue; }
-            const { errors: colErrors } = await this.auditSvc.setAttributesAuditStatus(
-              this.env, entity.metadataId, entityLogicalName, changes,
+            const { errors: colErrors } = await auditSvc.setAttributesAuditStatus(
+              env, entity.metadataId, entityLogicalName, changes,
             );
             errors.push(...colErrors.map((e) => `Columns (${entityLogicalName}): ${e}`));
           }
@@ -353,7 +371,7 @@ export class AuditPanel extends Panel {
 
           let attributes = attrCache.get(entity.logicalName);
           if (!attributes) {
-            attributes = await this.auditSvc.listAttributesWithAuditStatus(this.env, entity.logicalName);
+            attributes = await auditSvc.listAttributesWithAuditStatus(env, entity.logicalName);
             attrCache.set(entity.logicalName, attributes);
           }
 
@@ -422,7 +440,7 @@ export class AuditPanel extends Panel {
     ];
 
     const result = await runWizard<ManageAuditState>({
-      title: `Manage Auditing — ${this.env.name}`,
+      title: `Manage Auditing — ${env.name}`,
       pages,
       startPage: "entityPage",
       initialState: {

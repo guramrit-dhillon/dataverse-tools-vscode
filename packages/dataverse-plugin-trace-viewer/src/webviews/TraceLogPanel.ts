@@ -93,8 +93,10 @@ export class TraceLogPanel extends Panel {
   // ── Message handlers ───────────────────────────────────────────────────────
 
   private async handleRetrieve(filter: TraceLogFilter) {
+    const env = this.env;           // snapshot — prevents mid-flight env swap
+    const svc = this.traceLogSvc;
     try {
-      return await this.traceLogSvc.listTraceLogs(this.env, filter);
+      return await svc.listTraceLogs(env, filter);
     } catch (err) {
       Logger.error("Failed to retrieve trace logs", err);
       throw new Error(err instanceof Error ? err.message : String(err));
@@ -102,8 +104,10 @@ export class TraceLogPanel extends Panel {
   }
 
   private async getSuggestions() {
+    const env = this.env;           // snapshot — prevents mid-flight env swap
+    const svc = this.traceLogSvc;
     try {
-      return await this.traceLogSvc.listSuggestions(this.env);
+      return await svc.listSuggestions(env);
     } catch (err) {
       Logger.warn("Failed to load trace log suggestions", err instanceof Error ? { message: err.message } : {});
       throw new Error(err instanceof Error ? err.message : String(err));

@@ -178,12 +178,14 @@ export class QueryPanel extends Panel {
   private async handleExecute(payload: {
     sql: string;
   }): Promise<QueryResult> {
-    if (!this.env) {
+    const env = this.env;                       // snapshot — prevents mid-flight env swap
+    const queryService = this.queryService;
+    if (!env) {
       throw new Error("No environment selected. Select an environment first.");
     }
 
-    Logger.info(`Executing SQL query against ${this.env.name}`);
-    const result = await this.queryService.execute(this.env, {
+    Logger.info(`Executing SQL query against ${env.name}`);
+    const result = await queryService.execute(env, {
       sql: payload.sql,
     });
 
@@ -204,10 +206,12 @@ export class QueryPanel extends Panel {
   private async handleLoadSchema(): Promise<{
     tables: { logicalName: string; displayName: string }[];
   }> {
-    if (!this.env) {
+    const env = this.env;                       // snapshot — prevents mid-flight env swap
+    const metadataCache = this.metadataCache;
+    if (!env) {
       return { tables: [] };
     }
-    const schema = await this.metadataCache.getSchema(this.env);
+    const schema = await metadataCache.getSchema(env);
     return { tables: schema.tables };
   }
 
@@ -216,11 +220,13 @@ export class QueryPanel extends Panel {
   }): Promise<{
     columns: { logicalName: string; type: string; displayName: string }[];
   }> {
-    if (!this.env) {
+    const env = this.env;                       // snapshot — prevents mid-flight env swap
+    const metadataCache = this.metadataCache;
+    if (!env) {
       return { columns: [] };
     }
-    const columns = await this.metadataCache.getColumns(
-      this.env,
+    const columns = await metadataCache.getColumns(
+      env,
       payload.tableName
     );
     return { columns };
