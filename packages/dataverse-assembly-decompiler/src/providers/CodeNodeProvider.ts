@@ -94,14 +94,15 @@ export class CodeNodeProvider implements NodeProvider {
   readonly sortOrder = 999;
   readonly contributionOnly = true;
 
-  /** assemblyId → loaded result (namespaces). */
+  /** "${envId}:${assemblyId}" → loaded result (namespaces). */
   private readonly loaded = new Map<string, LoadAssemblyResult>();
 
-  /** assemblyId → folder tree built from namespace list. */
+  /** "${envId}:${assemblyId}" → folder tree built from namespace list. */
   private readonly folderTrees = new Map<string, FolderNode>();
 
-  /** In-flight loads to deduplicate concurrent requests. */
+  /** In-flight loads to deduplicate concurrent requests; keyed by "${envId}:${assemblyId}". */
   private readonly inflight = new Map<string, Promise<LoadAssemblyResult>>();
+  #generation = 0;
 
   constructor(
     private readonly backend: DecompilerService,
@@ -153,6 +154,7 @@ export class CodeNodeProvider implements NodeProvider {
   }
 
   onRefresh(): void {
+    this.#generation++;
     this.loaded.clear();
     this.folderTrees.clear();
     this.inflight.clear();
@@ -173,14 +175,17 @@ export class CodeNodeProvider implements NodeProvider {
     }
 
     const assemblyId = assembly.pluginassemblyid;
+    const envId = context.environment.id;
+    const cacheKey = `${envId}:${assemblyId}`;
+    const gen = this.#generation;
     const result = await this.ensureLoaded(assemblyId, context);
 
-    if (!this.folderTrees.has(assemblyId)) {
-      this.folderTrees.set(assemblyId, buildFolderTree(result.namespaces));
+    if (this.#generation === gen && !this.folderTrees.has(cacheKey)) {
+      this.folderTrees.set(cacheKey, buildFolderTree(result.namespaces));
     }
 
-    const root = this.folderTrees.get(assemblyId) as FolderNode;
-    return this.buildChildNodes(assemblyId, root, []);
+    const root = this.folderTrees.get(cacheKey) as FolderNode;
+    return this.buildChildNodes(assemblyId, envId, root, []);
   }
 
   /**
@@ -188,18 +193,19 @@ export class CodeNodeProvider implements NodeProvider {
    */
   private async getFolderChildren(node: ExplorerNode): Promise<ExplorerNode[]> {
     const assemblyId = node.data?.assemblyId as string | undefined;
+    const envId = node.data?.envId as string | undefined;
     const folderPath = node.data?.folderPath as string[] | undefined;
 
-    if (!assemblyId || !folderPath) {
+    if (!assemblyId || !envId || !folderPath) {
       return [];
     }
 
-    const folder = this.resolveFolderNode(assemblyId, folderPath);
+    const folder = this.resolveFolderNode(envId, assemblyId, folderPath);
     if (!folder) {
       return [];
     }
 
-    return this.buildChildNodes(assemblyId, folder, folderPath);
+    return this.buildChildNodes(assemblyId, envId, folder, folderPath);
   }
 
   /**
@@ -207,6 +213,7 @@ export class CodeNodeProvider implements NodeProvider {
    */
   private async buildChildNodes(
     assemblyId: string,
+    envId: string,
     folder: FolderNode,
     currentPath: string[]
   ): Promise<ExplorerNode[]> {
@@ -225,7 +232,7 @@ export class CodeNodeProvider implements NodeProvider {
         icon: "symbol-namespace",
         contextValue: "decompiler.folder",
         children: (collapsed.node.children.size === 0 && !collapsed.node.namespace) ? "none" : "lazy",
-        data: { assemblyId, folderPath: collapsed.path },
+        data: { assemblyId, envId, folderPath: collapsed.path },
       });
     }
 
@@ -266,8 +273,8 @@ export class CodeNodeProvider implements NodeProvider {
   }
 
   /** Walk the cached tree to find a folder by path segments. */
-  private resolveFolderNode(assemblyId: string, path: string[]): FolderNode | undefined {
-    let node = this.folderTrees.get(assemblyId);
+  private resolveFolderNode(envId: string, assemblyId: string, path: string[]): FolderNode | undefined {
+    let node = this.folderTrees.get(`${envId}:${assemblyId}`);
     if (!node) {
       return undefined;
     }
@@ -288,27 +295,33 @@ export class CodeNodeProvider implements NodeProvider {
     assemblyId: string,
     context: ExplorerContext
   ): Promise<LoadAssemblyResult> {
-    const cached = this.loaded.get(assemblyId);
+    const envId = context.environment.id;
+    const cacheKey = `${envId}:${assemblyId}`;
+
+    const cached = this.loaded.get(cacheKey);
     if (cached) {
       return cached;
     }
 
-    // Deduplicate concurrent requests for the same assembly
-    const existing = this.inflight.get(assemblyId);
+    // Deduplicate concurrent requests for the same assembly in the same environment
+    const existing = this.inflight.get(cacheKey);
     if (existing) {
       return existing;
     }
 
+    const gen = this.#generation;
     const promise = this.loadAssembly(assemblyId, context);
-    this.inflight.set(assemblyId, promise);
+    this.inflight.set(cacheKey, promise);
 
     try {
       const result = await promise;
-      this.loaded.set(assemblyId, result);
-      this.fsProvider.registerAssembly(assemblyId, result.namespaces);
+      if (this.#generation === gen) {
+        this.loaded.set(cacheKey, result);
+        this.fsProvider.registerAssembly(envId, assemblyId, result.namespaces);
+      }
       return result;
     } finally {
-      this.inflight.delete(assemblyId);
+      this.inflight.delete(cacheKey);
     }
   }
 

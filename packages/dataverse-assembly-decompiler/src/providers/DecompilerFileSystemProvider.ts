@@ -80,18 +80,23 @@ export class DecompilerFileSystemProvider implements vscode.FileSystemProvider {
   private readonly _onDidChangeFile = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
   readonly onDidChangeFile = this._onDidChangeFile.event;
 
-  /** assemblyId → namespace directory tree */
+  /** "${envId}:${assemblyId}" → namespace directory tree */
   private readonly trees = new Map<string, DirNode>();
 
-  /** Cache of decompiled source: "assemblyId/typeFullName" → source bytes */
+  /** Cache of decompiled source: "${envId}:${assemblyId}/${typeFullName}" → source bytes */
   private readonly sourceCache = new Map<string, Uint8Array>();
+
+  /** assemblyId → envId — tracks which environment last registered each assembly URI. */
+  private readonly assemblyEnv = new Map<string, string>();
 
   constructor(private readonly backend: DecompilerService) {}
 
   // ── Public helpers ──────────────────────────────────────────────────────
 
-  registerAssembly(assemblyId: string, namespaceList: string[]): void {
-    this.trees.set(assemblyId, buildNamespaceTree(namespaceList));
+  registerAssembly(envId: string, assemblyId: string, namespaceList: string[]): void {
+    const treeKey = `${envId}:${assemblyId}`;
+    this.trees.set(treeKey, buildNamespaceTree(namespaceList));
+    this.assemblyEnv.set(assemblyId, envId);
 
     this._onDidChangeFile.fire([{
       type: vscode.FileChangeType.Changed,
@@ -112,7 +117,7 @@ export class DecompilerFileSystemProvider implements vscode.FileSystemProvider {
   stat(uri: vscode.Uri): vscode.FileStat {
     const { assemblyId, pathSegments, isFile } = this.parsePath(uri);
 
-    if (!assemblyId || !this.trees.has(assemblyId)) {
+    if (!assemblyId || !this.assemblyEnv.has(assemblyId)) {
       throw vscode.FileSystemError.FileNotFound(uri);
     }
 
@@ -180,7 +185,8 @@ export class DecompilerFileSystemProvider implements vscode.FileSystemProvider {
     const entry = types.find((t) => t.name === typeName);
     const fullName = entry?.fullName ?? `${node.namespace}.${typeName}`;
 
-    const cacheKey = `${assemblyId}/${fullName}`;
+    const envId = this.assemblyEnv.get(assemblyId) ?? "";
+    const cacheKey = `${envId}:${assemblyId}/${fullName}`;
     const cached = this.sourceCache.get(cacheKey);
     if (cached) {
       return cached;
@@ -221,7 +227,8 @@ export class DecompilerFileSystemProvider implements vscode.FileSystemProvider {
 
   /** Walk the tree to find the DirNode for a given path. */
   private resolveNode(assemblyId: string, segments: string[]): DirNode | undefined {
-    let node = this.trees.get(assemblyId);
+    const envId = this.assemblyEnv.get(assemblyId) ?? "";
+    let node = this.trees.get(`${envId}:${assemblyId}`);
     if (!node) {
       return undefined;
     }
