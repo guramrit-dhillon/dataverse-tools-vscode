@@ -1,6 +1,6 @@
 # Dataverse Metadata — Feature Status
 
-> Last updated: 2026-03-13
+> Last updated: 2026-03-21
 
 ## Status Legend
 
@@ -24,6 +24,31 @@
 | 4 | Richer entity details | `Not Started` | Schema name, collection name, ownership type, primary key, etc. |
 | 5 | Entity search / filter | `Not Started` | Type-to-filter by name |
 | 6 | Entity count badge | `Not Started` | e.g. "Entities (347)" |
+
+## Form Viewer
+
+| # | Feature | Status | Notes |
+|---|---------|--------|-------|
+| 43 | Open form viewer from entity | `Done` | Click form name in EntityPanel |
+| 44 | Form structure tab | `Done` | Parsed from formxml — tabs, sections, fields |
+| 45 | Libraries & Events tab | `Done` | Form-level JS libraries and event handlers |
+| 46 | FormJSON tab | `Done` | Raw form definition viewer |
+| 47 | Field-level event handlers | `Done` | Field events from formxml |
+| 48 | Parse formxml (not formjson) | `Done` | Robust XML parsing via parseFormStructure |
+| 49 | Multiple form types | `Done` | Main, Quick Create, Quick View, Card, etc. |
+| 50 | Form navigation from entity panel | `Done` | Forms listed and clickable in EntityPanel |
+
+## View Designer
+
+| # | Feature | Status | Notes |
+|---|---------|--------|-------|
+| 51 | Open view designer from entity | `Done` | Views listed and clickable in EntityPanel |
+| 52 | View columns tab | `Done` | DataTable showing column names, widths, types |
+| 53 | View FetchXML tab | `Done` | Read-only FetchXML definition |
+| 54 | View properties | `Done` | View name, type, state |
+| 55 | Edit view columns | `Not Started` | Modify column order and widths |
+| 56 | Edit view FetchXML | `Not Started` | Visual filter/sort editing |
+| 57 | Save view changes | `Not Started` | Publish view back to Dataverse |
 
 ## Attributes
 

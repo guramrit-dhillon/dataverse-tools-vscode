@@ -1,6 +1,6 @@
 # Shared Views — Feature Status
 
-> Last updated: 2026-03-13
+> Last updated: 2026-03-21
 
 ## Status Legend
 
@@ -47,7 +47,7 @@
 
 | # | Component | Status | Notes |
 |---|-----------|--------|-------|
-| 20 | TreeView | `Idea` | Reusable tree component for webviews |
+| 20 | TreeView | `Done` | Reusable tree component for webviews |
 | 21 | CodeEditor | `Idea` | Lightweight code editor (Monaco subset) |
 | 22 | Chart | `Idea` | Simple chart components for analytics views |
 | 23 | Toast / notification | `Idea` | In-webview notifications |
