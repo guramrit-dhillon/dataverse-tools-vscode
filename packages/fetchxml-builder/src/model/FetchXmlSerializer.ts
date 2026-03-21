@@ -1,4 +1,5 @@
 import { type FetchNode } from "./FetchXmlNode";
+import { Logger } from "core-dataverse";
 
 /** Serialize a FetchNode tree to a formatted FetchXML string. */
 export function serialize(node: FetchNode, indent = 0): string {
@@ -45,7 +46,8 @@ export function parseFetchXml(xml: string): FetchNode | null {
   const trimmed = xml.trim();
   try {
     return parseElement(trimmed, createFetchNode);
-  } catch {
+  } catch (err) {
+    Logger.warn("FetchXML parse failed", err);
     return null;
   }
 }
