@@ -62,6 +62,7 @@ export class AssembliesNodeProvider implements NodeProvider {
 
   private readonly cache = new Map<string, ExplorerNode[]>();
   private readonly inflight = new Map<string, Promise<ExplorerNode[]>>();
+  #generation = 0;
 
   constructor(private readonly registrationSvc: IRegistrationService) {}
 
@@ -172,6 +173,7 @@ export class AssembliesNodeProvider implements NodeProvider {
   }
 
   onRefresh(): void {
+    this.#generation++;
     this.cache.clear();
     this.inflight.clear();
   }
@@ -384,9 +386,12 @@ export class AssembliesNodeProvider implements NodeProvider {
     const existing = this.inflight.get(key);
     if (existing) { return existing; }
 
+    const gen = this.#generation;
     const promise = loader()
       .then((items) => {
-        this.cache.set(key, items);
+        if (this.#generation === gen) {
+          this.cache.set(key, items);
+        }
         this.inflight.delete(key);
         return items;
       })
