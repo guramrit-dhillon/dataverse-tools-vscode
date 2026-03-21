@@ -260,6 +260,8 @@ export function ViewDesigner(): React.ReactElement {
     navigator.clipboard.writeText(xml).then(() => {
       dispatch({ type: "copyDone" });
       setTimeout(() => dispatch({ type: "copyReset" }), 1500);
+    }).catch(() => {
+      dispatch({ type: "copyReset" });
     });
   };
 

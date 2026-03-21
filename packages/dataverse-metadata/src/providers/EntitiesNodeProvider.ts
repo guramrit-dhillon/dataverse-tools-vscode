@@ -1,5 +1,6 @@
 import {
   SolutionComponentType,
+  Logger,
   type DetailItem,
   type DetailProperty,
   type ExplorerContext,
@@ -22,18 +23,23 @@ export class EntitiesNodeProvider implements NodeProvider {
   constructor(private readonly metadataService: IMetadataService) {}
 
   async getRoots(context: ExplorerContext): Promise<ExplorerNode[]> {
-    const solutionId = context.solution?.solutionid;
-    const includeAllComponents = context.filter.showOutOfSolution && !!solutionId;
+    try {
+      const solutionId = context.solution?.solutionid;
+      const includeAllComponents = context.filter.showOutOfSolution && !!solutionId;
 
-    const components = await this.metadataService.listEntities(
-      context.environment,
-      solutionId,
-      includeAllComponents,
-    );
+      const components = await this.metadataService.listEntities(
+        context.environment,
+        solutionId,
+        includeAllComponents,
+      );
 
-    return components
-      .sort((a, b) => (a.displayName || a.name).localeCompare(b.displayName || b.name))
-      .map((c) => this.toNode(c));
+      return components
+        .sort((a, b) => (a.displayName || a.name).localeCompare(b.displayName || b.name))
+        .map((c) => this.toNode(c));
+    } catch (err) {
+      Logger.error("EntitiesNodeProvider: failed to load entities", err);
+      return [];
+    }
   }
 
   async getChildren(node: ExplorerNode): Promise<ExplorerNode[]> {

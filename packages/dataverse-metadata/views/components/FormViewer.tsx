@@ -199,6 +199,8 @@ export function FormViewer(): React.ReactElement {
     navigator.clipboard.writeText(formatXml(xml)).then(() => {
       dispatch({ type: "copyDone" });
       setTimeout(() => dispatch({ type: "copyReset" }), 1500);
+    }).catch(() => {
+      dispatch({ type: "copyReset" });
     });
   };
 
@@ -230,26 +232,30 @@ export function FormViewer(): React.ReactElement {
 
   // ── Structure tree nodes (must be before early returns) ──────────────────
   const structureNodes = useMemo((): TreeNode[] => {
-    return formStructure.tabs.map((tab, ti) => ({
-      id: `t${ti}`,
-      label: tab.label || <span className="fv-label-empty">(unnamed tab)</span>,
-      defaultExpanded: true,
-      children: tab.sections.map((sec, si) => {
-        const isSpecial = sec.name === "header" || sec.name === "footer";
-        return {
-          id: `t${ti}s${si}`,
-          label: sec.label || <span className="fv-label-empty">(unnamed section)</span>,
-          badges: isSpecial ? <span className="fv-section-type-badge">{sec.name}</span> : undefined,
-          defaultExpanded: true,
-          children: sec.fields.map((f: FormField, fi) => ({
-            id: `t${ti}s${si}f${fi}`,
-            label: <span className="fv-field-logical">{f.logicalName}</span>,
-            secondary: f.label !== f.logicalName ? f.label : undefined,
-            badges: f.isPcf ? <span className="fv-pcf-badge">PCF</span> : undefined,
-          })),
-        };
-      }),
-    }));
+    return formStructure.tabs.map((tab, ti) => {
+      const tabKey = tab.name || String(ti);
+      return {
+        id: tabKey,
+        label: tab.label || <span className="fv-label-empty">(unnamed tab)</span>,
+        defaultExpanded: true,
+        children: tab.sections.map((sec, si) => {
+          const secKey = `${tabKey}:${sec.name || String(si)}`;
+          const isSpecial = sec.name === "header" || sec.name === "footer";
+          return {
+            id: secKey,
+            label: sec.label || <span className="fv-label-empty">(unnamed section)</span>,
+            badges: isSpecial ? <span className="fv-section-type-badge">{sec.name}</span> : undefined,
+            defaultExpanded: true,
+            children: sec.fields.map((f: FormField, fi) => ({
+              id: `${secKey}:${f.logicalName || String(fi)}`,
+              label: <span className="fv-field-logical">{f.logicalName}</span>,
+              secondary: f.label !== f.logicalName ? f.label : undefined,
+              badges: f.isPcf ? <span className="fv-pcf-badge">PCF</span> : undefined,
+            })),
+          };
+        }),
+      };
+    });
   }, [formStructure.tabs]);
 
   if (phase.tag === "loading") {

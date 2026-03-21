@@ -5,8 +5,8 @@ import { FORM_VIEWER_VIEW_TYPE } from "../constants";
 
 /**
  * Webview panel for the Form Viewer. Opens one panel per entity (keyed by
- * `entityLogicalName`). Loads the list of forms and initial form details on
- * ready, then handles `switchForm` messages from the webview.
+ * `{envId}:{entityLogicalName}`). Loads the list of forms and initial form
+ * details on ready, then handles `switchForm` messages from the webview.
  */
 export class FormViewerPanel extends Panel {
   static readonly #instances = new Map<string, FormViewerPanel>();
@@ -24,9 +24,11 @@ export class FormViewerPanel extends Panel {
 
     this.initListeners({
       switchForm: async ({ formid }: { formid: string }, successCallback: (r: undefined) => void) => {
+        const env = this.env; // snapshot — prevents mid-flight env swap
+        const svc = this.metadataSvc;
         successCallback(undefined);
         try {
-          const current = await this.metadataSvc.getFormDetails(this.env, formid);
+          const current = await svc.getFormDetails(env, formid);
           this.postMessage({ type: "formLoaded", payload: { current } });
         } catch (e: unknown) {
           const msg = e instanceof Error ? e.message : "Failed to load form";
@@ -44,7 +46,8 @@ export class FormViewerPanel extends Panel {
     entityDisplayName: string | undefined,
     initialFormId: string,
   ): void {
-    const existing = FormViewerPanel.#instances.get(entityLogicalName);
+    const key = `${env.id}:${entityLogicalName}`;
+    const existing = FormViewerPanel.#instances.get(key);
     if (existing) {
       existing.env = env;
       existing.metadataSvc = metadataSvc;
@@ -60,7 +63,7 @@ export class FormViewerPanel extends Panel {
       entityDisplayName,
       initialFormId,
     );
-    FormViewerPanel.#instances.set(entityLogicalName, instance);
+    FormViewerPanel.#instances.set(key, instance);
   }
 
   protected override async onReady(): Promise<void> {
@@ -85,7 +88,7 @@ export class FormViewerPanel extends Panel {
   }
 
   protected override dispose(): void {
-    FormViewerPanel.#instances.delete(this.entityLogicalName);
+    FormViewerPanel.#instances.delete(`${this.env.id}:${this.entityLogicalName}`);
     super.dispose();
   }
 }

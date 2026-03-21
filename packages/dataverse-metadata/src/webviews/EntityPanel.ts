@@ -91,8 +91,10 @@ export class EntityPanel extends Panel {
   // ── Message handlers ────────────────────────────────────────────────────────
 
   private async handleRetrieveAttributes() {
+    const env = this.env; // snapshot — prevents mid-flight env swap
+    const svc = this.metadataSvc;
     try {
-      return await this.metadataSvc.listAttributes(this.env, this.entityLogicalName);
+      return await svc.listAttributes(env, this.entityLogicalName);
     } catch (err) {
       Logger.error("Failed to retrieve attributes", err);
       throw new Error(err instanceof Error ? err.message : String(err));
@@ -100,8 +102,10 @@ export class EntityPanel extends Panel {
   }
 
   private async handleRetrieveRelationships() {
+    const env = this.env; // snapshot — prevents mid-flight env swap
+    const svc = this.metadataSvc;
     try {
-      return await this.metadataSvc.listRelationships(this.env, this.entityLogicalName);
+      return await svc.listRelationships(env, this.entityLogicalName);
     } catch (err) {
       Logger.error("Failed to retrieve relationships", err);
       throw new Error(err instanceof Error ? err.message : String(err));
@@ -109,8 +113,10 @@ export class EntityPanel extends Panel {
   }
 
   private async handleRetrieveForms() {
+    const env = this.env; // snapshot — prevents mid-flight env swap
+    const svc = this.metadataSvc;
     try {
-      return await this.metadataSvc.listForms(this.env, this.entityLogicalName);
+      return await svc.listForms(env, this.entityLogicalName);
     } catch (err) {
       Logger.error("Failed to retrieve forms", err);
       throw new Error(err instanceof Error ? err.message : String(err));
@@ -118,8 +124,10 @@ export class EntityPanel extends Panel {
   }
 
   private async handleRetrieveViews() {
+    const env = this.env; // snapshot — prevents mid-flight env swap
+    const svc = this.metadataSvc;
     try {
-      return await this.metadataSvc.listViews(this.env, this.entityLogicalName);
+      return await svc.listViews(env, this.entityLogicalName);
     } catch (err) {
       Logger.error("Failed to retrieve views", err);
       throw new Error(err instanceof Error ? err.message : String(err));

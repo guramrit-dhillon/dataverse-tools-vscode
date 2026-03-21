@@ -5,8 +5,8 @@ import { VIEW_DESIGNER_VIEW_TYPE } from "../constants";
 
 /**
  * Webview panel for the View Designer. Opens one panel per entity (keyed by
- * `entityLogicalName`). Loads the list of views and initial view details on
- * ready, then handles `switchView` messages from the webview.
+ * `{envId}:{entityLogicalName}`). Loads the list of views and initial view
+ * details on ready, then handles `switchView` messages from the webview.
  */
 export class ViewDesignerPanel extends Panel {
   static readonly #instances = new Map<string, ViewDesignerPanel>();
@@ -24,9 +24,11 @@ export class ViewDesignerPanel extends Panel {
 
     this.initListeners({
       switchView: async ({ savedqueryid }: { savedqueryid: string }, successCallback: (r: undefined) => void) => {
+        const env = this.env; // snapshot — prevents mid-flight env swap
+        const svc = this.metadataSvc;
         successCallback(undefined);
         try {
-          const current = await this.metadataSvc.getViewDetails(this.env, savedqueryid);
+          const current = await svc.getViewDetails(env, savedqueryid);
           this.postMessage({ type: "viewLoaded", payload: { current } });
         } catch (e: unknown) {
           const msg = e instanceof Error ? e.message : "Failed to load view";
@@ -44,7 +46,8 @@ export class ViewDesignerPanel extends Panel {
     entityDisplayName: string | undefined,
     initialViewId: string,
   ): void {
-    const existing = ViewDesignerPanel.#instances.get(entityLogicalName);
+    const key = `${env.id}:${entityLogicalName}`;
+    const existing = ViewDesignerPanel.#instances.get(key);
     if (existing) {
       existing.env = env;
       existing.metadataSvc = metadataSvc;
@@ -60,7 +63,7 @@ export class ViewDesignerPanel extends Panel {
       entityDisplayName,
       initialViewId,
     );
-    ViewDesignerPanel.#instances.set(entityLogicalName, instance);
+    ViewDesignerPanel.#instances.set(key, instance);
   }
 
   protected override async onReady(): Promise<void> {
@@ -85,7 +88,7 @@ export class ViewDesignerPanel extends Panel {
   }
 
   protected override dispose(): void {
-    ViewDesignerPanel.#instances.delete(this.entityLogicalName);
+    ViewDesignerPanel.#instances.delete(`${this.env.id}:${this.entityLogicalName}`);
     super.dispose();
   }
 }
