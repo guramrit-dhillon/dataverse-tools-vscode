@@ -61,6 +61,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const stepConfigFsProvider = new StepConfigFileSystemProvider();
   context.subscriptions.push(
     vscode.workspace.registerFileSystemProvider(StepConfigFileSystemProvider.SCHEME, stepConfigFsProvider, { isCaseSensitive: true }),
+    vscode.workspace.onDidCloseTextDocument((doc) => {
+      if (doc.uri.scheme === StepConfigFileSystemProvider.SCHEME) {
+        stepConfigFsProvider.delete(doc.uri);
+      }
+    }),
     api.explorer.registerProvider(container.assembliesProvider),
     api.explorer.registerProvider(container.messagesProvider),
   );
