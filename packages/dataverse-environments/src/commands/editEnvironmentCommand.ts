@@ -506,8 +506,14 @@ async function applyChanges(
   const newName = state.name ?? env.name;
   const methodChanged = newMethod !== env.authMethod;
 
-  // Clear old tokens + secret if method changed
-  if (methodChanged) {
+  // Determine whether credentials themselves changed (within the same method).
+  const credentialsChanged =
+    (newMethod === "clientcredentials" && !!state.spSecret) ||
+    (newMethod === "devicecode" && (state.customClientId !== undefined || state.customTenantId !== undefined)) ||
+    (newMethod === "vscode" && state.account !== undefined);
+
+  // Clear cached token whenever the auth method or credentials change.
+  if (methodChanged || credentialsChanged) {
     await authSvc.clearTokens(env);
     if (env.authMethod === "clientcredentials") {
       await secretStorage.deleteClientSecret(env.id);

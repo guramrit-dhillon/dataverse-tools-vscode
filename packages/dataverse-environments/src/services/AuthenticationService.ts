@@ -44,12 +44,12 @@ export class AuthenticationService implements IAuthenticationService {
   private deviceCodeCredMap = new Map<string, DeviceCodeCredential>();
 
   /** In-process token cache keyed by environment ID. */
-  private static readonly tokenCache = new Map<string, TokenCacheEntry>();
+  private readonly tokenCache = new Map<string, TokenCacheEntry>();
 
   constructor(private readonly secretStorage: SecretStorageService) {}
 
   async getAccessToken(environment: DataverseEnvironment): Promise<string> {
-    const cached = AuthenticationService.tokenCache.get(environment.id);
+    const cached = this.tokenCache.get(environment.id);
     if (cached && cached.expiresAtMs - REFRESH_BUFFER_S * 1000 > Date.now()) {
       return cached.token;
     }
@@ -72,7 +72,7 @@ export class AuthenticationService implements IAuthenticationService {
       token = await this.getTokenForMethod(environment.authMethod, scope, environment.clientId, environment.tenantId);
     }
 
-    AuthenticationService.tokenCache.set(environment.id, {
+    this.tokenCache.set(environment.id, {
       token,
       expiresAtMs: AuthenticationService.decodeExpiry(token),
     });
@@ -90,7 +90,7 @@ export class AuthenticationService implements IAuthenticationService {
   }
 
   async clearTokens(environment: DataverseEnvironment): Promise<void> {
-    AuthenticationService.tokenCache.delete(environment.id);
+    this.tokenCache.delete(environment.id);
 
     if (environment.authMethod === "devicecode") {
       const credKey = this.credKey(environment.tenantId, environment.clientId);
@@ -101,7 +101,7 @@ export class AuthenticationService implements IAuthenticationService {
   }
 
   async clearAllTokens(): Promise<void> {
-    AuthenticationService.tokenCache.clear();
+    this.tokenCache.clear();
     this.deviceCodeCredMap.clear();
     Logger.info("All tokens cleared");
   }
