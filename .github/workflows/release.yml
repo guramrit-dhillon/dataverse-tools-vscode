@@ -175,6 +175,12 @@ jobs:
             echo "flag=" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Build .NET binaries for all platforms
+        if: matrix.extension == 'dataverse-assembly-decompiler' || matrix.extension == 'dataverse-assemblies'
+        run: |
+          npm run build:all -w assembly-decompiler
+          npm run build:all -w dataverse-assembly-analyzer
+
       - name: Build extension
         run: npm run build -w ${{ matrix.extension }}
 

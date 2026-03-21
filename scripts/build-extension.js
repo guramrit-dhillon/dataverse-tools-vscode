@@ -124,7 +124,7 @@ function getRuntimeIdentifier() {
  * Copy .NET workspace package files into the extension's output directory
  * so the extension works in production (VSIX) without npm workspace symlinks.
  *
- * Copies: package.json, index.js, and the current platform's binary.
+ * Copies: package.json, index.js, and all available platform binaries.
  * Recursively copies transitive DOTNET_PACKAGES dependencies.
  */
 async function copyNpmDependencies() {
@@ -133,7 +133,6 @@ async function copyNpmDependencies() {
     return;
   }
 
-  const rid = getRuntimeIdentifier();
   const copied = new Set();
 
   async function copyPackage(pkg) {
@@ -162,22 +161,28 @@ async function copyNpmDependencies() {
       }
     }
 
-    // Copy platform-specific binary (if this package has one)
-    const srcBinDir = path.join(pkgDir, "bin", rid);
-    if (fs.existsSync(srcBinDir)) {
-      const destBinDir = path.join(destDir, "bin", rid);
-      await fsp.mkdir(destBinDir, { recursive: true });
-
-      const files = await fsp.readdir(srcBinDir);
-      for (const file of files) {
-        await fsp.copyFile(
-          path.join(srcBinDir, file),
-          path.join(destBinDir, file),
-        );
+    // Copy all available platform binaries (every RID subdirectory present in bin/)
+    const srcBinRoot = path.join(pkgDir, "bin");
+    if (fs.existsSync(srcBinRoot)) {
+      const rids = (await fsp.readdir(srcBinRoot)).filter(
+        (entry) => fs.statSync(path.join(srcBinRoot, entry)).isDirectory()
+      );
+      if (rids.length === 0) {
+        log(`Warning: ${pkg}/bin/ exists but contains no platform directories`);
       }
-      log(`Copied ${pkg} binary for ${rid}`);
-    } else if (fs.existsSync(path.join(pkgDir, "bin"))) {
-      log(`Warning: ${pkg}/bin/${rid} not found — skipping binary copy`);
+      for (const rid of rids) {
+        const srcBinDir = path.join(srcBinRoot, rid);
+        const destBinDir = path.join(destDir, "bin", rid);
+        await fsp.mkdir(destBinDir, { recursive: true });
+        const files = await fsp.readdir(srcBinDir);
+        for (const file of files) {
+          await fsp.copyFile(
+            path.join(srcBinDir, file),
+            path.join(destBinDir, file),
+          );
+        }
+        log(`Copied ${pkg} binary for ${rid}`);
+      }
     }
 
     // Recursively copy transitive DOTNET_PACKAGES dependencies
