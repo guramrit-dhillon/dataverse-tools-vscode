@@ -1,5 +1,18 @@
 # dataverse-assemblies
 
+## 0.9.1
+
+### Patch Changes
+
+- [`95f8954`](https://github.com/guramrit-dhillon/dataverse-tools-vscode/commit/95f89547071bd569e0ddaf327c720a148906d269) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - fix(fetchxml): log parse errors instead of swallowing silently
+  - fix(assemblies): clean up step config sessions on document close
+  - fix: add refresh generation counter to prevent stale in-flight cache results
+  - fix: snapshot this.env in async handlers to prevent mid-flight env swaps
+  - fix(metadata): scope panels by env, snapshot env in handlers, fix tree keys
+  - fix(decompiler): scope assembly caches by environment ID
+  - fix(auth): make token cache instance-level and clear on credential change
+  - docs: update feature-status for shared-views TreeView and metadata form/view features
+
 ## 0.9.0
 
 ### Minor Changes
