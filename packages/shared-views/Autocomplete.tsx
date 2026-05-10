@@ -104,14 +104,14 @@ export function Autocomplete({
     if (containerRef.current?.contains(e.relatedTarget as Node)) { return; }
     setOpen(false);
     setHighlightIndex(-1);
-    if (clearOnBlur) {
-      if (inputText === "") {
-        // User explicitly cleared the field — treat as clearing the selection.
-        if (value !== null) { onSelect(null); }
-      } else {
-        // Partial input without selecting — revert to the committed value.
-        setInputText(value?.label ?? "");
-      }
+    // An empty input is unambiguous user intent — always commit the clear,
+    // regardless of `clearOnBlur`. The flag only governs reverting *partial*
+    // unselected text on blur.
+    if (inputText === "") {
+      if (value !== null) { onSelect(null); }
+    } else if (clearOnBlur) {
+      // Partial input without selecting — revert to the committed value.
+      setInputText(value?.label ?? "");
     }
   };
 
