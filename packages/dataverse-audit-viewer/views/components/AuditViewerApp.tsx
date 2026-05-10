@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback, useMemo, useState } from "react";
 import {
   useReducer,
   SplitView,
@@ -16,7 +16,7 @@ import "shared-views/filter-field.css";
 import "shared-views/environment-bar.css";
 import "shared-views/status-bar.css";
 import "shared-views/results-viewer.css";
-import { useAuditAdapter, type AuditRow } from "../adapters/auditAdapter";
+import { useAuditAdapter, flattenAuditRows, type AuditRow, type FlatAuditRow } from "../adapters/auditAdapter";
 import { AuditDiffView } from "./AuditDiffView";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -352,6 +352,7 @@ export function AuditViewerApp(): React.ReactElement {
     auditStatus,
   } = state;
   const adapter = useAuditAdapter();
+  const flatAuditRows = useMemo(() => flattenAuditRows(auditRecords), [auditRecords]);
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const retrieve = useCallback(() => {
@@ -570,14 +571,14 @@ export function AuditViewerApp(): React.ReactElement {
       <SplitView initialRatio={0.45} min={200}>
         <div className="table-pane">
           {loading && <div className="progress-bar" />}
-          <ResultsViewer<AuditRow>
+          <ResultsViewer<FlatAuditRow>
             columns={adapter.columns}
-            rows={auditRecords}
+            rows={flatAuditRows}
             keyFormatter={adapter.keyFormatter}
             rowClassName={adapter.rowClassName}
-            selectedKeys={selected ? [selected.auditid] : []}
+            selectedKeys={selected ? flatAuditRows.filter((r) => r.audit.auditid === selected.auditid).map((r) => r.rowKey) : []}
             onSelectionChange={(_keys, selectedRows) =>
-              dispatch({ type: "setSelected", payload: selectedRows[0] ?? null })
+              dispatch({ type: "setSelected", payload: selectedRows[0]?.audit ?? null })
             }
             enableFilter={false}
             enableExport={true}

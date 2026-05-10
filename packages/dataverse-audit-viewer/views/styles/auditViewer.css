@@ -146,6 +146,33 @@ button {
     cursor: pointer;
 }
 
+/* Continuation rows (2nd+ change of a multi-change audit) — blank time/user/op/action cells */
+.table-pane .data-table tbody tr.audit-row-continuation td:first-child,
+.table-pane .data-table tbody tr.audit-row-continuation td:nth-child(2),
+.table-pane .data-table tbody tr.audit-row-continuation td:nth-child(3),
+.table-pane .data-table tbody tr.audit-row-continuation td:nth-child(4) {
+    color: var(--vscode-descriptionForeground);
+    opacity: 0.45;
+}
+
+/* Transaction-group boundary — top divider before a row that starts a new transaction */
+.table-pane .data-table tbody tr.tx-group-boundary > td {
+    border-top: 1px solid var(--vscode-panel-border);
+}
+
+/* Transaction-group accent — left border in 8 muted hues; same hue = same transaction */
+.table-pane .data-table tbody tr[class*="tx-group-"] > td:first-child {
+    border-left: 3px solid transparent;
+}
+.table-pane .data-table tbody tr.tx-group-0 > td:first-child { border-left-color: hsl(0,   60%, 55%); }
+.table-pane .data-table tbody tr.tx-group-1 > td:first-child { border-left-color: hsl(30,  70%, 50%); }
+.table-pane .data-table tbody tr.tx-group-2 > td:first-child { border-left-color: hsl(60,  60%, 45%); }
+.table-pane .data-table tbody tr.tx-group-3 > td:first-child { border-left-color: hsl(140, 50%, 45%); }
+.table-pane .data-table tbody tr.tx-group-4 > td:first-child { border-left-color: hsl(190, 60%, 50%); }
+.table-pane .data-table tbody tr.tx-group-5 > td:first-child { border-left-color: hsl(220, 60%, 60%); }
+.table-pane .data-table tbody tr.tx-group-6 > td:first-child { border-left-color: hsl(280, 50%, 60%); }
+.table-pane .data-table tbody tr.tx-group-7 > td:first-child { border-left-color: hsl(320, 55%, 55%); }
+
 /* ── Diff pane ────────────────────────────────────────────────────────── */
 .diff-pane {
     flex: 1;

@@ -18,6 +18,8 @@ interface EntityOption {
 
 /** Cached entity-set-name lookups per environment. */
 const entitySetNameCache = new Map<string, Map<string, string>>();
+/** Cached primary-id attribute lookups per environment. */
+const primaryIdAttributeCache = new Map<string, Map<string, string>>();
 
 export class AuditService {
   constructor(
@@ -54,16 +56,34 @@ export class AuditService {
   }
 
   /**
-   * Retrieves audit records for a specific record from the `audits` entity set.
-   * Returns who made the change, when, and what operation — but NOT the field-level diffs.
-   * Field-level diffs are fetched on demand via `getAuditDetails()`.
+   * Retrieves audit records, including inline field-level changes.
+   *
+   * Two paths:
+   *  - When both `recordId` and `entityLogicalName` are set, calls
+   *    `RetrieveRecordChangeHistory(EntityMoniker)` — one request that returns
+   *    every audit detail with formatted lookup/optionset values.
+   *  - Otherwise queries `audits` directly with `$select=...,changedata` and
+   *    parses the JSON client-side. Values are raw (GUIDs/integers) — the
+   *    detail panel still resolves formatted values via `getAuditDetails()`.
    */
   async getRecordAuditHistory(
     env: DataverseEnvironment,
     filter: AuditFilter,
   ): Promise<AuditChangeDetail[]> {
-    const client = this.client(env);
     const maxCount = Math.min(filter.maxCount ?? 50, 500);
+
+    if (filter.recordId && filter.entityLogicalName) {
+      return this.getRecordAuditHistoryViaChangeHistory(env, filter.entityLogicalName, filter.recordId, maxCount);
+    }
+    return this.getRecordAuditHistoryViaList(env, filter, maxCount);
+  }
+
+  private async getRecordAuditHistoryViaList(
+    env: DataverseEnvironment,
+    filter: AuditFilter,
+    maxCount: number,
+  ): Promise<AuditChangeDetail[]> {
+    const client = this.client(env);
 
     const clauses: string[] = [];
     if (filter.recordId) {
@@ -74,7 +94,8 @@ export class AuditService {
     }
 
     const filterPart = clauses.length > 0 ? `&$filter=${clauses.join(" and ")}` : "";
-    const query = `audits?$orderby=createdon desc&$top=${maxCount}${filterPart}`;
+    const select = "$select=auditid,createdon,_userid_value,_objectid_value,objecttypecode,action,operation,transactionid,changedata";
+    const query = `audits?${select}&$orderby=createdon desc&$top=${maxCount}${filterPart}`;
 
     const data = await client.get<ODataCollection<RawAuditRecord>>(query);
 
@@ -86,8 +107,45 @@ export class AuditService {
       operation: r["operation@OData.Community.Display.V1.FormattedValue"] ?? String(r.operation),
       action: r["action@OData.Community.Display.V1.FormattedValue"] ?? String(r.action),
       transactionId: r.transactionid as string | undefined,
-      changes: [],
+      changes: parseChangeDataJson(r.changedata as string | null | undefined),
     }));
+  }
+
+  private async getRecordAuditHistoryViaChangeHistory(
+    env: DataverseEnvironment,
+    entityLogicalName: string,
+    recordId: string,
+    maxCount: number,
+  ): Promise<AuditChangeDetail[]> {
+    const client = this.client(env);
+
+    // EntityMoniker requires the primary-key attribute name (e.g. contactid for contact).
+    const primaryIdAttribute = await this.resolvePrimaryIdAttribute(env, entityLogicalName);
+    const moniker = {
+      "@odata.type": `Microsoft.Dynamics.CRM.${entityLogicalName}`,
+      [primaryIdAttribute]: recordId,
+    };
+    const param = encodeURIComponent(JSON.stringify(moniker));
+    const url = `RetrieveRecordChangeHistory(Target=@p1)?@p1=${param}`;
+
+    const data = await client.get<{
+      AuditDetailCollection: { AuditDetails: RawAuditDetailWithRecord[] };
+    }>(url);
+
+    const details = data.AuditDetailCollection?.AuditDetails ?? [];
+    return details.slice(0, maxCount).map((d) => {
+      const record = d.AuditRecord ?? {} as RawAuditRecord;
+      return {
+        auditid: record.auditid,
+        createdon: record.createdon,
+        userId: record._userid_value,
+        userDisplayName: record["_userid_value@OData.Community.Display.V1.FormattedValue"] ?? record._userid_value,
+        operation: record["operation@OData.Community.Display.V1.FormattedValue"] ?? String(record.operation),
+        action: record["action@OData.Community.Display.V1.FormattedValue"] ?? String(record.action),
+        transactionId: record.transactionid as string | undefined,
+        changes: this.parseAttributeAuditDetail(d),
+      };
+    });
   }
 
   /**
@@ -281,6 +339,18 @@ export class AuditService {
     return data.EntitySetName;
   }
 
+  private async resolvePrimaryIdAttribute(env: DataverseEnvironment, logicalName: string): Promise<string> {
+    const cache = getOrCreatePrimaryIdCache(env.id);
+    const cached = cache.get(logicalName);
+    if (cached) { return cached; }
+
+    const data = await this.client(env).get<{ PrimaryIdAttribute: string }>(
+      `EntityDefinitions(LogicalName='${logicalName}')?$select=PrimaryIdAttribute`
+    );
+    cache.set(logicalName, data.PrimaryIdAttribute);
+    return data.PrimaryIdAttribute;
+  }
+
   /**
    * Parses the Web API AttributeAuditDetail response.
    *
@@ -382,6 +452,12 @@ interface RawAuditDetailResponse {
   [key: string]: unknown;
 }
 
+/** Shape returned per-detail from RetrieveRecordChangeHistory — extends the
+ *  detail response with the parent AuditRecord. */
+interface RawAuditDetailWithRecord extends RawAuditDetailResponse {
+  AuditRecord?: RawAuditRecord;
+}
+
 // ── Helpers ──────────────────────────────────────────────────────────────
 
 function getOrCreateCache(envId: string): Map<string, string> {
@@ -391,6 +467,55 @@ function getOrCreateCache(envId: string): Map<string, string> {
     entitySetNameCache.set(envId, cache);
   }
   return cache;
+}
+
+function getOrCreatePrimaryIdCache(envId: string): Map<string, string> {
+  let cache = primaryIdAttributeCache.get(envId);
+  if (!cache) {
+    cache = new Map();
+    primaryIdAttributeCache.set(envId, cache);
+  }
+  return cache;
+}
+
+/**
+ * Parses the `changedata` JSON column on an audit row.
+ * Modern Dataverse shape:
+ *   { "changedAttributes": [{ "logicalName": "name", "oldValue": "...", "newValue": "..." }] }
+ * Older or alternate shapes (`attributes`, `Changes`) are handled defensively.
+ */
+function parseChangeDataJson(raw: string | null | undefined): AuditAttributeChange[] {
+  if (!raw) { return []; }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return [];
+  }
+  if (!parsed || typeof parsed !== "object") { return []; }
+  const obj = parsed as Record<string, unknown>;
+  const arr =
+    (Array.isArray(obj.changedAttributes) && obj.changedAttributes) ||
+    (Array.isArray(obj.attributes) && obj.attributes) ||
+    (Array.isArray(obj.Changes) && obj.Changes) ||
+    [];
+  const out: AuditAttributeChange[] = [];
+  for (const item of arr as Array<Record<string, unknown>>) {
+    const logicalName =
+      (item.logicalName as string | undefined) ??
+      (item.LogicalName as string | undefined) ??
+      (item.attributeName as string | undefined);
+    if (!logicalName) { continue; }
+    const oldRaw = item.oldValue ?? item.OldValue ?? null;
+    const newRaw = item.newValue ?? item.NewValue ?? null;
+    out.push({
+      attributeName: logicalName,
+      displayName: logicalName,
+      oldValue: oldRaw === null || oldRaw === undefined ? null : formatRawValue(oldRaw) ?? null,
+      newValue: newRaw === null || newRaw === undefined ? null : formatRawValue(newRaw) ?? null,
+    });
+  }
+  return out;
 }
 
 /** Extract real attribute keys from an OData entity object, skipping annotations and @odata.type. */
