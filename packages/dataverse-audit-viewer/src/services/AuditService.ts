@@ -187,7 +187,7 @@ export class AuditService {
       `EntityDefinitions(${metadataId})`,
       {
         "@odata.type": "Microsoft.Dynamics.CRM.EntityMetadata",
-        IsAuditEnabled: { Value: isEnabled, CanBeChanged: true, ManagedPropertyLogicalName: "canmodifyauditsettings" },
+        IsAuditEnabled: { Value: isEnabled },
       },
       { "MSCRM.MergeLabels": "true" },
     );
@@ -244,7 +244,7 @@ export class AuditService {
           `EntityDefinitions(${entityMetadataId})/Attributes(${attribute.metadataId})`,
           {
             "@odata.type": attribute.odataType,
-            IsAuditEnabled: { Value: isEnabled, CanBeChanged: true, ManagedPropertyLogicalName: "canmodifyauditsettings" },
+            IsAuditEnabled: { Value: isEnabled },
           },
           { "MSCRM.MergeLabels": "true" },
         );
